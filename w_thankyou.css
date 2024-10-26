@@ -102,3 +102,15 @@ body {
     box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.3);
     text-decoration: underline;
 }
+
+/* Style for changed download links */
+.downloaded-link {
+    color: #478ac9 !important; /* Change text color */
+    font-weight: bold; /* Make font bold */
+}
+
+/* Style for the "Download All" button after being clicked */
+#download-all-btn:active {
+    background-color: #478ac9;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+}

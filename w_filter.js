@@ -136,7 +136,9 @@ function getFilterConditions(headers) {
     { column: headers['header-price'], min: parseFloat(document.getElementById('priceMinTextbox').value), max: parseFloat(document.getElementById('priceMaxTextbox').value) },
     { column: headers['header-training-months'], min: parseFloat(document.getElementById('trainingMonthsMinTextbox').value), max: parseFloat(document.getElementById('trainingMonthsMaxTextbox').value) },
     { column: headers['header-trade-activity'], min: parseFloat(document.getElementById('activityPerCandleMinTextbox').value), max: parseFloat(document.getElementById('activityPerCandleMaxTextbox').value) },
-    { column: headers['header-n-candles'], min: parseFloat(document.getElementById('nCandlesMinTextbox').value), max: parseFloat(document.getElementById('nCandlesMaxTextbox').value) }
+    { column: headers['header-n-candles'], min: parseFloat(document.getElementById('nCandlesMinTextbox').value), max: parseFloat(document.getElementById('nCandlesMaxTextbox').value) },
+    { column: headers['header-precision-f1-per'], min: parseFloat(document.getElementById('precisionF1PerMinTextbox').value), max: parseFloat(document.getElementById('precisionF1PerMaxTextbox').value) },
+    { column: headers['header-tree-deep'], min: parseFloat(document.getElementById('treeDeepMinTextbox').value), max: parseFloat(document.getElementById('treeDeepMaxTextbox').value) }
   ];
   return filters;
 }
@@ -286,6 +288,8 @@ function resetFilters() {
     // Reset numeric ranges and sliders for new filters
     resetRangeWithSlider('activityPerCandle', 0.0, 10.0);
     resetRangeWithSlider('nCandles', 0, 500000);
+    resetRangeWithSlider('precisionF1Per', 0, 100);
+    resetRangeWithSlider('treeDeep', 1, 10);
 
     // Reset multi-select dropdowns (select all options)
     selectAll('#tickerDropdown');       // Use selectAll() helper method for dropdowns

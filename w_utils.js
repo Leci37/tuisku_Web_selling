@@ -164,12 +164,17 @@ function getUniqueTickerNamePairs(data) {
 
 
 function generateTradingViewPath(row) {
-    const ticker = row['ticker'];
-    const index = row['Index'];
+    let ticker = row['ticker'];
+    let index = row['Index'];
 
     if (!ticker || !index) {
         console.error("Ticker or Index is missing in the row data.");
         return '';
+    }
+
+    // Change 'CRYPTO' to 'BINANCE' if needed
+    if (index === 'CRYPTO') {
+        index = 'BINANCE';
     }
 
     // Format the TradingView URL
@@ -177,7 +182,6 @@ function generateTradingViewPath(row) {
 
     return tradingViewUrl;
 }
-
 
 
 // Utility function to format currency
@@ -271,8 +275,10 @@ function getTechnicalPatternInfo(row) {
     const keyCombination = explanationRow ? explanationRow['Key Combination'] : row['key_techs'];
 
     // Handle keyCombination format
-    if (keyCombination.includes('|')) {
-        keyCombination = "Composed by: " + keyCombination.replace(/\|/g, ', ');
+    // Handle keyCombination format using a new variable
+    let formattedKeyCombination = keyCombination;
+    if (formattedKeyCombination.includes('|')) {
+        formattedKeyCombination = "Composed by: " + formattedKeyCombination.replace(/\|/g, ', ');
     }
 
     // Function to conditionally display each field if the value is not "--"
@@ -291,7 +297,7 @@ function getTechnicalPatternInfo(row) {
         ${displayField('Author', author)}
         ${displayField('Variables it Returns', variables)}
         ${displayField('Explanation', explanation)}
-        ${displayField('Key Combination', keyCombination)}
+        ${displayField('Key Combination', formattedKeyCombination)}
     </div>`;
 }
 

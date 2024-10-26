@@ -60,7 +60,8 @@ function renderGridView() {
 
         // Create the cells in grid view format
         const columns = [
-            'path_stra', 'path_candle', 'Name', 'Price', 'Net Profit_usd', 'Trade Activity Per Candle', 'n_candles'
+            'path_stra', 'path_candle', 'Name', 'Price', 'Net Profit_usd',
+            'Trade Activity Per Candle', 'n_candles', 'Precision f1', 'Tree deep' // Add the new columns here
         ];
 
         columns.forEach(column => {

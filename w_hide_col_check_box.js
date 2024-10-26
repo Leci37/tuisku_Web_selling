@@ -16,7 +16,7 @@ function initializeColumnCheckboxes() {
 
     // List of columns that should be unchecked by default
     const uncheckedColumns = [
-        'Indicators','Symbol', 'Max Loss ($)', 'Max Loss (%)', 'Profit Factor', 'Avg Bars/Trade', 'Numbers candles', 'Months trained'
+        'Indicators','Symbol', 'Max Loss ($)', 'Max Loss (%)', 'Profit Factor', 'Avg Bars/Trade', 'Numbers candles', 'Months trained','Precision f1 (%)', 'Tree Deep'
     ];
 
     tableHeaders.each(function(index) {

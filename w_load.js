@@ -9,7 +9,7 @@ let explanationsData = [];
 // Function to load data and initialize the process
 function loadData() {
     const csvFilePath = 'd_result/pine_TW_img_info_5.csv';
-    const indicatorCsvFilePath = 'd_result/indicator_tech_explanation.csv'; // Path to explanations CSV
+    const indicatorCsvFilePath = 'TW_pines_script/indicator_tech_explanation.csv'; // Path to explanations CSV
 
     console.log(`Loading data from ${csvFilePath} and ${indicatorCsvFilePath}...`);
     // Load the indicator explanations
@@ -143,7 +143,7 @@ function populateTable(data) {
             'Net Profit_usd','Full Indicator Name', 'key_techs', 'Index', 'ticker', 'Net Profit_per',
             'Total Closed Trades', 'Percent Profitable_per', 'Profit Factor',
             'Max Drawdown_usd', 'Max Drawdown_per', 'Avg Trade_usd', 'Avg Trade_per',
-            'Avg # Bars in Trades', 'Release date', 'months_trained',  'Trade Activity Per Candle','n_candles'
+            'Avg # Bars in Trades', 'Release date', 'months_trained',  'Trade Activity Per Candle','n_candles', 'Precision f1_per', 'Tree Deep'
         ];
 
         // Loop through columns and generate table cells
@@ -349,8 +349,3 @@ function populateDropdownWithIndicators(dropdownId, indicatorPairs) {
 
 
 
-// Histogram and opacity update function
-function updateHistogramOpacity(min, max, type) {
-    console.log(`Updating opacity of the ${type} histogram with range: ${min} - ${max}.`);
-    // Assume there's some implementation here to update histogram visuals
-}

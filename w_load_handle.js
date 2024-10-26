@@ -179,6 +179,7 @@ function createSimpleCartFields(row, price, id_encodedKey) {
         <span class="item_price" data-price="${price}" style="display:none;">${price}</span>
         <span class="item_interval" data-interval="${row['interval']}" style="display:none;">${row['interval']}</span>
         <span class="item_net-profit-usd" data-net-profit-usd="${row['Net Profit_usd']}" style="display:none;">${row['Net Profit_usd']}</span>
+        <span class="item_net Profit_per" data-net-profit-usd="${row['Net Profit_per']}" style="display:none;">${row['Net Profit_per']}</span>
         <span class="item_indicator-name" data-indicator-name="${row['Full Indicator Name']}"style="display:none;">"${row['Full Indicator Name']}"</span> <!-- New Indicator Name field -->
         <span class="item_key-techs" data-key-techs="${row['key_techs']}" style="display:none;">${row['key_techs']}</span>
         <span class="item_index" data-index="${row['Index']}" style="display:none;">${row['Index']}</span>
@@ -201,17 +202,18 @@ simpleCart({
     cartColumns: [
         { attr: "name", label: "ID" },
         { attr: "name-name", label: "Name", view: function(item) {
-            return `<div style="display: flex; align-items: center;"> <p style=" margin: 0px;">  ${item.get('name-name')} </p> &ensp; <img style="width: 1em; height: 1em;" src="${item.get('path-ico')}" alt="Icon"></div>`;
+            return `<div style="display: flex; align-items: center;"> <p style=" margin: 0px;">  ${item.get('name-name')} &ensp;(${item.get('ticker')})</p> &ensp; <img style="width: 1em; height: 1em;" src="${item.get('path-ico')}" alt="Icon"> </div>`;
         } },
         { attr: "price", label: "Price" , view: 'currency' },
         { attr: "interval", label: "Interval" },
         { attr: "net-profit-usd", label: "Net Profit (USD)", view: 'currency' },
+        { attr: "net-profit-per", label: "Net Profit (%)", view: 'currency' },
         { attr: "indicator-name", label: "Indicators Name" , view: function(item) {
-            return handleFullIndicatorNameColumn(item.get('key-techs')).innerHTML;
+            return handleFullIndicatorNameColumn(item.get('key-techs')).innerHTML ; //+ " ("+item.get('key-techs')+")"
         } },
-        { attr: "key-techs", label: "Key Techs" },
+//        { attr: "key-techs", label: "Key Techs" },
         { attr: "index", label: "Index" },
-        { attr: "ticker", label: "Ticker" },
+//        { attr: "ticker", label: "Ticker" },
         { attr: "win-rate-per", label: "Win Rate (%)" },
         { attr: "total-closed-trades", label: "Closed Trades" },
         { attr: "release-date", label: "Release Date" },
@@ -247,14 +249,17 @@ simpleCart({
             if (existingItem && existingItem.get('quantity') > 1) {
                 existingItem.set('quantity', 1);
                 simpleCart.update();
-                var cartTable = document.querySelector('.simpleCart_checkout');
-                showTemporaryText(cartTable, 'You can only have 1 of this item in your cart.');
+                var header_shop_ele = document.querySelector('#header-shop')// ;.simple_cart_table tbody tr:last-child');
+                showTemporaryText(header_shop_ele, 'You can only have 1 of this item in your cart.');
             }
         }, 100);
 
         console.log(item.get('name') + " added to cart.");
     }
 });
+
+
+
 
 
 

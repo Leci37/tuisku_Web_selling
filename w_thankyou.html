@@ -93,13 +93,13 @@
                 var url_buy = "d_result/pine_TW_b/" + decode_B + ".pine";
 
                 row.innerHTML = `
-<td>
-    <a href="javascript:void(0);" style="color: #3BD7C8; font-weight: bold; cursor: pointer;" onclick="downloadFile('${url_buy}', '${decodeKey(item.get('name')).replaceAll(' - ', '_')}')">
+<td onclick="downloadFile('${url_buy}', '${decodeKey(item.get('name')).replaceAll(' - ', '_')}', this)">
+    <a href="javascript:void(0);" style="color: #3BD7C8; font-weight: bold; cursor: pointer;" >
         <i class="fa-solid fa-file-arrow-down" style="color: #3BD7C8; font-size: 1.35em; font-weight: bold;"></i>
     </a>
     &nbsp&nbsp
-    <a href="javascript:void(0);" style="color: #3BD7C8; font-weight: bold; cursor: pointer;" onclick="downloadFile('${url_buy}', '${decodeKey(item.get('name')).replaceAll(' - ', '_')}')">Download</a>
-    <a href="javascript:void(0);" onclick="downloadFile('${url_buy}', '${decodeKey(item.get('name')).replaceAll(' - ', '_')}')">${decodeKey(item.get('name')).replaceAll(' - ', '_')}</a>
+    <a href="javascript:void(0);" style="color: #3BD7C8; font-weight: bold; cursor: pointer;" >Download</a>
+        <a href="javascript:void(0);" >${decodeKey(item.get('name')).replaceAll(' - ', '_')}</a>
 </td>
                     <td>${item.get('name-name')} <img src="${item.get('path-ico')}" style="width:1em;height:1em;"></td>
                     <td>$${parseFloat(item.get('price')).toFixed(2)}</td> <!-- Format as currency -->
@@ -132,36 +132,47 @@
             }
         });
 
-function downloadFile(url, fileName) {
-    // Create an invisible anchor element
+function downloadFile(url, fileName, element = null) {
+    // Create an invisible anchor element for downloading the file
     const a = document.createElement('a');
     a.style.display = 'none';
-
-    // Set the href to the file URL and set the download attribute to the custom file name
     a.href = url;
-    a.download = fileName + '_TW.pine'; // Add the .pine extension to the custom name
+    a.download = fileName + '_TW.pine'; // Set the custom file name with `.pine` extension
 
     // Append it to the document body and trigger the download
     document.body.appendChild(a);
     a.click();
-
-    // Remove the anchor element after the download
     document.body.removeChild(a);
+
+    // Change the color of the clicked element, if provided
+    if (element) {
+        element.querySelectorAll('a').forEach(link => {
+            link.style.color = '#478ac9'; // Change to a darker color to indicate download
+        });
+        element.querySelector('i').style.color = '#478ac9'; // Change the icon color
+    }
 }
 
 function downloadAllFiles() {
-    // Get the first 'a' tag from each 'td' in the Download column (one per row)
-    const downloadLinks = document.querySelectorAll('#cart-items td:first-child a:first-of-type');
+    const downloadAllButton = document.getElementById('download-all-btn');
+
+    // Change the color of the "Download All" button
+    downloadAllButton.style.backgroundColor = '#478ac9';
+    downloadAllButton.style.boxShadow = '0px 4px 8px rgba(0, 0, 0, 0.3)';
+
+    // Get all the 'a' tags within the first 'td' of each row that have the 'downloadFile' function in `onclick`
+    const downloadLinks = document.querySelectorAll('#cart-items td:first-child[onclick*="downloadFile"]');
 
     // Loop through each link and trigger the download
     downloadLinks.forEach(link => {
-        const url = link.getAttribute('onclick').match(/'(.*?)'/)[1]; // Extract URL from onclick
+        const url = link.getAttribute('onclick').match(/'(.*?)'/)[1]; // Extract URL from `onclick`
         const fileName = link.getAttribute('onclick').match(/'(.*?)'/g)[1].replace(/'/g, ''); // Extract file name
 
-        // Trigger the download using the downloadFile function
-        downloadFile(url, fileName);
+        // Trigger the download using the `downloadFile` function and pass the element to change color
+        downloadFile(url, fileName, link);
     });
 }
+
 
 function copyToClipboard() {
     // Get all the download information from the table

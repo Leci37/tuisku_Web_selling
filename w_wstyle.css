@@ -202,16 +202,48 @@ button.simpleCart_checkout:hover, button.simpleCart_empty:hover {
 
 /* PayPal button container */
 #paypal-button-container {
-  flex: 0 0 auto;
-  margin-left: 1px;
-  padding: 1em;
+    flex: 0 0 auto;
+    margin-left: 1px;
+    padding: 1em;
     padding-top: 1em;
-  width: 16%;
-  display: flex;
-  flex-direction: column-reverse;
-  flex-wrap: nowrap;
-  align-content: center;
-  align-items: center;
-  padding-top: 2em;
-  gap: 0.2em;
+    width: 16%;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-content: center;
+    align-items: center;
+    padding-top: 2em;
+    gap: 0.2em;
 }
+
+/* Main container for the discount information */
+#discount-info-container {
+    margin-top: 10px;
+    padding: 10px;
+    border: 1px solid #e6e6fa;  /* Light purple border */
+    background-color: #f3e6ff;  /* Light purple background */
+    border-radius: 8px;
+    max-width: 300px;  /* Optional: Set a max width for better readability */
+    margin-bottom:0.6em;
+}
+
+/* Text styles for the combined discount details */
+#discount-details {
+    font-size: 1em;
+    color: #5d3f6a;  /* Dark purple text */
+    margin: 0;
+}
+
+/* Style for the original price (line-through to indicate discount) */
+#original-price-text {
+    color: gray;
+    text-decoration: line-through;
+}
+
+/* Style for the discount amount (highlighted) */
+#discount-amount-text {
+    color: #5d3f6a;  /* Darker purple to stand out */
+    display: block;  /* Display on a new line */
+    margin-top: 5px;
+}
+

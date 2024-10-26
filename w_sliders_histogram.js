@@ -135,7 +135,7 @@ function load_full_sliders() {
   });
 
   // Load regular sliders without histograms
-  $("#slider-range-netProfitPer, #slider-range-totalClosedTrades, #slider-range-percentProfitablePer, #slider-range-profitFactor, #slider-range-maxDrawdownUsd, #slider-range-maxDrawdownPer, #slider-range-avgTradeUsd, #slider-range-avgTradePer, #slider-range-avgBarsInTrades, #slider-range-activityPerCandle, #slider-range-nCandles").each(function() {
+$("#slider-range-netProfitPer, #slider-range-totalClosedTrades, #slider-range-percentProfitablePer, #slider-range-profitFactor, #slider-range-maxDrawdownUsd, #slider-range-maxDrawdownPer, #slider-range-avgTradeUsd, #slider-range-avgTradePer, #slider-range-avgBarsInTrades, #slider-range-activityPerCandle, #slider-range-nCandles, #slider-range-precisionF1Per, #slider-range-treeDeep").each(function() {
     const id = $(this).attr('id').replace('slider-range-', '');
     const minTextbox = $(`#${id}MinTextbox`);
     const maxTextbox = $(`#${id}MaxTextbox`);

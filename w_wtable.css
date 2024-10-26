@@ -326,9 +326,64 @@ td.full-indicator-name {
 }
 
 
+/* Ensure the table layout is responsive */
+.simple_card_table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+/* Apply styles to header row */
+.simple_card_table .headerRow th {
+  background-color: #f4f4f4;
+  text-align: center;
+  padding: 5px;
+  font-weight: bold;
+}
+
+/* General styling for table rows and cells */
+.simple_card_table tr {
+  height: 2em; /* Maximum height for each row */
+  overflow: hidden;
+}
+
+/* Styling for table data cells */
+.simple_card_table th, .simple_card_table td {
+  max-width: 160px; /* Max width for cells */
+  height: 2em; /* Ensure height is 2em */
+  padding: 0.5em; /* Add padding for visual separation */
+  text-align: center; /* Center align text */
+  white-space: nowrap; /* Prevent text from wrapping */
+  overflow: hidden; /* Hide overflow text */
+  text-overflow: ellipsis; /* Use ellipsis for overflowing text */
+  border: 1px solid #ddd; /* Light border around cells */
+}
+
+/* Handle image alignment in cells */
+.simple_card_table img {
+  max-height: 1em; /* Ensure image fits within row height */
+  vertical-align: middle; /* Center align image vertically */
+}
+
+/* Styling for the name column */
+.simple_card_table .item-name-name {
+  text-align: left; /* Align names to the left */
+  display: flex;
+  align-items: center;
+}
+.item-indicator-name{
+    font-size: 0.86em;
+}
+
+/* Tooltip on hover */
+.tooltip-keytech:hover {
+  text-decoration: underline;
+}
 
 
 
+.simple_card_table .item-remove a:hover {
+  text-decoration: underline;
+}
 
 
 
