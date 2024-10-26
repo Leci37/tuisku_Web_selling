@@ -105,13 +105,13 @@ function load_full_sliders() {
 
   // Sliders with histograms
   initialize_Sliders_with_Histogram({
-    sliderId: "#slider-range-profit",
+    sliderId: "#slider-range-profitUsd",
     minTextboxId: "#profitUsdMinTextbox",
     maxTextboxId: "#profitUsdMaxTextbox",
-    histogramType: 'profit',
+    histogramType: 'profitUsd',
     min: 0,
-    max: 22000,
-    step: 10
+    max: 6500000 ,
+    step: 5
   });
 
   initialize_Sliders_with_Histogram({
@@ -119,9 +119,9 @@ function load_full_sliders() {
     minTextboxId: "#priceMinTextbox",
     maxTextboxId: "#priceMaxTextbox",
     histogramType: 'price',
-    min: 0.0,
-    max: 199.0,
-    step: 1
+    min: 0,
+    max: 140,
+    step: 5
   });
 
   initialize_Sliders_with_Histogram({
@@ -129,12 +129,12 @@ function load_full_sliders() {
     minTextboxId: "#trainingMonthsMinTextbox",
     maxTextboxId: "#trainingMonthsMaxTextbox",
     histogramType: 'trainingMonths',
-    min: 0,
-    max: 400,
-    step: 1
+    min: 5,
+    max: 105,
+    step: 5
   });
 
-  // Load regular sliders without histograms
+      // Load regular sliders without histograms
 $("#slider-range-netProfitPer, #slider-range-totalClosedTrades, #slider-range-percentProfitablePer, #slider-range-profitFactor, #slider-range-maxDrawdownUsd, #slider-range-maxDrawdownPer, #slider-range-avgTradeUsd, #slider-range-avgTradePer, #slider-range-avgBarsInTrades, #slider-range-activityPerCandle, #slider-range-nCandles, #slider-range-precisionF1Per, #slider-range-treeDeep").each(function() {
     const id = $(this).attr('id').replace('slider-range-', '');
     const minTextbox = $(`#${id}MinTextbox`);
@@ -151,6 +151,7 @@ $("#slider-range-netProfitPer, #slider-range-totalClosedTrades, #slider-range-pe
       step: parseFloat(minTextbox.attr('step'))
     });
   });
+
 
   // Link input textboxes to sliders
   $("input[type='number']").on('input', function() {

@@ -271,25 +271,28 @@ function resetFilters() {
     document.getElementById('onlyFreeCheckbox').checked = false;
     //document.getElementById('onlyBuyCheckbox').checked = false;
 
-    // Reset numeric ranges to their initial values and sliders
-    resetRangeWithSlider('profitUsd', 0, 22000);
-    resetRangeWithSlider('price', 0.0, 199.0);
-    resetRangeWithSlider('netProfitPer', 0.00, 3.00);
-    resetRangeWithSlider('totalClosedTrades', 0, 3000);
-    resetRangeWithSlider('percentProfitablePer', 0.0, 100.0);
-    resetRangeWithSlider('profitFactor', 0, 2000);
-    resetRangeWithSlider('trainingMonths', 0, 400);
-    resetRangeWithSlider('maxDrawdownUsd', 0, 3000);
-    resetRangeWithSlider('maxDrawdownPer', 0.0, 2.0);
-    resetRangeWithSlider('avgTradeUsd', 0.0, 400.0);
-    resetRangeWithSlider('avgTradePer', 0.0, 4000.0);
-    resetRangeWithSlider('avgBarsInTrades', 0.0, 2000.0);
+    document.getElementById('onlyFreeCheckbox').checked = false;
+    // document.getElementById('onlyBuyCheckbox').checked = false;
 
-    // Reset numeric ranges and sliders for new filters
-    resetRangeWithSlider('activityPerCandle', 0.0, 10.0);
-    resetRangeWithSlider('nCandles', 0, 500000);
-    resetRangeWithSlider('precisionF1Per', 0, 100);
-    resetRangeWithSlider('treeDeep', 1, 10);
+    // Reset numeric ranges to their initial values and sliders
+    resetRangeWithSlider('profitUsd', 200, 6500000);
+    resetRangeWithSlider('price', 0, 140);
+    resetRangeWithSlider('netProfitPer', 0.02, 6500);
+    resetRangeWithSlider('totalClosedTrades', 3, 1100);
+    resetRangeWithSlider('percentProfitablePer', 27, 100);
+    resetRangeWithSlider('profitFactor', 1, 35000);
+    resetRangeWithSlider('trainingMonths', 5, 105);
+    resetRangeWithSlider('maxDrawdownUsd', 190, 38000);
+    resetRangeWithSlider('maxDrawdownPer', 0, 4);
+    resetRangeWithSlider('avgTradeUsd', 0.5, 2100000);
+    resetRangeWithSlider('avgTradePer', 0.01, 51040.36);
+    resetRangeWithSlider('avgBarsInTrades', 2, 8000);
+
+    // Reset numeric ranges and sliders for additional filters
+    resetRangeWithSlider('activityPerCandle', 0.002, 0.483);
+    resetRangeWithSlider('nCandles', 800, 129999);
+    resetRangeWithSlider('precisionF1Per', 55, 75.6);
+    resetRangeWithSlider('treeDeep', 5, 8);
 
     // Reset multi-select dropdowns (select all options)
     selectAll('#tickerDropdown');       // Use selectAll() helper method for dropdowns

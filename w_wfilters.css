@@ -126,7 +126,7 @@ select:focus {
 /* Histogram Containers */
 /* Histogram Containers */
 #histogram-container-trainingMonths,
-#histogram-container-profit,
+#histogram-container-profitUsd,
 #histogram-container-price {
   display: flex;
   align-items: flex-end;

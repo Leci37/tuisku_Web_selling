@@ -112,13 +112,13 @@ function initializeHistograms(data) {
     const priceValues = extractNumericColumn(data, 'Price');
     const trainingMonthsValues = extractNumericColumn(data, 'months_trained');
 
-    const histogramDataProfit = generateHistogram(profitUsdValues, binCount, 202.12, 19675.13);
-    const histogramDataPrice = generateHistogram(priceValues, binCount, 0, 199.00);
-    const histogramDataTrainingMonths = generateHistogram(trainingMonthsValues, binCount, 0, 400);
+    const histogramDataProfit = generateHistogram(profitUsdValues, binCount, 200, 6500000 / 30 );// 30 only visual
+    const histogramDataPrice = generateHistogram(priceValues, binCount, 0, 140);
+    const histogramDataTrainingMonths = generateHistogram(trainingMonthsValues, binCount, 5, 105);
 
-    updateHistogram(202.12, 19675.13, 'profit', histogramDataProfit);
-    updateHistogram(1.00, 199.00, 'price', histogramDataPrice);
-    updateHistogram(0, 400, 'trainingMonths', histogramDataTrainingMonths);
+    updateHistogram(0, 6500000 , 'profitUsd', histogramDataProfit); // 30 only visual
+    updateHistogram(0, 140, 'price', histogramDataPrice);
+    updateHistogram(5, 105, 'trainingMonths', histogramDataTrainingMonths);
 }
 
 // Extract numeric values from a column
@@ -269,8 +269,8 @@ function handleFullIndicatorNameColumn(row_key_techs) {
 function triggerPostLoadActions() {
     console.log("Triggering post-load actions...");
     filterTable();
-    updateHistogramOpacity(202.12, 19675.13, 'profit');
-    updateHistogramOpacity(1.00, 199.00, 'price');
+    updateHistogramOpacity(0, 6500000, 'profitUsd');
+    updateHistogramOpacity(1.00, 140, 'price');
     updateHistogramOpacity(0, 400, 'trainingMonths');
 }
 
