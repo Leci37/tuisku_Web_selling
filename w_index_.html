@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>jQuery UI Sliders with Interactive Histograms</title>
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.14.0/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="w_wtable.css">
+  <link rel="stylesheet" href="w_wfilters.css">
+  <link rel="stylesheet" href="w_wstyle.css">
+
+
+  <!-- fSelect CSS -->
+  <link rel="stylesheet" href="fSelect.css">
+  <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+  <script src="https://code.jquery.com/ui/1.14.0/jquery-ui.js"></script>
+
+  <!-- Font Awesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+  <!-- fSelect JS -->
+  <script src="simpleCart.js"></script>
+  <script src="fSelect.js"></script>
+</head>
+<body>
+<!-- Main container to hold the filters on the left and table in the center -->
+<div class="layout-container">
+  <div class="layout-container_B">
+    <!-- Filter elements on the left -->
+    <div class="filter-column">
+      <!-- Counter for the number of visible rows -->
+      <div>
+        <p>Strategies shown: <span id="visibleRowCount">0</span></p>
+      </div>
+
+      <!-- Container to load the filters from w_filters.html -->
+      <div id="filters-container"></div>
+    </div>
+
+    <!-- Table in the center -->
+    <!-- Table in the center -->
+    <div class="table-container">
+        <div class="row-container">
+            <div class="hide-column">
+                <div id="loadingMessage">Loading Strategies, please wait...</div>
+                <div style="display: inline-flex; align-items: center;">
+                    <h4>Select Columns to Display:</h4>
+                    <div id="column-toggle-container"></div>
+                </div>
+                <div style="display: inline-flex;align-items: flex-end;width: 100%;justify-content: space-between;flex-direction: row;flex-wrap: nowrap;">
+                    <h3  style="padding-left:1em;">Strategies Shopping Cart <i class="fas fa-shopping-cart" style="color: #3BAF75; font-size: 1.05em; font-weight: bold;"></i></h3>
+                    <p style="padding-right:1em;">If you have any problems, please contact <strong>sales@tuisku.eu</strong> <span id="copy-icon" style="cursor: pointer; color: #3BD7C8;" onclick="copyEmailToClipboard()"><i class="fas fa-copy"></i></span></p>
+                </div>
+                <div class="simpleCart_items"></div>  <!-- Cart items will be displayed here -->
+
+                <div style="background-color: white; display: inline-flex; align-items: center; padding-left: 1em; padding-right: 1em;">
+                    <!-- Checkout and cart buttons -->
+
+                </div>
+            </div>
+
+<div id="paypal-button-container">
+    <!-- Discount Information and Discount Code Input -->
+        <!-- Discount Information -->
+        <!-- New Paragraphs for Original Price and Discount Display -->
+        <div id="discount-info" style="padding-right: 0.8em;padding-left: 0.8em; background-color: #f9f9f9; border: 1px solid #ddd; margin-bottom: 5px;">
+            <ul style="list-style-type: none; padding-left: 10px;">
+                <p style="margin: 0; padding: 5px;font-weight: bold;">Discount Information:</p>
+                <li>📉 Buy over <strong>$200</strong>: <span style="color: green;">10%</span></li>
+                <li>📈 Buy over <strong>$500</strong>: <span style="color: green;">20%</span></li>
+                <li>📊 Buy over <strong>$800</strong>: <span style="color: green;">25%</span></li>
+                <li>💸 Buy over <strong>$1000</strong>: <span style="color: green;">40%</span></li>
+                <li>🏦 Buy over <strong>$2500</strong>: <span style="color: green;">60%</span></li>
+            </ul>
+        </div>
+
+        <!-- Discount Code Input -->
+        <p for="discount-code" style="font-weight: bold;margin-bottom: -0.08em;">Discount Code:</p>
+        <div style="display: inline-flex; align-items: center; margin-bottom: 1em;">
+            <input type="text" id="discount-code" placeholder="Enter discount code" style="margin-left: 10px; padding: 5px;">
+            <button id="apply-discount" style="background-color: #019cdf; color: white;font-size:1em; font-weight: bold; cursor: pointer; padding: 5px 10px; border: none; border-radius: 5px; margin-left: 5px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);">Apply</button>
+        </div>
+
+    <!-- Existing Elements -->
+    <button class="simpleCart_empty btn btn-warning">Empty Cart <i class="fas fa-trash-alt"></i></button>
+    <p style="font-size: 1.3em; background-color: white; padding: 0.3em;margin-bottom: -0.08em; margin-bottom: 0.06em;">&ensp;Number of items: <span class="simpleCart_quantity"></span></p>
+    <p id="cart-total" style="font-size: 1.5em; border: 1px solid #ccc; background-color: white; padding: 0.3em; margin-top: -0.05em;margin-bottom: 0.4em;">
+        Total: <span id="simpleCart_total" class="simpleCart_total"></span>
+    </p>
+<div id="discount-info-container" style="display: none;">
+    <p id="discount-details">
+        <span id="original-price-text">Original Price: $<span id="original-price-value"></span></span> <br>
+        <span id="discount-amount-text">Applied Discount: <span id="discount-percentage"></span>% ($<span id="discount-value"></span> off)</span>
+    </p>
+</div>
+
+</div>
+
+        </div>
+
+
+      <table id="dataTable">
+        <thead>
+          <tr>
+            <th id="header-shop" title="Direct link to purchase or access this strategy on platforms like TradingView or similar.">Shop</th>
+            <th id="header-price" onclick="sortTable(1)" title="Displays the price of the trading strategy or script in U.S. dollars.">Price</th>
+            <th id="header-name" onclick="sortTable(2)" title="The official name or identifier of the trading strategy or indicator.">Name</th>
+            <th id="header-time-frame" onclick="sortTable(3)" title="Specifies the ideal time frame for this strategy (e.g., 1d for daily, 4h for four-hour intervals).">Time frame</th>
+            <th id="header-strategy-chart" title="Image or link that shows the chart representation of the strategy’s historical performance.">Strategy Chart</th>
+            <th id="header-candle-chart" title="Displays a candlestick chart representation, showing price action over time for this strategy.">Candle Chart</th>
+            <th id="header-net-profit-usd" onclick="sortTable(6)" title="Total net profit in dollars achieved by the strategy over its analysis period.">Net Profit ($)</th>
+            <th id="header-indicators-name" onclick="sortTable(7)" title="The name(s) of the primary indicator(s) that guide this strategy’s decisions.">Indicators Name</th>
+            <th id="header-indicators" onclick="sortTable(8)" title="List of specific indicators or technical signals the strategy uses to identify trades.">Indicators</th>
+            <th id="header-index" onclick="sortTable(9)" title="The trading index or market (e.g., NASDAQ, BINANCE) where this strategy is primarily applied.">Index</th>
+            <th id="header-symbol" onclick="sortTable(10)" title="Ticker symbol of the asset traded with this strategy, such as AAPL for Apple.">Symbol</th>
+            <th id="header-net-profit-percent" onclick="sortTable(11)" title="Percentage of net profit achieved over the trading period for this strategy.">Net Profit (%)</th>
+            <th id="header-closed-trades" onclick="sortTable(12)" title="Total count of closed trades completed by the strategy within its analyzed period.">Closed Trades</th>
+            <th id="header-win-rate-percent" onclick="sortTable(13)" title="Percentage of trades that ended in profit, representing the strategy's success rate.">Win Rate (%)</th>
+            <th id="header-profit-factor" onclick="sortTable(14)" title="Profit factor, calculated as the ratio of gross profit to gross loss, showing profitability.">Profit Factor</th>
+            <th id="header-max-loss-usd" onclick="sortTable(15)" title="Maximum loss in dollars the strategy incurred on a single or series of trades.">Max Loss ($)</th>
+            <th id="header-max-loss-percent" onclick="sortTable(16)" title="Largest percentage decline from a peak value within the strategy, showing max drawdown.">Max Loss (%)</th>
+            <th id="header-avg-profit-usd" onclick="sortTable(17)" title="Average profit per trade in dollars, calculated from all trades executed by the strategy.">Avg Profit ($)</th>
+            <th id="header-avg-profit-percent" onclick="sortTable(18)" title="Average percentage return per trade, providing insight into the expected profitability.">Avg Profit (%)</th>
+            <th id="header-avg-bars-trade" onclick="sortTable(19)" title="Average number of bars (time intervals) for which each trade remains open.">Avg Bars/Trade</th>
+            <th id="header-release-date" onclick="sortTable(20)" title="The official release or publication date of the trading strategy.">Release Date</th>
+            <th id="header-training-months" onclick="sortTable(21)" title="Number of months the strategy or model has been back-tested or trained on historical data.">Months Trained</th>
+            <th id="header-trade-activity" onclick="sortTable(22)" title="Average frequency of trades executed within each candle (time interval).">Trades Per Candle</th>
+            <th id="header-n-candles" onclick="sortTable(23)" title="Total number of candles (price bars) used in the strategy’s training or back-test period.">Numbers Candles</th>
+            <th id="header-precision-f1-per" onclick="sortTable(24)" title="F1 score, a metric indicating the precision or accuracy of the strategy’s buy/sell signals.">Precision f1 (%)</th>
+            <th id="header-tree-deep" onclick="sortTable(25)" title="The depth of the decision tree model (if applicable), showing model complexity.">Tree Deep</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <!-- Data will be dynamically inserted here -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- JS files for functionality -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+<script src="w_utils.js"></script>
+<script src="w_hide_col_check_box.js"></script>
+<script src="w_sliders_histogram.js"></script>
+<script src="w_load_handle.js"></script>
+<script src="w_load.js"></script>
+<script src="w_filter.js"></script>
+<script src="w_checkTrolley.js"></script>
+<script src="w_one_stock.js"></script>
+<script>
+  $(function() {
+    console.log(typeof simpleCart !== "undefined" ? "SimpleCart.js is loaded" : "SimpleCart.js is NOT loaded");
+    console.log(simpleCart);
+    console.log(typeof fSelect !== "undefined" ? "fSelect.js is loaded" : "fSelect.js is NOT loaded");
+
+    // Load filters from w_filters.html and initialize all sliders
+    $("#filters-container").load("w_filters.html", function() {
+      loadData();
+      load_full_sliders(); // Initialize all sliders after the filters are loaded
+    });
+  });
+
+
+</script>
+<script src="https://www.paypal.com/sdk/js?client-id=AXB8V655a2_Zg2wAMeeouVdDGg_kjp6WxSOALQ7sTzbSUrGcc_aJVeN9WFRY1NP2-94gA-0eyT8OjiLE&currency=USD"></script>
+<script src="w_paypal.js"></script>
+
+</body>
+</html>

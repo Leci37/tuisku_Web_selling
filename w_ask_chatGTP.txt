@@ -1,0 +1,68 @@
+Help me make a web page html css js
+I will pass you files: w_filter.js , w_filters.html, w_sliders_histogram.js, w_index_.html, w_load.js and w_styles_a.css and w_styles_b.css
+
+
+
+perfect, remember you have w_histogram.js, w_load.js, and w_filter.js. The w_styles.css, just update the necessary ones,
+
+Previous perfect code Update the:step,  max and min values of the search elements
+
+For the data you provided, the ranges from lowest to highest (interquartile range) and the minimum and maximum values are as follows:
+
+Net Profit_usd:
+Minimum: 0
+Maximum: 22000
+step 10
+
+Net Profit_per:
+Minimum: 0.00
+Maximum: 3.00
+step 0.05
+
+Total Closed Trades:
+Minimum: 0
+Maximum: 3000
+step 10
+
+
+Percent Profitable_per:
+Minimum: 0.0
+Maximum: 100.0
+step 0.05
+
+Profit Factor:
+Minimum: 0.05
+Maximum: 20.256
+step 1
+
+Max Drawdown_usd:
+Minimum: 0
+Maximum: 3000
+step 1
+
+Max Drawdown_per:
+Minimum: 0.0
+Max Drawdown_per: Max: 2.00
+step 0.05
+
+Avg Trade_usd:
+Minimum: 0.0
+Maximum: 400.0
+step 1
+
+Avg Trade_per:
+Minimum: 0.0
+Maximum: 4000.0
+step 10
+
+Avg # Bars in Trades:
+Minimum: 0.0
+Maximum: 2000.0
+step 10
+
+Price:
+Minimum: 30.0
+Maximum: 100.0
+step 1
+
+These values give you an idea of the interquartile range (25% to 75%) along with the minimum and maximum values of each metric in the data provided.
