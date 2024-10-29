@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: Fibonacci_Bollinger
+// ID_model: TTD_30Min_1FIB_24c1acad Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_TTD_30Min_1FIB_24c1acad", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_TTD_30Min_24c1acad(lower_6, lower_3, basis_max, lower_1, upper_2, upper_6, upper_4, lower_2, basis_minus, upper_3, lower_5, upper_1, lower_4, basis, upper_5)=>
+	var float ret = 0  // # DecisionTreeRegressor(criterion=friedman_mse, max_depth=6, max_features=0.9,min_samples_leaf=7, random_state=843828734)
+	if( lower_3 <= 43.7305 )
+		if( lower_1 <= 45.6907 )
+			if( upper_6 <= 28.7628 )
+				if( lower_6 <= 21.0439 )
+					ret := -0.333333
+				if( lower_6 > 21.0439 )
+					if( lower_6 <= 21.2139 )
+						if( lower_4 <= 22.4633 )
+							ret := 0.555556
+						if( lower_4 > 22.4633 )
+							ret := 1.000000 // buy
+					if( lower_6 > 21.2139 )
+						if( lower_5 <= 23.6533 )
+							ret := -0.500000
+						if( lower_5 > 23.6533 )
+							ret := 0.851485 // buy
+			if( upper_6 > 28.7628 )
+				if( basis <= 27.835 )
+					if( upper_4 <= 30.1343 )
+						if( basis_minus <= 4.43734 )
+							ret := -0.253333
+						if( basis_minus > 4.43734 )
+							ret := 0.227041
+					if( upper_4 > 30.1343 )
+						if( upper_2 <= 28.9127 )
+							ret := 0.214286
+						if( upper_2 > 28.9127 )
+							ret := -0.680982
+				if( basis > 27.835 )
+					if( basis <= 28.4543 )
+						if( upper_1 <= 29.0998 )
+							ret := 0.279570
+						if( upper_1 > 29.0998 )
+							ret := 0.765625 // buy
+					if( basis > 28.4543 )
+						if( lower_1 <= 45.0539 )
+							ret := 0.103569
+						if( lower_1 > 45.0539 )
+							ret := -0.230964
+		if( lower_1 > 45.6907 )
+			if( lower_1 <= 46.2293 )
+				if( lower_2 <= 44.4493 )
+					if( upper_6 <= 59.3088 )
+						ret := 0.000000
+					if( upper_6 > 59.3088 )
+						if( basis <= 49.7664 )
+							ret := 0.902439 // buy
+						if( basis > 49.7664 )
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.

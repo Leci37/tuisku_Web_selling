@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: Squeeze_Momentum_Indicator
+// ID_model: DDOG_15Min_1SQU_c9e5f5b2 Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_DDOG_15Min_1SQU_c9e5f5b2", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_DDOG_15Min_c9e5f5b2(sqzOnInt, priceRange, lowerKC, lowerBB, rangema, noSqzInt, basis, val, ma, dev, sqzOffInt, upperBB, upperKC, avgHighLow)=>
+	var float ret = 0  // # DecisionTreeRegressor(criterion=friedman_mse, max_depth=6, max_features=0.9,min_samples_leaf=7, random_state=843828734)
+	if( val <= -0.003512 )
+		if( upperKC <= 91.6017 )
+			if( lowerBB <= 86.4228 )
+				if( upperKC <= 88.1135 )
+					if( val <= -0.211973 )
+						if( dev <= 3.0697 )
+							ret := 0.386667
+						if( dev > 3.0697 )
+							ret := 0.812121 // buy
+					if( val > -0.211973 )
+						if( upperKC <= 69.2271 )
+							ret := 0.138071
+						if( upperKC > 69.2271 )
+							ret := 0.037153
+				if( upperKC > 88.1135 )
+					if( upperBB <= 93.6955 )
+						if( avgHighLow <= 88.2317 )
+							ret := -0.296912
+						if( avgHighLow > 88.2317 )
+							ret := -0.725664 // sell
+					if( upperBB > 93.6955 )
+						ret := 0.782609 // buy
+			if( lowerBB > 86.4228 )
+				if( upperKC <= 88.2876 )
+					if( rangema <= 0.426875 )
+						if( upperBB <= 87.4673 )
+							ret := 0.230769
+						if( upperBB > 87.4673 )
+							ret := 0.880795 // buy
+					if( rangema > 0.426875 )
+						if( priceRange <= 0.493431 )
+							ret := 0.000000
+						if( priceRange > 0.493431 )
+							ret := 0.742857 // buy
+				if( upperKC > 88.2876 )
+					if( upperKC <= 91.3308 )
+						if( upperKC <= 90.4647 )
+							ret := 0.225780
+						if( upperKC > 90.4647 )
+							ret := -0.007605
+					if( upperKC > 91.3308 )
+						if( avgHighLow <= 90.9841 )
+							ret := 0.689922
+						if( avgHighLow > 90.9841 )
+							ret := 0.173913
+		if( upperKC > 91.6017 )
+			if( lowerKC <= 165.581 )
+				if( avgHighLow <= 159.906 )
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.

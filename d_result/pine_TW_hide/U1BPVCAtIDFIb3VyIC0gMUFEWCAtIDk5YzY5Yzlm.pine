@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: ADX_and_DI
+// ID_model: SPOT_1Hour_1ADX_99c69c9f Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_SPOT_1Hour_1ADX_99c69c9f", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_SPOT_1Hour_99c69c9f(dx, diMinus, directionalMovementMinus, adx, diPlus, directionalMovementPlus, smoothedTrueRange, smoothedDirectionalMovementPlus, smoothedDirectionalMovementMinus, trueRange)=>
+	var float ret = 0  // # DecisionTreeRegressor(criterion=friedman_mse, max_depth=5, max_features=0.65,max_leaf_nodes=30, random_state=843828734)
+	if( diMinus <= 48.9542 )
+		if( smoothedDirectionalMovementMinus <= 1.57098 )
+			if( directionalMovementPlus <= 1.02903 )
+				if( diPlus <= 9.47982 )
+					if( diMinus <= 42.5362 )
+						ret := 0.008092
+					if( diMinus > 42.5362 )
+						ret := -0.378049
+				if( diPlus > 9.47982 )
+					if( diMinus <= 46.8016 )
+						ret := 0.027475
+					if( diMinus > 46.8016 )
+						ret := 0.422857
+			if( directionalMovementPlus > 1.02903 )
+				if( diMinus <= 38.0816 )
+					if( diMinus <= 29.8149 )
+						ret := -0.048772
+					if( diMinus > 29.8149 )
+						ret := -0.292086
+				if( diMinus > 38.0816 )
+					if( adx <= 42.0374 )
+						ret := 0.503759
+					if( adx > 42.0374 )
+						ret := -0.179688
+		if( smoothedDirectionalMovementMinus > 1.57098 )
+			if( diPlus <= 8.91097 )
+				if( diMinus <= 46.4662 )
+					if( smoothedDirectionalMovementMinus <= 1.61298 )
+						ret := 1.000000 // buy
+					if( smoothedDirectionalMovementMinus > 1.61298 )
+						ret := -0.700000 // sell
+				if( diMinus > 46.4662 )
+					if( smoothedDirectionalMovementMinus <= 2.37957 )
+						ret := -0.444444
+					if( smoothedDirectionalMovementMinus > 2.37957 )
+						ret := 1.000000 // buy
+			if( diPlus > 8.91097 )
+				if( dx <= 41.2777 )
+					if( directionalMovementMinus <= 1.5099 )
+						ret := -0.595745
+					if( directionalMovementMinus > 1.5099 )
+						ret := -0.135417
+				if( dx > 41.2777 )
+					if( trueRange <= 3.81012 )
+						ret := -0.211268
+					if( trueRange > 3.81012 )
+						ret := 0.357143
+	if( diMinus > 48.9542 )
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.

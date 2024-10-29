@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: L_Money_Flow_Index, L_Stochastic_RSI
+// ID_model: AMD_1Min_2MS0_d910dacc Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_AMD_1Min_2MS0_d910dacc", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_AMD_1Min_d910dacc(Negative_Money_Flow, MFI_Low, Money_Flow_Ratio, MFI, Raw_Money_Flow, Positive_Money_Flow, Typical_Price, Positive_Money_Flow_Sum, MFI_High, Negative_Money_Flow_Sum, rsi1, smoothK_k, d_k, k, d, smoothD_d)=>
+	var float ret = 0  // # DecisionTreeRegressor(criterion=friedman_mse, max_depth=8, max_features=0.7,min_samples_leaf=4, min_samples_split=5,random_state=843828734)
+	if( rsi1 <= 36.2846 )
+		if( Positive_Money_Flow <= 3.17882e+07 )
+			if( MFI <= 12.6951 )
+				if( Negative_Money_Flow_Sum <= 4.55375e+07 )
+					if( rsi1 <= 26.7919 )
+						if( Raw_Money_Flow <= 557635 )
+							if( Typical_Price <= 136.955 )
+								if( k <= 2.82504 )
+									ret := 0.600000
+								if( k > 2.82504 )
+									ret := -0.700000 // sell
+							if( Typical_Price > 136.955 )
+								if( Typical_Price <= 154.543 )
+									ret := 0.438202
+								if( Typical_Price > 154.543 )
+									ret := 0.182927
+						if( Raw_Money_Flow > 557635 )
+							if( k <= 0.009991 )
+								if( rsi1 <= 8.44565 )
+									ret := 0.857143 // buy
+								if( rsi1 > 8.44565 )
+									ret := 0.111111
+							if( k > 0.009991 )
+								if( Raw_Money_Flow <= 7.05677e+06 )
+									ret := 0.732283 // buy
+								if( Raw_Money_Flow > 7.05677e+06 )
+									ret := 0.277778
+					if( rsi1 > 26.7919 )
+						if( MFI_High <= -71.0619 )
+							if( d <= 19.8999 )
+								if( Typical_Price <= 150.152 )
+									ret := 0.476190
+								if( Typical_Price > 150.152 )
+									ret := -0.093750
+							if( d > 19.8999 )
+								if( Positive_Money_Flow_Sum <= 248867 )
+									ret := 0.083333
+								if( Positive_Money_Flow_Sum > 248867 )
+									ret := 0.630769
+						if( MFI_High > -71.0619 )
+							if( Typical_Price <= 126.955 )
+								ret := 1.000000 // buy
+							if( Typical_Price > 126.955 )
+								if( smoothK_k <= 52.5608 )
+									ret := -0.104396
+								if( smoothK_k > 52.5608 )
+									ret := 0.391304
+				if( Negative_Money_Flow_Sum > 4.55375e+07 )
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.

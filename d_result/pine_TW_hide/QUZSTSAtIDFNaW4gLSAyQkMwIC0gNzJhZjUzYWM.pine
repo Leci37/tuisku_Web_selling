@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: L_Bull_Bear_Power, L_Chaikin_Money_Flow
+// ID_model: AFRM_1Min_2BC0_72af53ac Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_AFRM_1Min_2BC0_72af53ac", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_AFRM_1Min_72af53ac(bullPower, bbp, bearPower, bbm, BBPower_Color, ad, mf, ad_mf)=>
+	var float ret = 0  // # DecisionTreeRegressor(max_depth=8, max_features=sqrt, min_samples_leaf=7,min_samples_split=5, random_state=843828734)
+	if( bearPower <= 0.047724 )
+		if( bbm <= 4.7e-05 )
+			if( bearPower <= -0.009038 )
+				if( bullPower <= -0.053557 )
+					if( mf <= 0.345704 )
+						if( bullPower <= -0.074942 )
+							if( bullPower <= -0.127592 )
+								if( mf <= -0.052297 )
+									ret := 0.611979
+								if( mf > -0.052297 )
+									ret := 0.281250
+							if( bullPower > -0.127592 )
+								if( ad_mf <= -0.230915 )
+									ret := 0.647482
+								if( ad_mf > -0.230915 )
+									ret := 0.229314
+						if( bullPower > -0.074942 )
+							if( bullPower <= -0.066006 )
+								if( mf <= -0.139727 )
+									ret := 0.223881
+								if( mf > -0.139727 )
+									ret := 0.763441 // buy
+							if( bullPower > -0.066006 )
+								if( ad_mf <= -0.104102 )
+									ret := 0.802326 // buy
+								if( ad_mf > -0.104102 )
+									ret := 0.297688
+					if( mf > 0.345704 )
+						if( ad_mf <= -0.656779 )
+							if( bbp <= -0.123134 )
+								if( bullPower <= -0.072248 )
+									ret := 0.300000
+								if( bullPower > -0.072248 )
+									ret := 1.000000 // buy
+							if( bbp > -0.123134 )
+								ret := 0.200000
+						if( ad_mf > -0.656779 )
+							if( ad_mf <= -0.602601 )
+								if( mf <= 0.625186 )
+									ret := -0.227273
+								if( mf > 0.625186 )
+									ret := -0.800000 // sell
+							if( ad_mf > -0.602601 )
+								if( ad_mf <= -0.587219 )
+									ret := 1.000000 // buy
+								if( ad_mf > -0.587219 )
+									ret := 0.097403
+				if( bullPower > -0.053557 )
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.

@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: L_Triple_EMA
+// ID_model: AMD_30Min_1T00_74f5b300 Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_AMD_30Min_1T00_74f5b300", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_AMD_30Min_74f5b300(ema3, tema, ema2, ema12, ema13, ema1)=>
+	var float ret = 0  // # DecisionTreeRegressor(max_depth=8, max_features=sqrt, min_samples_leaf=7,min_samples_split=5, random_state=843828734)
+	if( ema3 <= 6.70082 )
+		if( ema3 <= 2.90832 )
+			if( ema3 <= 2.78948 )
+				if( ema1 <= 1.85508 )
+					if( ema12 <= -0.001964 )
+						if( tema <= 1.83037 )
+							if( ema1 <= 1.82944 )
+								ret := 0.333333
+							if( ema1 > 1.82944 )
+								if( ema1 <= 1.84269 )
+									ret := 1.000000 // buy
+								if( ema1 > 1.84269 )
+									ret := 0.818182 // buy
+						if( tema > 1.83037 )
+							ret := -0.090909
+					if( ema12 > -0.001964 )
+						if( ema3 <= 1.85177 )
+							ret := 1.000000 // buy
+						if( ema3 > 1.85177 )
+							ret := 0.866667 // buy
+				if( ema1 > 1.85508 )
+					if( ema2 <= 1.88204 )
+						if( ema1 <= 1.86123 )
+							if( ema12 <= 0.00303 )
+								ret := -0.300000
+							if( ema12 > 0.00303 )
+								ret := -0.739130 // sell
+						if( ema1 > 1.86123 )
+							if( ema3 <= 1.85912 )
+								if( ema13 <= 0.013738 )
+									ret := -0.937500 // sell
+								if( ema13 > 0.013738 )
+									ret := -0.666667
+							if( ema3 > 1.85912 )
+								ret := -1.000000 // sell
+					if( ema2 > 1.88204 )
+						if( ema1 <= 2.79974 )
+							if( ema1 <= 2.48666 )
+								if( ema3 <= 2.29388 )
+									ret := 0.050235
+								if( ema3 > 2.29388 )
+									ret := -0.230964
+							if( ema1 > 2.48666 )
+								if( ema3 <= 2.52363 )
+									ret := 0.759494 // buy
+								if( ema3 > 2.52363 )
+									ret := 0.122137
+						if( ema1 > 2.79974 )
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.

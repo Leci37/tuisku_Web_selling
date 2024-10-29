@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: L_Chaikin_Money_Flow, L_Stochastic_RSI
+// ID_model: GTLB_30Min_2CS0_f2f3e6a3 Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_GTLB_30Min_2CS0_f2f3e6a3", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_GTLB_30Min_f2f3e6a3(mf, ad_mf, ad, d, d_k, smoothK_k, k, rsi1, smoothD_d)=>
+	var float ret = 0  // # DecisionTreeRegressor(max_depth=6, max_features=0.7, min_samples_split=10,random_state=843828734)
+	if( d_k <= -5.50194 )
+		if( ad <= 352725 )
+			if( ad_mf <= 8988.27 )
+				if( d_k <= -19.3888 )
+					if( ad_mf <= -25518.9 )
+						if( k <= 81.2647 )
+							ret := 0.639344
+						if( k > 81.2647 )
+							ret := 0.045455
+					if( ad_mf > -25518.9 )
+						if( d <= 62.7017 )
+							ret := -0.129834
+						if( d > 62.7017 )
+							ret := 0.250000
+				if( d_k > -19.3888 )
+					if( ad <= -14523.5 )
+						if( ad_mf <= -20099.1 )
+							ret := -0.048091
+						if( ad_mf > -20099.1 )
+							ret := 0.388235
+					if( ad > -14523.5 )
+						if( mf <= 0.206227 )
+							ret := -0.279327
+						if( mf > 0.206227 )
+							ret := 0.125561
+			if( ad_mf > 8988.27 )
+				if( ad <= 258937 )
+					if( ad <= 37519.1 )
+						if( d_k <= -11.2507 )
+							ret := 0.369099
+						if( d_k > -11.2507 )
+							ret := -0.007435
+					if( ad > 37519.1 )
+						if( mf <= -0.08247 )
+							ret := 0.168067
+						if( mf > -0.08247 )
+							ret := -0.106407
+				if( ad > 258937 )
+					if( d_k <= -14.4175 )
+						if( d <= 24.5235 )
+							ret := 0.571429
+						if( d > 24.5235 )
+							ret := 0.958333 // buy
+					if( d_k > -14.4175 )
+						if( d_k <= -7.28147 )
+							ret := 0.000000
+						if( d_k > -7.28147 )
+							ret := 1.000000 // buy
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.

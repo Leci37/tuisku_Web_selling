@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: L_Money_Flow_Index, L_Stochastic_RSI
+// ID_model: BTCUSDT_15Min_2MS0_0709b464 Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_BTCUSDT_15Min_2MS0_0709b464", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_BTCUSDT_15Min_0709b464(Negative_Money_Flow, MFI_Low, Money_Flow_Ratio, MFI, Raw_Money_Flow, Positive_Money_Flow, Typical_Price, Positive_Money_Flow_Sum, MFI_High, Negative_Money_Flow_Sum, rsi1, smoothK_k, d_k, k, d, smoothD_d)=>
+	var float ret = 0  // # DecisionTreeRegressor(max_depth=8, max_features=0.9, max_leaf_nodes=12,min_samples_leaf=7, random_state=843828734)
+	if( k <= 48.8916 )
+		if( Typical_Price <= 26132 )
+			ret := -0.018205
+		if( Typical_Price > 26132 )
+			if( rsi1 <= 42.5539 )
+				if( Money_Flow_Ratio <= 0.589799 )
+					if( rsi1 <= 31.6825 )
+						ret := -0.505203
+					if( rsi1 > 31.6825 )
+						ret := -0.091734
+				if( Money_Flow_Ratio > 0.589799 )
+					ret := -0.613635
+			if( rsi1 > 42.5539 )
+				if( MFI_High <= -30.6185 )
+					ret := 0.099392
+				if( MFI_High > -30.6185 )
+					if( rsi1 <= 55.7369 )
+						ret := -0.392690
+					if( rsi1 > 55.7369 )
+						ret := 0.023955
+	if( k > 48.8916 )
+		if( rsi1 <= 59.425 )
+			if( Negative_Money_Flow <= 4.70852e+06 )
+				ret := 0.001173
+			if( Negative_Money_Flow > 4.70852e+06 )
+				ret := 0.207010
+		if( rsi1 > 59.425 )
+			if( Typical_Price <= 25891 )
+				ret := -0.008638
+			if( Typical_Price > 25891 )
+				if( Typical_Price <= 32720.7 )
+					ret := 0.360884
+				if( Typical_Price > 32720.7 )
+					ret := 0.613878
+	
+    ret //return
+// Define expected timeframe based on the selected interval: 15Min pine_value: 15   Trigger an alert and show a label if the timeframe is incorrect
+alert_message_time_wrong = "The current candle TIMEframe is WRONG: "+ str.tostring(timeframe.period) + ", CHANGE it to the CORRECT one:  15MIN !!"
+if (str.tostring(timeframe.period) != "15")
+    alert(alert_message_time_wrong, alert.freq_once_per_bar_close)
+    label.new(bar_index -300, high+30, text = alert_message_time_wrong, style = label.style_label_down,size = size.large, color = color.red, textcolor = color.white)
+    log.error(alert_message_time_wrong)
+
+//CODE associated with the technical indicator L_Money_Flow_Index 
+//@version=5
+//indicator title="Money Flow Index (MFI)", shorttitle="MFI", format=format.price, precision=2, timeframe="", timeframe_gaps=true)
+
+// Input parameters
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.

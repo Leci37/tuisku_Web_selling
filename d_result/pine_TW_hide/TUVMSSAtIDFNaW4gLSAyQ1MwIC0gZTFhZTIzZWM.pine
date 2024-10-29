@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: L_Chaikin_Money_Flow, L_Stochastic_RSI
+// ID_model: MELI_1Min_2CS0_e1ae23ec Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_MELI_1Min_2CS0_e1ae23ec", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_MELI_1Min_e1ae23ec(mf, ad_mf, ad, d, d_k, smoothK_k, k, rsi1, smoothD_d)=>
+	var float ret = 0  // # DecisionTreeRegressor(criterion=friedman_mse, max_depth=6, max_features=0.9,min_samples_leaf=7, random_state=843828734)
+	if( ad <= -127.756 )
+		if( mf <= -0.04449 )
+			if( ad <= -1903.65 )
+				if( smoothD_d <= 66.3107 )
+					if( ad_mf <= -3234.75 )
+						if( rsi1 <= 36.2311 )
+							ret := 0.541667
+						if( rsi1 > 36.2311 )
+							ret := 0.028807
+					if( ad_mf > -3234.75 )
+						if( d <= 0.932622 )
+							ret := 0.454545
+						if( d > 0.932622 )
+							ret := -0.292585
+				if( smoothD_d > 66.3107 )
+					if( ad_mf <= -2236.34 )
+						if( ad <= -2406.41 )
+							ret := 0.282895
+						if( ad > -2406.41 )
+							ret := -0.766667 // sell
+					if( ad_mf > -2236.34 )
+						if( k <= 88.0498 )
+							ret := 0.711111 // buy
+						if( k > 88.0498 )
+							ret := 0.263158
+			if( ad > -1903.65 )
+				if( ad <= -1717.58 )
+					if( d_k <= 6.51574 )
+						if( d <= 4.53453 )
+							ret := 0.153846
+						if( d > 4.53453 )
+							ret := 0.756757 // buy
+					if( d_k > 6.51574 )
+						if( ad <= -1784.28 )
+							ret := -0.500000
+						if( ad > -1784.28 )
+							ret := 0.562500
+				if( ad > -1717.58 )
+					if( d <= 96.3277 )
+						if( mf <= -0.345963 )
+							ret := 0.328455
+						if( mf > -0.345963 )
+							ret := 0.166565
+					if( d > 96.3277 )
+						if( rsi1 <= 60.9356 )
+							ret := -0.560976
+						if( rsi1 > 60.9356 )
+							ret := -0.013514
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.

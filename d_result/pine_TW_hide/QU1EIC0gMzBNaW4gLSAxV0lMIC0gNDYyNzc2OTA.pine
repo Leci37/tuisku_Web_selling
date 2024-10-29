@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: Williams_Vix_Fix
+// ID_model: AMD_30Min_1WIL_46277690 Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_AMD_30Min_1WIL_46277690", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_AMD_30Min_46277690(rangeHigh, rangeLow, midLine, sDev, lowerBand, wvf, Color_con1, colInt, Color_con2, upperBand)=>
+	var float ret = 0  // # DecisionTreeRegressor(criterion=friedman_mse, max_depth=8, max_features=0.7,min_samples_leaf=4, min_samples_split=5,random_state=843828734)
+	if( wvf <= 1.5797 )
+		if( lowerBand <= 0.542091 )
+			if( upperBand <= 1.20816 )
+				if( Color_con2 <= -1.15312 )
+					if( lowerBand <= -0.152684 )
+						if( Color_con1 <= -0.862649 )
+							if( lowerBand <= -0.386464 )
+								if( wvf <= 0.184196 )
+									ret := -0.250000
+								if( wvf > 0.184196 )
+									ret := -0.800000 // sell
+							if( lowerBand > -0.386464 )
+								if( lowerBand <= -0.373424 )
+									ret := 1.000000 // buy
+								if( lowerBand > -0.373424 )
+									ret := 0.050633
+						if( Color_con1 > -0.862649 )
+							if( upperBand <= 0.862012 )
+								if( colInt <= 0.5 )
+									ret := -0.178947
+								if( colInt > 0.5 )
+									ret := 0.588235
+							if( upperBand > 0.862012 )
+								if( sDev <= 0.702419 )
+									ret := -0.588040
+								if( sDev > 0.702419 )
+									ret := -0.300000
+					if( lowerBand > -0.152684 )
+						if( wvf <= 0.354149 )
+							if( Color_con1 <= -0.225401 )
+								if( upperBand <= 0.488087 )
+									ret := 0.750000 // buy
+								if( upperBand > 0.488087 )
+									ret := 0.112754
+							if( Color_con1 > -0.225401 )
+								if( sDev <= 0.235414 )
+									ret := -0.888889 // sell
+								if( sDev > 0.235414 )
+									ret := -0.250000
+						if( wvf > 0.354149 )
+							if( wvf <= 1.05412 )
+								if( Color_con2 <= -1.18997 )
+									ret := -0.126566
+								if( Color_con2 > -1.18997 )
+									ret := -0.645161
+							if( wvf > 1.05412 )
+								if( Color_con2 <= -2.32459 )
+									ret := 0.736842 // buy
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.

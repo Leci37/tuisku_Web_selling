@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: SuperTrend
+// ID_model: SNAP_1Min_1SUP_eb23cc5d Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_SNAP_1Min_1SUP_eb23cc5d", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_SNAP_1Min_eb23cc5d(dn, atr, buySignalInt, up1, dn1, up, trend, atr2, sellSignalInt)=>
+	var float ret = 0  // # DecisionTreeRegressor(criterion=friedman_mse, max_depth=8, max_features=0.7,min_samples_leaf=4, min_samples_split=5,random_state=843828734)
+	if( trend <= 0 )
+		if( atr2 <= 0.027273 )
+			if( atr2 <= 0.010578 )
+				if( up1 <= 9.45241 )
+					if( atr <= 0.004422 )
+						if( dn <= 9.06259 )
+							if( atr <= 0.003691 )
+								ret := -0.500000
+							if( atr > 0.003691 )
+								ret := 0.166667
+						if( dn > 9.06259 )
+							ret := 0.333333
+					if( atr > 0.004422 )
+						if( atr <= 0.012387 )
+							if( atr2 <= 0.008688 )
+								if( dn1 <= 8.87532 )
+									ret := 0.766667 // buy
+								if( dn1 > 8.87532 )
+									ret := 0.444444
+							if( atr2 > 0.008688 )
+								if( dn1 <= 8.83557 )
+									ret := -0.200000
+								if( dn1 > 8.83557 )
+									ret := 0.750000 // buy
+						if( atr > 0.012387 )
+							ret := 1.000000 // buy
+				if( up1 > 9.45241 )
+					if( up <= 10.5644 )
+						if( dn <= 10.02 )
+							if( dn <= 9.72419 )
+								ret := 0.000000
+							if( dn > 9.72419 )
+								ret := 0.750000 // buy
+						if( dn > 10.02 )
+							if( up1 <= 10.3544 )
+								ret := -1.000000 // sell
+							if( up1 > 10.3544 )
+								ret := 0.000000
+					if( up > 10.5644 )
+						if( atr2 <= 0.004995 )
+							if( atr <= 0.005656 )
+								ret := 0.000000
+							if( atr > 0.005656 )
+								ret := -0.500000
+						if( atr2 > 0.004995 )
+							if( up <= 16.32 )
+								if( atr <= 0.009625 )
+									ret := 0.250000
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.

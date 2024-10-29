@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: L_Stochastic_RSI, L_Vortex_Indicator
+// ID_model: MSFT_5Min_2SV0_47506ab7 Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_MSFT_5Min_2SV0_47506ab7", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_MSFT_5Min_47506ab7(d, d_k, smoothK_k, k, rsi1, smoothD_d, VIP, VIP_VIM, VIM)=>
+	var float ret = 0  // # DecisionTreeRegressor(criterion=friedman_mse, max_depth=8, max_features=0.7,min_samples_leaf=4, min_samples_split=5,random_state=843828734)
+	if( rsi1 <= 48.8958 )
+		if( VIP <= 0.944892 )
+			if( smoothK_k <= 76.2084 )
+				if( rsi1 <= 41.3668 )
+					if( VIM <= 1.43206 )
+						if( VIM <= 1.05218 )
+							if( smoothK_k <= 30.1265 )
+								if( smoothD_d <= 4.29731 )
+									ret := -0.014286
+								if( smoothD_d > 4.29731 )
+									ret := 0.459677
+							if( smoothK_k > 30.1265 )
+								if( rsi1 <= 22.6148 )
+									ret := -1.000000 // sell
+								if( rsi1 > 22.6148 )
+									ret := 0.151961
+						if( VIM > 1.05218 )
+							if( rsi1 <= 12.6514 )
+								if( rsi1 <= 12.1037 )
+									ret := -0.068536
+								if( rsi1 > 12.1037 )
+									ret := -0.547170
+							if( rsi1 > 12.6514 )
+								if( VIM <= 1.29422 )
+									ret := 0.053242
+								if( VIM > 1.29422 )
+									ret := 0.158800
+					if( VIM > 1.43206 )
+						if( d <= 2.19781 )
+							if( rsi1 <= 28.9845 )
+								if( VIP_VIM <= -0.915552 )
+									ret := 0.350877
+								if( VIP_VIM > -0.915552 )
+									ret := 0.725275 // buy
+							if( rsi1 > 28.9845 )
+								if( smoothK_k <= -2.1679 )
+									ret := 0.250000
+								if( smoothK_k > -2.1679 )
+									ret := -0.800000 // sell
+						if( d > 2.19781 )
+							if( rsi1 <= 32.3422 )
+								if( VIP <= 0.677129 )
+									ret := -0.010638
+								if( VIP > 0.677129 )
+									ret := 0.286374
+							if( rsi1 > 32.3422 )
+								if( d_k <= -14.5253 )
+									ret := -0.583333
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.

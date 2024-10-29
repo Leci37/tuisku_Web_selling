@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: L_Vortex_Indicator
+// ID_model: DBX_5Min_1V00_a9dfb041 Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_DBX_5Min_1V00_a9dfb041", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_DBX_5Min_a9dfb041(VIP, VIP_VIM, VIM)=>
+	var float ret = 0  // # DecisionTreeRegressor(max_depth=5, max_features=0.9, random_state=843828734)
+	if( VIP <= 1.64049 )
+		if( VIP <= 0.482039 )
+			if( VIP_VIM <= -1.1804 )
+				ret := 1.000000 // buy
+			if( VIP_VIM > -1.1804 )
+				if( VIM <= 1.54323 )
+					if( VIP <= 0.393234 )
+						ret := -1.000000 // sell
+					if( VIP > 0.393234 )
+						ret := 0.787879 // buy
+				if( VIM > 1.54323 )
+					if( VIM <= 1.59892 )
+						ret := 0.000000
+					if( VIM > 1.59892 )
+						ret := 1.000000 // buy
+		if( VIP > 0.482039 )
+			if( VIM <= 0.567172 )
+				if( VIP_VIM <= 0.905675 )
+					if( VIM <= 0.527761 )
+						ret := 0.885714 // buy
+					if( VIM > 0.527761 )
+						ret := 0.455696
+				if( VIP_VIM > 0.905675 )
+					if( VIM <= 0.442667 )
+						ret := -0.461538
+					if( VIM > 0.442667 )
+						ret := 0.279762
+			if( VIM > 0.567172 )
+				if( VIM <= 1.12862 )
+					if( VIP <= 1.59514 )
+						ret := 0.026942
+					if( VIP > 1.59514 )
+						ret := 0.645455
+				if( VIM > 1.12862 )
+					if( VIM <= 1.47631 )
+						ret := 0.107316
+					if( VIM > 1.47631 )
+						ret := -0.025563
+	if( VIP > 1.64049 )
+		if( VIP_VIM <= -0.587386 )
+			if( VIP_VIM <= -1.26843 )
+				if( VIM <= 8.03202 )
+					if( VIM <= 5.3494 )
+						ret := -0.400000
+					if( VIM > 5.3494 )
+						ret := -1.000000 // sell
+				if( VIM > 8.03202 )
+					if( VIM <= 21.8724 )
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.

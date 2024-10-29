@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: SuperTrend
+// ID_model: GME_15Min_1SUP_09fc64d3 Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_GME_15Min_1SUP_09fc64d3", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_GME_15Min_09fc64d3(dn1, trend, atr, atr2, buySignalInt, sellSignalInt, up1, up, dn)=>
+	var float ret = 0  // # DecisionTreeRegressor(criterion=friedman_mse, max_depth=8,max_features=sqrt, min_samples_leaf=7,random_state=843828734)
+	if( up1 <= 3.92693 )
+		if( up <= 3.02452 )
+			if( atr2 <= 0.082326 )
+				if( dn1 <= 2.94787 )
+					if( dn <= 2.78393 )
+						ret := 1.000000 // buy
+					if( dn > 2.78393 )
+						if( atr <= 0.048453 )
+							ret := 0.833333 // buy
+						if( atr > 0.048453 )
+							ret := -0.368421
+				if( dn1 > 2.94787 )
+					if( dn <= 3.15208 )
+						if( atr <= 0.045846 )
+							if( up <= 2.79368 )
+								ret := 0.666667
+							if( up > 2.79368 )
+								if( up1 <= 2.81965 )
+									ret := -0.928571 // sell
+								if( up1 > 2.81965 )
+									ret := -0.533333
+						if( atr > 0.045846 )
+							if( up <= 2.62628 )
+								ret := -1.000000 // sell
+							if( up > 2.62628 )
+								if( up1 <= 2.76694 )
+									ret := -0.533333
+								if( up1 > 2.76694 )
+									ret := -1.000000 // sell
+					if( dn > 3.15208 )
+						if( dn <= 3.21656 )
+							if( atr <= 0.046264 )
+								ret := 0.687500
+							if( atr > 0.046264 )
+								ret := 1.000000 // buy
+						if( dn > 3.21656 )
+							if( atr2 <= 0.063833 )
+								if( up1 <= 3.01206 )
+									ret := -0.941176 // sell
+								if( up1 > 3.01206 )
+									ret := -1.000000 // sell
+							if( atr2 > 0.063833 )
+								ret := -0.083333
+			if( atr2 > 0.082326 )
+				if( up1 <= 2.86731 )
+					if( dn1 <= 3.19776 )
+						ret := 1.000000 // buy
+					if( dn1 > 3.19776 )
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.

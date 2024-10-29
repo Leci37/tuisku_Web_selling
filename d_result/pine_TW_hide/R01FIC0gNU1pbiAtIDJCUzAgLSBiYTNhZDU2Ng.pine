@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: L_Bull_Bear_Power, L_Stochastic_RSI
+// ID_model: GME_5Min_2BS0_ba3ad566 Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_GME_5Min_2BS0_ba3ad566", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_GME_5Min_ba3ad566(bearPower, bbm, bbp, bullPower, BBPower_Color, d, d_k, smoothK_k, k, rsi1, smoothD_d)=>
+	var float ret = 0  // # DecisionTreeRegressor(max_depth=6, max_features=0.7, min_samples_split=10,random_state=843828734)
+	if( bbp <= -0.023798 )
+		if( bbm <= 0.946849 )
+			if( d_k <= 2.95028 )
+				if( bullPower <= -0.556747 )
+					if( d_k <= -9.1119 )
+						ret := -0.833333 // sell
+					if( d_k > -9.1119 )
+						if( bbm <= 0.763865 )
+							ret := 0.479339
+						if( bbm > 0.763865 )
+							ret := 1.000000 // buy
+				if( bullPower > -0.556747 )
+					if( smoothD_d <= 58.1715 )
+						if( bullPower <= -0.163765 )
+							ret := 0.121951
+						if( bullPower > -0.163765 )
+							ret := -0.006616
+					if( smoothD_d > 58.1715 )
+						if( bullPower <= -0.073306 )
+							ret := 0.366279
+						if( bullPower > -0.073306 )
+							ret := 0.085441
+			if( d_k > 2.95028 )
+				if( bbp <= -0.183516 )
+					if( bbm <= 0.026163 )
+						if( d <= 4.5969 )
+							ret := -0.857143 // sell
+						if( d > 4.5969 )
+							ret := 0.628788
+					if( bbm > 0.026163 )
+						if( smoothK_k <= 1.76572 )
+							ret := 0.037987
+						if( smoothK_k > 1.76572 )
+							ret := 0.220131
+				if( bbp > -0.183516 )
+					if( bbm <= 0.346943 )
+						if( bullPower <= -0.035008 )
+							ret := 0.195172
+						if( bullPower > -0.035008 )
+							ret := 0.049552
+					if( bbm > 0.346943 )
+						if( bullPower <= 0.303852 )
+							ret := 0.635135
+						if( bullPower > 0.303852 )
+							ret := -0.611111
+		if( bbm > 0.946849 )
+			if( d <= 13.6635 )
+				if( d <= 3.73692 )
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.

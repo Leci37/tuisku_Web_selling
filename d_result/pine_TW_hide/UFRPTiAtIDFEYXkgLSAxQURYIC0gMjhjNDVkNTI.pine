@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: ADX_and_DI
+// ID_model: PTON_1Day_1ADX_28c45d52 Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_PTON_1Day_1ADX_28c45d52", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_PTON_1Day_28c45d52(dx, directionalMovementMinus, diPlus, smoothedDirectionalMovementMinus, trueRange, smoothedDirectionalMovementPlus, smoothedTrueRange, directionalMovementPlus, diMinus, adx)=>
+	var float ret = 0  // # DecisionTreeRegressor(max_depth=5, max_features=0.75, max_leaf_nodes=12,min_samples_leaf=4, min_samples_split=10,random_state=843828734)
+	if( adx <= 20.7183 )
+		if( smoothedTrueRange <= 0.687629 )
+			if( dx <= 13.9014 )
+				ret := 0.307692
+			if( dx > 13.9014 )
+				ret := -0.666667
+		if( smoothedTrueRange > 0.687629 )
+			if( smoothedTrueRange <= 3.42021 )
+				ret := 0.724359 // buy
+			if( smoothedTrueRange > 3.42021 )
+				ret := -0.129630
+	if( adx > 20.7183 )
+		if( smoothedDirectionalMovementMinus <= 0.106824 )
+			if( smoothedDirectionalMovementPlus <= 0.293917 )
+				if( smoothedDirectionalMovementPlus <= 0.120299 )
+					ret := 0.293413
+				if( smoothedDirectionalMovementPlus > 0.120299 )
+					ret := -0.232558
+			if( smoothedDirectionalMovementPlus > 0.293917 )
+				ret := 0.584416
+		if( smoothedDirectionalMovementMinus > 0.106824 )
+			if( smoothedDirectionalMovementMinus <= 0.366318 )
+				if( smoothedDirectionalMovementPlus <= 0.132093 )
+					ret := 0.148148
+				if( smoothedDirectionalMovementPlus > 0.132093 )
+					ret := -0.517413
+			if( smoothedDirectionalMovementMinus > 0.366318 )
+				if( smoothedDirectionalMovementMinus <= 1.71955 )
+					if( smoothedTrueRange <= 1.1717 )
+						ret := 0.820513 // buy
+					if( smoothedTrueRange > 1.1717 )
+						ret := 0.083176
+				if( smoothedDirectionalMovementMinus > 1.71955 )
+					ret := -0.428571
+	
+    ret //return
+// Define expected timeframe based on the selected interval: 1Day pine_value: D   Trigger an alert and show a label if the timeframe is incorrect
+alert_message_time_wrong = "The current candle TIMEframe is WRONG: "+ str.tostring(timeframe.period) + ", CHANGE it to the CORRECT one:  1DAY !!"
+if (str.tostring(timeframe.period) != "D")
+    alert(alert_message_time_wrong, alert.freq_once_per_bar_close)
+    label.new(bar_index -300, high+30, text = alert_message_time_wrong, style = label.style_label_down,size = size.large, color = color.red, textcolor = color.white)
+    log.error(alert_message_time_wrong)
+
+//CODE associated with the technical indicator ADX_and_DI 
+//@version=5
+// This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © BeikabuOyaji
+
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.

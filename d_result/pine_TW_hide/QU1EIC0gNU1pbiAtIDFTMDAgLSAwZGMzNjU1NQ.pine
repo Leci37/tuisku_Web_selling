@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: L_Stochastic_RSI
+// ID_model: AMD_5Min_1S00_0dc36555 Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_AMD_5Min_1S00_0dc36555", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_AMD_5Min_0dc36555(rsi1, smoothK_k, d_k, k, d, smoothD_d)=>
+	var float ret = 0  // # DecisionTreeRegressor(max_depth=8, max_features=sqrt, min_samples_leaf=7,min_samples_split=5, random_state=843828734)
+	if( rsi1 <= 47.638 )
+		if( k <= 37.8871 )
+			if( rsi1 <= 29.1671 )
+				if( smoothD_d <= 55.5148 )
+					if( k <= 0.017546 )
+						if( d <= 26.8516 )
+							if( smoothD_d <= 17.7909 )
+								if( smoothD_d <= 2.36266 )
+									ret := 0.139091
+								if( smoothD_d > 2.36266 )
+									ret := -0.013405
+							if( smoothD_d > 17.7909 )
+								if( d_k <= 24.1647 )
+									ret := 0.608696
+								if( d_k > 24.1647 )
+									ret := 1.000000 // buy
+						if( d > 26.8516 )
+							ret := -0.666667
+					if( k > 0.017546 )
+						if( smoothD_d <= -1.10489 )
+							if( rsi1 <= 4.66286 )
+								if( d_k <= -0.191927 )
+									ret := 1.000000 // buy
+								if( d_k > -0.191927 )
+									ret := 0.916667 // buy
+							if( rsi1 > 4.66286 )
+								if( smoothK_k <= 1.07377 )
+									ret := 0.072549
+								if( smoothK_k > 1.07377 )
+									ret := 0.825000 // buy
+						if( smoothD_d > -1.10489 )
+							if( rsi1 <= 25.3543 )
+								if( rsi1 <= 23.5966 )
+									ret := -0.037134
+								if( rsi1 > 23.5966 )
+									ret := -0.224903
+							if( rsi1 > 25.3543 )
+								if( smoothK_k <= 6.98783 )
+									ret := -0.059934
+								if( smoothK_k > 6.98783 )
+									ret := 0.173523
+				if( smoothD_d > 55.5148 )
+					if( rsi1 <= 27.383 )
+						ret := -0.800000 // sell
+					if( rsi1 > 27.383 )
+						ret := -1.000000 // sell
+			if( rsi1 > 29.1671 )
+				if( rsi1 <= 32.4664 )
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.

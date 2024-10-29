@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: Squeeze_Momentum_Indicator
+// ID_model: DBX_1Hour_1SQU_125494fe Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_DBX_1Hour_1SQU_125494fe", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_DBX_1Hour_125494fe(sqzOnInt, priceRange, lowerKC, lowerBB, rangema, noSqzInt, basis, val, ma, dev, sqzOffInt, upperBB, upperKC, avgHighLow)=>
+	var float ret = 0  // # DecisionTreeRegressor(criterion=friedman_mse, max_depth=6, max_features=0.5,max_leaf_nodes=30, min_samples_split=10,random_state=843828734)
+	if( avgHighLow <= 22.0155 )
+		if( lowerBB <= 21.3379 )
+			if( lowerBB <= 21.2558 )
+				if( upperKC <= 22.2125 )
+					if( upperBB <= 17.3338 )
+						if( val <= 0.080386 )
+							ret := 0.630841
+						if( val > 0.080386 )
+							ret := -1.000000 // sell
+					if( upperBB > 17.3338 )
+						if( upperKC <= 21.9444 )
+							ret := 0.077666
+						if( upperKC > 21.9444 )
+							ret := 0.501832
+				if( upperKC > 22.2125 )
+					ret := -0.567797
+			if( lowerBB > 21.2558 )
+				ret := -0.457490
+		if( lowerBB > 21.3379 )
+			if( rangema <= 0.258135 )
+				if( upperKC <= 21.873 )
+					ret := -0.821429 // sell
+				if( upperKC > 21.873 )
+					if( ma <= 21.7824 )
+						ret := 0.515152
+					if( ma > 21.7824 )
+						if( lowerKC <= 21.5939 )
+							ret := -0.350515
+						if( lowerKC > 21.5939 )
+							ret := 0.363971
+			if( rangema > 0.258135 )
+				ret := 0.679537
+	if( avgHighLow > 22.0155 )
+		if( dev <= 0.60186 )
+			if( lowerKC <= 21.5563 )
+				ret := -0.666667
+			if( lowerKC > 21.5563 )
+				if( upperBB <= 24.2463 )
+					if( upperBB <= 22.7754 )
+						if( lowerBB <= 21.6183 )
+							ret := 0.493506
+						if( lowerBB > 21.6183 )
+							ret := -0.178282
+					if( upperBB > 22.7754 )
+						if( sqzOffInt <= 0.5 )
+							ret := -0.012137
+						if( sqzOffInt > 0.5 )
+							ret := 0.160813
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.

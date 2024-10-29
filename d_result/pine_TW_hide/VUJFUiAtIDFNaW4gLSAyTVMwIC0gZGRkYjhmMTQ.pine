@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: L_Money_Flow_Index, L_Stochastic_RSI
+// ID_model: UBER_1Min_2MS0_dddb8f14 Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_UBER_1Min_2MS0_dddb8f14", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_UBER_1Min_dddb8f14(Typical_Price, MFI_High, Negative_Money_Flow, Positive_Money_Flow, Money_Flow_Ratio, MFI, Negative_Money_Flow_Sum, Positive_Money_Flow_Sum, MFI_Low, Raw_Money_Flow, rsi1, d, k, smoothD_d, d_k, smoothK_k)=>
+	var float ret = 0  // # DecisionTreeRegressor(criterion=friedman_mse, max_depth=8, max_features=0.7,min_samples_leaf=4, min_samples_split=5,random_state=843828734)
+	if( rsi1 <= 54.9703 )
+		if( Negative_Money_Flow_Sum <= 3.2652e+06 )
+			if( rsi1 <= 47.8479 )
+				if( Positive_Money_Flow_Sum <= 537973 )
+					if( Negative_Money_Flow <= 452.294 )
+						if( Raw_Money_Flow <= 41499.7 )
+							if( Negative_Money_Flow_Sum <= 596464 )
+								if( MFI <= 63.6196 )
+									ret := 0.239583
+								if( MFI > 63.6196 )
+									ret := -0.094118
+							if( Negative_Money_Flow_Sum > 596464 )
+								if( Negative_Money_Flow_Sum <= 1.64983e+06 )
+									ret := -0.192893
+								if( Negative_Money_Flow_Sum > 1.64983e+06 )
+									ret := 0.441860
+						if( Raw_Money_Flow > 41499.7 )
+							if( Positive_Money_Flow_Sum <= 223671 )
+								if( MFI <= 18.8343 )
+									ret := 0.148936
+								if( MFI > 18.8343 )
+									ret := 0.711538 // buy
+							if( Positive_Money_Flow_Sum > 223671 )
+								if( MFI_Low <= 37.4645 )
+									ret := 0.334495
+								if( MFI_Low > 37.4645 )
+									ret := -0.055556
+					if( Negative_Money_Flow > 452.294 )
+						if( Raw_Money_Flow <= 22678.7 )
+							if( smoothK_k <= 66.2616 )
+								if( Raw_Money_Flow <= 7183.08 )
+									ret := 0.189655
+								if( Raw_Money_Flow > 7183.08 )
+									ret := 0.655606
+							if( smoothK_k > 66.2616 )
+								if( rsi1 <= 46.2305 )
+									ret := 0.440000
+								if( rsi1 > 46.2305 )
+									ret := -0.818182 // sell
+						if( Raw_Money_Flow > 22678.7 )
+							if( rsi1 <= 36.3579 )
+								if( MFI_High <= -57.1966 )
+									ret := 0.641509
+								if( MFI_High > -57.1966 )
+									ret := 0.384615
+							if( rsi1 > 36.3579 )
+								if( Positive_Money_Flow_Sum <= 356893 )
+									ret := 0.171591
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.

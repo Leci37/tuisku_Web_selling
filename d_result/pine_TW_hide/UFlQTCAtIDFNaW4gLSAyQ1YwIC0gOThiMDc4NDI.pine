@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: L_Chaikin_Money_Flow, L_Vortex_Indicator
+// ID_model: PYPL_1Min_2CV0_98b07842 Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_PYPL_1Min_2CV0_98b07842", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_PYPL_1Min_98b07842(mf, ad_mf, ad, VIP, VIP_VIM, VIM)=>
+	var float ret = 0  // # DecisionTreeRegressor(max_depth=8, max_features=sqrt, min_samples_leaf=7,min_samples_split=5, random_state=843828734)
+	if( ad <= 13.3638 )
+		if( VIP <= 12.9292 )
+			if( mf <= 0.519571 )
+				if( VIM <= 1.18178 )
+					if( VIP <= 1.58899 )
+						if( ad_mf <= -42244.2 )
+							if( VIP <= 1.28772 )
+								if( VIP_VIM <= -0.26724 )
+									ret := 0.373402
+								if( VIP_VIM > -0.26724 )
+									ret := 0.161635
+							if( VIP > 1.28772 )
+								if( mf <= 0.131486 )
+									ret := -0.688525
+								if( mf > 0.131486 )
+									ret := -0.197802
+						if( ad_mf > -42244.2 )
+							if( ad <= -27461.3 )
+								if( VIM <= 0.968408 )
+									ret := 0.002176
+								if( VIM > 0.968408 )
+									ret := -0.199689
+							if( ad > -27461.3 )
+								if( ad_mf <= 0.668303 )
+									ret := 0.000120
+								if( ad_mf > 0.668303 )
+									ret := -0.884615 // sell
+					if( VIP > 1.58899 )
+						if( mf <= 0.224872 )
+							if( VIP_VIM <= 0.587742 )
+								ret := -0.642857
+							if( VIP_VIM > 0.587742 )
+								if( VIM <= 0.497052 )
+									ret := 1.000000 // buy
+								if( VIM > 0.497052 )
+									ret := 0.125749
+						if( mf > 0.224872 )
+							if( VIP <= 1.70919 )
+								if( mf <= 0.32429 )
+									ret := 1.000000 // buy
+								if( mf > 0.32429 )
+									ret := 0.700000 // buy
+							if( VIP > 1.70919 )
+								if( VIP_VIM <= 0.762175 )
+									ret := -0.538462
+								if( VIP_VIM > 0.762175 )
+									ret := 0.378049
+				if( VIM > 1.18178 )
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.

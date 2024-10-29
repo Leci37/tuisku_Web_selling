@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: Fibonacci_Bollinger
+// ID_model: PYPL_1Min_1FIB_aeaf3fa0 Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_PYPL_1Min_1FIB_aeaf3fa0", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_PYPL_1Min_aeaf3fa0(upper_2, basis, lower_6, basis_minus, lower_5, upper_5, upper_4, basis_max, upper_6, upper_3, lower_2, upper_1, lower_4, lower_1, lower_3)=>
+	var float ret = 0  // # DecisionTreeRegressor(criterion=friedman_mse, max_depth=8, max_features=0.7,min_samples_leaf=4, min_samples_split=5,random_state=843828734)
+	if( lower_6 <= 65.1094 )
+		if( basis <= 66.3976 )
+			if( basis_minus <= 0.942402 )
+				if( basis_max <= -0.81837 )
+					if( lower_3 <= 64.8833 )
+						if( upper_1 <= 65.214 )
+							if( lower_2 <= 64.4703 )
+								if( lower_6 <= 63.7907 )
+									ret := -0.123851
+								if( lower_6 > 63.7907 )
+									ret := -0.655556
+							if( lower_2 > 64.4703 )
+								if( basis <= 64.8247 )
+									ret := 1.000000 // buy
+								if( basis > 64.8247 )
+									ret := 0.244444
+						if( upper_1 > 65.214 )
+							if( basis_minus <= 0.843123 )
+								if( lower_6 <= 64.4645 )
+									ret := 0.571429
+								if( lower_6 > 64.4645 )
+									ret := -0.400000
+							if( basis_minus > 0.843123 )
+								if( basis_max <= -0.866812 )
+									ret := -0.461538
+								if( basis_max > -0.866812 )
+									ret := -0.928571 // sell
+					if( lower_3 > 64.8833 )
+						if( lower_4 <= 64.8814 )
+							if( lower_4 <= 64.7869 )
+								if( lower_3 <= 64.8872 )
+									ret := 0.300000
+								if( lower_3 > 64.8872 )
+									ret := -0.750000 // sell
+							if( lower_4 > 64.7869 )
+								if( upper_1 <= 65.6355 )
+									ret := 0.695652
+								if( upper_1 > 65.6355 )
+									ret := -0.250000
+						if( lower_4 > 64.8814 )
+							if( upper_4 <= 66.5051 )
+								if( upper_4 <= 66.4843 )
+									ret := 0.062147
+								if( upper_4 > 66.4843 )
+									ret := -0.769231 // sell
+							if( upper_4 > 66.5051 )
+								if( lower_1 <= 65.7384 )
+									ret := 0.750000 // buy
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.

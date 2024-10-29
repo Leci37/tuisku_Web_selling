@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: Blai5_Koncorde_v10
+// ID_model: SNAP_30Min_1KON_f68f2b25 Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_SNAP_30Min_1KON_f68f2b25", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_SNAP_30Min_f68f2b25(nvimin, azul, nvim, marron_mean, marron, nvimax, pvi, pvi_ema, oscp, verde, source, stoc, verde_mean, xrsi, media, xmf, tprice, pvimin, media_azul, verde_media, BollOsc, pvimax, nvi_ema, azul_mean, pvim, nvi, verde_azul)=>
+	var float ret = 0  // # DecisionTreeRegressor(criterion=friedman_mse, max_depth=6, max_features=0.9,min_samples_leaf=7, random_state=843828734)
+	if( verde_media <= 6.50666 )
+		if( nvimax <= 0.400679 )
+			if( media_azul <= -0.960006 )
+				if( xrsi <= 35.6894 )
+					if( azul_mean <= 21.9349 )
+						if( azul_mean <= 14.7775 )
+							ret := -0.277259
+						if( azul_mean > 14.7775 )
+							ret := 0.193548
+					if( azul_mean > 21.9349 )
+						if( marron_mean <= -4.26585 )
+							ret := 0.481481
+						if( marron_mean > -4.26585 )
+							ret := -0.631728
+				if( xrsi > 35.6894 )
+					if( BollOsc <= -14.2749 )
+						if( media <= 39.8589 )
+							ret := -0.066390
+						if( media > 39.8589 )
+							ret := 0.697917
+					if( BollOsc > -14.2749 )
+						if( verde_media <= 4.13086 )
+							ret := -0.457447
+						if( verde_media > 4.13086 )
+							ret := 0.304348
+			if( media_azul > -0.960006 )
+				if( xmf <= 74.7665 )
+					if( marron <= -23.679 )
+						if( azul <= -6.75737 )
+							ret := 0.605769
+						if( azul > -6.75737 )
+							ret := -0.058394
+					if( marron > -23.679 )
+						if( oscp <= -29.3586 )
+							ret := -0.058633
+						if( oscp > -29.3586 )
+							ret := 0.073253
+				if( xmf > 74.7665 )
+					if( azul <= 7.44704 )
+						if( marron_mean <= 106.742 )
+							ret := 0.313024
+						if( marron_mean > 106.742 )
+							ret := 0.649770
+					if( azul > 7.44704 )
+						if( azul <= 19.4044 )
+							ret := 0.115546
+						if( azul > 19.4044 )
+							ret := -0.189474
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.

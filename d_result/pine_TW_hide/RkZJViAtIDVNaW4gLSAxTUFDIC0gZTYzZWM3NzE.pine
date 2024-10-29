@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: MACD_ULT_MTF
+// ID_model: FFIV_5Min_1MAC_e63ec771 Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_FFIV_5Min_1MAC_e63ec771", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_FFIV_5Min_e63ec771(macd, macd_IsBelowInt, signal, histB_IsUpInt, macd_IsAboveInt, histB_IsDownInt, histA_IsUpInt, hist, histA_IsDownInt)=>
+	var float ret = 0  // # DecisionTreeRegressor(criterion=friedman_mse, max_depth=6,max_features=sqrt, min_samples_split=10,random_state=843828734)
+	if( macd <= 0.346838 )
+		if( hist <= 0.146675 )
+			if( macd <= -1.03426 )
+				if( hist <= -0.204411 )
+					if( signal <= -1.69653 )
+						if( macd_IsBelowInt <= 0.5 )
+							ret := -1.000000 // sell
+						if( macd_IsBelowInt > 0.5 )
+							ret := 0.769231 // buy
+					if( signal > -1.69653 )
+						if( histB_IsDownInt <= 0.5 )
+							ret := 0.153846
+						if( histB_IsDownInt > 0.5 )
+							ret := 0.020408
+				if( hist > -0.204411 )
+					if( signal <= -1.01626 )
+						if( histB_IsUpInt <= 0.5 )
+							ret := 0.956522 // buy
+						if( histB_IsUpInt > 0.5 )
+							ret := 0.936170 // buy
+					if( signal > -1.01626 )
+						if( macd <= -1.11687 )
+							ret := 1.000000 // buy
+						if( macd > -1.11687 )
+							ret := 0.458333
+			if( macd > -1.03426 )
+				if( histB_IsUpInt <= 0.5 )
+					if( macd <= 0.344678 )
+						if( signal <= 0.455908 )
+							ret := 0.030986
+						if( signal > 0.455908 )
+							ret := 0.750000 // buy
+					if( macd > 0.344678 )
+						if( signal <= 0.293053 )
+							ret := 0.787879 // buy
+						if( signal > 0.293053 )
+							ret := 0.312500
+				if( histB_IsUpInt > 0.5 )
+					if( hist <= -0.117223 )
+						if( macd <= -0.638498 )
+							ret := -0.513514
+						if( macd > -0.638498 )
+							ret := -0.145500
+					if( hist > -0.117223 )
+						if( signal <= -0.784232 )
+							ret := -0.550000
+						if( signal > -0.784232 )
+							ret := 0.010156
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.

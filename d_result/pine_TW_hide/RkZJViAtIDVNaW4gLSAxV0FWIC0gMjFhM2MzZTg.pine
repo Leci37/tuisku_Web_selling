@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: Wave_Trend_Calculation
+// ID_model: FFIV_5Min_1WAV_21a3c3e8 Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_FFIV_5Min_1WAV_21a3c3e8", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_FFIV_5Min_21a3c3e8(d, esa, d_tci, ci_wt2, wt2, ci, ap, tci)=>
+	var float ret = 0  // # DecisionTreeRegressor(max_depth=5, max_features=0.9, random_state=843828734)
+	if( ci <= 159.562 )
+		if( tci <= 70.9072 )
+			if( d_tci <= 40.3874 )
+				if( wt2 <= -22.72 )
+					if( ap <= 190.723 )
+						ret := 0.144262
+					if( ap > 190.723 )
+						ret := -0.044318
+				if( wt2 > -22.72 )
+					if( ap <= 131.169 )
+						ret := 0.677778
+					if( ap > 131.169 )
+						ret := -0.004483
+			if( d_tci > 40.3874 )
+				if( d_tci <= 57.0351 )
+					if( ap <= 150.471 )
+						ret := 0.095411
+					if( ap > 150.471 )
+						ret := -0.175274
+				if( d_tci > 57.0351 )
+					if( esa <= 203.413 )
+						ret := 0.017943
+					if( esa > 203.413 )
+						ret := 0.601770
+		if( tci > 70.9072 )
+			if( esa <= 149.043 )
+				if( ci <= -81.7016 )
+					ret := 0.000000
+				if( ci > -81.7016 )
+					if( d <= 0.231527 )
+						ret := -0.400000
+					if( d > 0.231527 )
+						ret := -0.931507 // sell
+			if( esa > 149.043 )
+				if( esa <= 174.817 )
+					if( tci <= 81.5394 )
+						ret := 0.367470
+					if( tci > 81.5394 )
+						ret := -0.612903
+				if( esa > 174.817 )
+					if( d <= 0.723084 )
+						ret := -0.553299
+					if( d > 0.723084 )
+						ret := 0.423077
+	if( ci > 159.562 )
+		if( d <= 0.210199 )
+			if( wt2 <= -20.6915 )
+				if( d <= 0.193103 )
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.

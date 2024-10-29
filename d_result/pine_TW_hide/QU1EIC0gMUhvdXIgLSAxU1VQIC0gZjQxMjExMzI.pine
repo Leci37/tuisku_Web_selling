@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: SuperTrend
+// ID_model: AMD_1Hour_1SUP_f4121132 Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_AMD_1Hour_1SUP_f4121132", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_AMD_1Hour_f4121132(atr, up, dn1, sellSignalInt, buySignalInt, atr2, dn, trend, up1)=>
+	var float ret = 0  // # DecisionTreeRegressor(max_depth=5, max_features=0.5, min_samples_leaf=7,min_samples_split=10, random_state=843828734)
+	if( dn <= 20.5571 )
+		if( up1 <= 18.2234 )
+			if( up <= 16.1075 )
+				if( atr <= 0.339305 )
+					ret := 0.600000
+				if( atr > 0.339305 )
+					if( up1 <= 15.4311 )
+						ret := 0.777778 // buy
+					if( up1 > 15.4311 )
+						ret := 0.978261 // buy
+			if( up > 16.1075 )
+				if( atr2 <= 0.224986 )
+					if( atr <= 0.184642 )
+						ret := -0.363636
+					if( atr > 0.184642 )
+						ret := 0.870370 // buy
+				if( atr2 > 0.224986 )
+					if( atr2 <= 0.297745 )
+						ret := -0.500000
+					if( atr2 > 0.297745 )
+						ret := 0.140449
+		if( up1 > 18.2234 )
+			if( dn <= 20.4859 )
+				if( dn1 <= 20.3133 )
+					if( dn <= 20.18 )
+						ret := 0.741935 // buy
+					if( dn > 20.18 )
+						ret := -0.538462
+				if( dn1 > 20.3133 )
+					if( dn <= 20.4399 )
+						ret := 0.938462 // buy
+					if( dn > 20.4399 )
+						ret := 0.615385
+			if( dn > 20.4859 )
+				if( atr2 <= 0.232516 )
+					ret := -0.545455
+				if( atr2 > 0.232516 )
+					ret := 0.666667
+	if( dn > 20.5571 )
+		if( up <= 83.2691 )
+			if( up <= 83.1329 )
+				if( dn1 <= 21.3195 )
+					if( up1 <= 18.445 )
+						ret := 0.461538
+					if( up1 > 18.445 )
+						ret := -0.291667
+				if( dn1 > 21.3195 )
+					if( atr <= 0.674135 )
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.

@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: SuperTrend
+// ID_model: SNOW_5Min_1SUP_36b08515 Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_SNOW_5Min_1SUP_36b08515", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_SNOW_5Min_36b08515(dn, atr, buySignalInt, up1, dn1, up, trend, atr2, sellSignalInt)=>
+	var float ret = 0  // # DecisionTreeRegressor(max_depth=6, max_features=0.7, min_samples_split=10,random_state=843828734)
+	if( trend <= -0.53939 )
+		if( atr2 <= 0.176474 )
+			if( dn <= 198.899 )
+				if( atr <= 0.212088 )
+					if( atr2 <= 0.059625 )
+						ret := 1.000000 // buy
+					if( atr2 > 0.059625 )
+						if( trend <= -0.856166 )
+							ret := -0.191781
+						if( trend > -0.856166 )
+							ret := -1.000000 // sell
+				if( atr > 0.212088 )
+					if( atr2 <= 0.17218 )
+						ret := 0.777778 // buy
+					if( atr2 > 0.17218 )
+						ret := 0.000000
+			if( dn > 198.899 )
+				ret := 0.500000
+		if( atr2 > 0.176474 )
+			if( dn <= 114.977 )
+				if( atr2 <= 0.234998 )
+					if( atr2 <= 0.224578 )
+						ret := 1.000000 // buy
+					if( atr2 > 0.224578 )
+						ret := 0.000000
+				if( atr2 > 0.234998 )
+					ret := 1.000000 // buy
+			if( dn > 114.977 )
+				if( atr <= 1.26149 )
+					if( up <= 151.503 )
+						if( atr <= 0.682633 )
+							ret := -0.152778
+						if( atr > 0.682633 )
+							ret := 0.655172
+					if( up > 151.503 )
+						if( up1 <= 172.818 )
+							ret := 0.689474
+						if( up1 > 172.818 )
+							ret := 0.347826
+				if( atr > 1.26149 )
+					if( up <= 225.512 )
+						ret := -0.928571 // sell
+					if( up > 225.512 )
+						ret := 1.000000 // buy
+	if( trend > -0.53939 )
+		if( atr <= 0.161353 )
+			if( up1 <= 126.252 )
+				if( up <= 113.493 )
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.

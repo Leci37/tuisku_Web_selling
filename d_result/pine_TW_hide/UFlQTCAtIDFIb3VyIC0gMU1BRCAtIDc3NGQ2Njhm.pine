@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: Madrid_Moving_Average_Ribbon
+// ID_model: PYPL_1Hour_1MAD_774d668f Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_PYPL_1Hour_1MAD_774d668f", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_PYPL_1Hour_774d668f(ma15, ma70_colorInt, ma75_colorInt, ma70, ma40_colorInt, ma80_colorInt, ma20, ma20_colorInt, ma60, ma50, ma65_colorInt, ma45, ma55, ma05_colorInt, ma35_colorInt, ma10_colorInt, ma30, ma25_colorInt, ma100, ma65, ma85, ma80, ma60_colorInt, ma85_colorInt, ma90, ma90_colorInt, ma25, ma40, ma50_colorInt, ma35, ma30_colorInt, ma45_colorInt, ma05, ma75, ma55_colorInt, ma10, ma15_colorInt)=>
+	var float ret = 0  // # DecisionTreeRegressor(criterion=friedman_mse, max_depth=6, max_features=0.5,max_leaf_nodes=30, min_samples_split=10,random_state=843828734)
+	if( ma85 <= 287.601 )
+		if( ma05 <= 58.1154 )
+			if( ma100 <= 58.8815 )
+				if( ma85_colorInt <= 2.5 )
+					if( ma75_colorInt <= 1.5 )
+						if( ma55 <= 57.6961 )
+							ret := 0.093750
+						if( ma55 > 57.6961 )
+							ret := 1.000000 // buy
+					if( ma75_colorInt > 1.5 )
+						ret := 0.645570
+				if( ma85_colorInt > 2.5 )
+					if( ma30 <= 52.0038 )
+						if( ma15_colorInt <= 3.5 )
+							ret := 0.745455 // buy
+						if( ma15_colorInt > 3.5 )
+							ret := 0.033333
+					if( ma30 > 52.0038 )
+						if( ma100 <= 54.9416 )
+							ret := -0.696970
+						if( ma100 > 54.9416 )
+							ret := -0.041353
+			if( ma100 > 58.8815 )
+				if( ma55 <= 59.6499 )
+					ret := 0.820144 // buy
+				if( ma55 > 59.6499 )
+					ret := -0.166667
+		if( ma05 > 58.1154 )
+			if( ma10 <= 126.343 )
+				if( ma100 <= 116.144 )
+					if( ma90 <= 115.488 )
+						if( ma05 <= 109.921 )
+							ret := 0.000161
+						if( ma05 > 109.921 )
+							ret := -0.177761
+					if( ma90 > 115.488 )
+						if( ma20_colorInt <= 1.5 )
+							ret := -0.040650
+						if( ma20_colorInt > 1.5 )
+							ret := 0.632353
+				if( ma100 > 116.144 )
+					if( ma40 <= 116.737 )
+						if( ma05 <= 112.568 )
+							ret := -0.133333
+						if( ma05 > 112.568 )
+							ret := -0.807018 // sell
+					if( ma40 > 116.737 )
+						if( ma10 <= 115.22 )
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.

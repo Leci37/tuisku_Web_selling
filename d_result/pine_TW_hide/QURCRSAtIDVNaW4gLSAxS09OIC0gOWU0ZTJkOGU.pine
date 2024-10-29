@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: Blai5_Koncorde_v10
+// ID_model: ADBE_5Min_1KON_9e4e2d8e Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_ADBE_5Min_1KON_9e4e2d8e", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_ADBE_5Min_9e4e2d8e(oscp, media, media_azul, verde_media, azul, tprice, azul_mean, verde, nvim, marron, pvimin, pvi, nvimax, verde_mean, xmf, source, stoc, pvimax, nvi_ema, nvi, xrsi, pvim, marron_mean, nvimin, BollOsc, verde_azul, pvi_ema)=>
+	var float ret = 0  // # DecisionTreeRegressor(criterion=friedman_mse, max_depth=6, max_features=0.9,min_samples_leaf=7, random_state=843828734)
+	if( marron_mean <= -5.89949 )
+		if( media_azul <= 36.3403 )
+			if( stoc <= 9.40726 )
+				if( xrsi <= 24.3267 )
+					if( verde_media <= -31.9506 )
+						if( xmf <= 5.72234 )
+							ret := -0.700000 // sell
+						if( xmf > 5.72234 )
+							ret := -0.955224 // sell
+					if( verde_media > -31.9506 )
+						if( nvi_ema <= 0.11102 )
+							ret := 0.181818
+						if( nvi_ema > 0.11102 )
+							ret := -0.828571 // sell
+				if( xrsi > 24.3267 )
+					if( BollOsc <= -52.5716 )
+						ret := 0.692308
+					if( BollOsc > -52.5716 )
+						ret := -0.285714
+			if( stoc > 9.40726 )
+				if( xrsi <= 25.5646 )
+					if( verde <= -39.5631 )
+						if( stoc <= 16.271 )
+							ret := -0.375000
+						if( stoc > 16.271 )
+							ret := 0.333333
+					if( verde > -39.5631 )
+						if( azul <= -7.81043 )
+							ret := 0.735294 // buy
+						if( azul > -7.81043 )
+							ret := 0.000000
+				if( xrsi > 25.5646 )
+					if( azul_mean <= 3.32002 )
+						if( pvimax <= 0.206296 )
+							ret := -0.416667
+						if( pvimax > 0.206296 )
+							ret := -0.964286 // sell
+					if( azul_mean > 3.32002 )
+						ret := -0.181818
+		if( media_azul > 36.3403 )
+			if( azul <= -92.5493 )
+				if( xrsi <= 12.1923 )
+					ret := 0.500000
+				if( xrsi > 12.1923 )
+					if( pvi <= 0.297159 )
+						ret := -1.000000 // sell
+					if( pvi > 0.297159 )
+						ret := -0.100000
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.

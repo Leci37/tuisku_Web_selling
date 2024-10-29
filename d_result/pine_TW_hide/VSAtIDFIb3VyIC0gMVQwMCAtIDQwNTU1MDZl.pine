@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: L_Triple_EMA
+// ID_model: U_1Hour_1T00_4055506e Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_U_1Hour_1T00_4055506e", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_U_1Hour_4055506e(ema2, ema1, ema12, ema3, ema13, tema)=>
+	var float ret = 0  // # DecisionTreeRegressor(criterion=friedman_mse, max_depth=6, max_features=0.4,max_leaf_nodes=30, min_samples_split=10,random_state=843828734)
+	if( ema2 <= 16.2848 )
+		if( ema2 <= 14.3994 )
+			ret := 0.723404 // buy
+		if( ema2 > 14.3994 )
+			if( ema2 <= 14.5779 )
+				ret := -0.365854
+			if( ema2 > 14.5779 )
+				if( ema12 <= 0.020753 )
+					if( tema <= 15.5013 )
+						ret := 0.653846
+					if( tema > 15.5013 )
+						ret := 0.317949
+				if( ema12 > 0.020753 )
+					ret := 0.111111
+	if( ema2 > 16.2848 )
+		if( ema3 <= 39.2374 )
+			if( ema3 <= 36.3558 )
+				if( ema13 <= 0.94089 )
+					if( ema13 <= -0.369514 )
+						if( ema13 <= -1.7499 )
+							ret := 0.894737 // buy
+						if( ema13 > -1.7499 )
+							ret := 0.123533
+					if( ema13 > -0.369514 )
+						if( tema <= 34.8703 )
+							ret := -0.051681
+						if( tema > 34.8703 )
+							ret := -0.314545
+				if( ema13 > 0.94089 )
+					if( ema13 <= 2.9998 )
+						if( ema3 <= 33.8502 )
+							ret := 0.509317
+						if( ema3 > 33.8502 )
+							ret := 0.167785
+					if( ema13 > 2.9998 )
+						ret := -1.000000 // sell
+			if( ema3 > 36.3558 )
+				if( ema2 <= 37.083 )
+					ret := 0.376263
+				if( ema2 > 37.083 )
+					ret := 0.225241
+		if( ema3 > 39.2374 )
+			if( ema2 <= 71.5669 )
+				if( ema1 <= 40.0462 )
+					if( tema <= 38.8631 )
+						if( tema <= 37.753 )
+							ret := -0.765957 // sell
+						if( tema > 37.753 )
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.

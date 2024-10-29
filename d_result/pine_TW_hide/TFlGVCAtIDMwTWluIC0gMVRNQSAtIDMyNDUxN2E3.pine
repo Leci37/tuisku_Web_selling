@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: TMA_Overlay
+// ID_model: LYFT_30Min_1TMA_324517a7 Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_LYFT_30Min_1TMA_324517a7", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_LYFT_30Min_324517a7(bullishEngulfingInt, smma4, bullSigInt, smma2, ema2, bearSigInt, bearishEngulfingInt, smma3, smma1)=>
+	var float ret = 0  // # DecisionTreeRegressor(criterion=friedman_mse, max_depth=6, max_features=0.9,min_samples_leaf=7, random_state=843828734)
+	if( smma4 <= 13.6277 )
+		if( smma1 <= 15.5922 )
+			if( smma1 <= 10.1324 )
+				if( ema2 <= 9.6111 )
+					if( smma4 <= 8.51752 )
+						if( smma4 <= 8.46494 )
+							ret := 1.000000 // buy
+						if( smma4 > 8.46494 )
+							ret := 0.478261
+					if( smma4 > 8.51752 )
+						if( smma2 <= 8.38223 )
+							ret := -0.293839
+						if( smma2 > 8.38223 )
+							ret := 0.049744
+				if( ema2 > 9.6111 )
+					if( smma2 <= 9.8338 )
+						if( smma1 <= 9.4177 )
+							ret := -0.461538
+						if( smma1 > 9.4177 )
+							ret := 0.568493
+					if( smma2 > 9.8338 )
+						if( smma1 <= 9.79112 )
+							ret := 0.692857
+						if( smma1 > 9.79112 )
+							ret := 0.159717
+			if( smma1 > 10.1324 )
+				if( smma4 <= 10.4936 )
+					if( smma2 <= 10.5398 )
+						if( smma1 <= 10.2903 )
+							ret := -0.279264
+						if( smma1 > 10.2903 )
+							ret := 0.101528
+					if( smma2 > 10.5398 )
+						if( smma1 <= 10.7985 )
+							ret := -0.737705 // sell
+						if( smma1 > 10.7985 )
+							ret := -0.247191
+				if( smma4 > 10.4936 )
+					if( smma3 <= 10.8078 )
+						if( smma4 <= 10.9114 )
+							ret := 0.175439
+						if( smma4 > 10.9114 )
+							ret := 0.558704
+					if( smma3 > 10.8078 )
+						if( smma1 <= 12.1851 )
+							ret := -0.013718
+						if( smma1 > 12.1851 )
+							ret := 0.131332
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.

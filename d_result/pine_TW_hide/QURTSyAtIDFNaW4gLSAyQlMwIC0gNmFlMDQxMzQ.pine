@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: L_Bull_Bear_Power, L_Stochastic_RSI
+// ID_model: ADSK_1Min_2BS0_6ae04134 Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_ADSK_1Min_2BS0_6ae04134", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_ADSK_1Min_6ae04134(bullPower, bbp, bearPower, bbm, BBPower_Color, rsi1, smoothK_k, d_k, k, d, smoothD_d)=>
+	var float ret = 0  // # DecisionTreeRegressor(max_depth=6, max_features=0.7, min_samples_split=10,random_state=843828734)
+	if( d_k <= 5.37647 )
+		if( rsi1 <= 56.502 )
+			if( bbp <= -3.61742 )
+				if( rsi1 <= 22.0553 )
+					if( d_k <= 4.83961 )
+						if( d <= 0.222159 )
+							ret := 0.571429
+						if( d > 0.222159 )
+							ret := 1.000000 // buy
+					if( d_k > 4.83961 )
+						ret := 0.000000
+				if( rsi1 > 22.0553 )
+					if( d <= 51.0306 )
+						if( bbm <= 1.13903 )
+							ret := -0.777778 // sell
+						if( bbm > 1.13903 )
+							ret := 1.000000 // buy
+					if( d > 51.0306 )
+						if( bullPower <= -1.64154 )
+							ret := 1.000000 // buy
+						if( bullPower > -1.64154 )
+							ret := 0.000000
+			if( bbp > -3.61742 )
+				if( bbp <= 2.23759 )
+					if( bbp <= 0.31185 )
+						if( k <= 42.5537 )
+							ret := 0.018964
+						if( k > 42.5537 )
+							ret := -0.035872
+					if( bbp > 0.31185 )
+						if( d <= 90.052 )
+							ret := 0.134211
+						if( d > 90.052 )
+							ret := -0.252964
+				if( bbp > 2.23759 )
+					if( rsi1 <= 49.1587 )
+						ret := 0.833333 // buy
+					if( rsi1 > 49.1587 )
+						if( d_k <= -22.1567 )
+							ret := 1.000000 // buy
+						if( d_k > -22.1567 )
+							ret := -0.886792 // sell
+		if( rsi1 > 56.502 )
+			if( bbm <= 0.147518 )
+				if( d <= 99.2371 )
+					if( bbp <= 1.9863 )
+						if( bullPower <= 0.63444 )
+							ret := -0.051382
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.

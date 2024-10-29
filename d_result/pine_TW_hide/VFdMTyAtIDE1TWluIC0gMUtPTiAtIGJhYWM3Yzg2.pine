@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: Blai5_Koncorde_v10
+// ID_model: TWLO_15Min_1KON_baac7c86 Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_TWLO_15Min_1KON_baac7c86", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_TWLO_15Min_baac7c86(nvi, nvi_ema, marron_mean, source, azul, verde_azul, verde_mean, xmf, pvimin, stoc, media, tprice, marron, pvim, pvimax, xrsi, oscp, pvi, nvimax, nvimin, verde, verde_media, azul_mean, nvim, BollOsc, pvi_ema, media_azul)=>
+	var float ret = 0  // # DecisionTreeRegressor(criterion=friedman_mse, max_depth=8, max_features=0.7,min_samples_leaf=4, min_samples_split=5,random_state=843828734)
+	if( BollOsc <= -16.9451 )
+		if( pvimin <= 1.25791 )
+			if( tprice <= 117.288 )
+				if( azul_mean <= -104.195 )
+					if( marron_mean <= 11.5828 )
+						if( media_azul <= 103.433 )
+							ret := -0.500000
+						if( media_azul > 103.433 )
+							if( nvimin <= 0.570459 )
+								ret := 1.000000 // buy
+							if( nvimin > 0.570459 )
+								ret := 0.500000
+					if( marron_mean > 11.5828 )
+						if( oscp <= 8.17131 )
+							if( media <= 46.8339 )
+								if( media_azul <= 105.763 )
+									ret := -1.000000 // sell
+								if( media_azul > 105.763 )
+									ret := 0.200000
+							if( media > 46.8339 )
+								ret := -1.000000 // sell
+						if( oscp > 8.17131 )
+							ret := 0.250000
+				if( azul_mean > -104.195 )
+					if( verde_media <= -157.66 )
+						if( stoc <= 24.8684 )
+							if( source <= 82.6787 )
+								if( azul_mean <= -10.4071 )
+									ret := 0.285714
+								if( azul_mean > -10.4071 )
+									ret := 1.000000 // buy
+							if( source > 82.6787 )
+								if( verde_media <= -192.894 )
+									ret := 0.500000
+								if( verde_media > -192.894 )
+									ret := -0.846154 // sell
+						if( stoc > 24.8684 )
+							if( marron <= 11.2285 )
+								if( pvimax <= 1.15922 )
+									ret := -0.904762 // sell
+								if( pvimax > 1.15922 )
+									ret := -0.333333
+							if( marron > 11.2285 )
+								if( pvim <= 0.547663 )
+									ret := 0.250000
+								if( pvim > 0.547663 )
+									ret := 0.500000
+					if( verde_media > -157.66 )
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.

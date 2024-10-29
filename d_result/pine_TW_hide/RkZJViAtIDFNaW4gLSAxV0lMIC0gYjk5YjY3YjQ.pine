@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: Williams_Vix_Fix
+// ID_model: FFIV_1Min_1WIL_b99b67b4 Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_FFIV_1Min_1WIL_b99b67b4", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_FFIV_1Min_b99b67b4(sDev, Color_con1, lowerBand, wvf, upperBand, midLine, Color_con2, rangeLow, colInt, rangeHigh)=>
+	var float ret = 0  // # DecisionTreeRegressor(criterion=friedman_mse, max_depth=6, max_features=0.9,min_samples_leaf=7, random_state=843828734)
+	if( Color_con1 <= 0.02882 )
+		if( upperBand <= 0.679334 )
+			if( upperBand <= 0.624996 )
+				if( wvf <= 0.337283 )
+					if( lowerBand <= 0.228617 )
+						if( midLine <= 0.206199 )
+							ret := -0.040040
+						if( midLine > 0.206199 )
+							ret := 0.040580
+					if( lowerBand > 0.228617 )
+						if( Color_con2 <= -0.196452 )
+							ret := 0.000000
+						if( Color_con2 > -0.196452 )
+							ret := -0.573171
+				if( wvf > 0.337283 )
+					if( sDev <= 0.162295 )
+						if( wvf <= 0.359734 )
+							ret := 0.099338
+						if( wvf > 0.359734 )
+							ret := -0.246795
+					if( sDev > 0.162295 )
+						if( wvf <= 0.372717 )
+							ret := 0.261878
+						if( wvf > 0.372717 )
+							ret := 0.075949
+			if( upperBand > 0.624996 )
+				if( lowerBand <= 0.072834 )
+					if( lowerBand <= -0.099926 )
+						if( sDev <= 0.466475 )
+							ret := -0.380353
+						if( sDev > 0.466475 )
+							ret := 0.647059
+					if( lowerBand > -0.099926 )
+						if( sDev <= 0.361439 )
+							ret := -0.099822
+						if( sDev > 0.361439 )
+							ret := 0.625000
+				if( lowerBand > 0.072834 )
+					if( midLine <= 0.438292 )
+						if( Color_con2 <= -0.220065 )
+							ret := -0.615635
+						if( Color_con2 > -0.220065 )
+							ret := -0.330855
+					if( midLine > 0.438292 )
+						if( Color_con1 <= -0.088569 )
+							ret := 0.194631
+						if( Color_con1 > -0.088569 )
+							ret := -0.615385
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.

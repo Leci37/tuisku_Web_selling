@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: Wave_Trend_Calculation
+// ID_model: ADSK_1Min_1WAV_4fcbe029 Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_ADSK_1Min_1WAV_4fcbe029", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_ADSK_1Min_4fcbe029(tci, ci, d_tci, esa, d, ci_wt2, wt2, ap)=>
+	var float ret = 0  // # DecisionTreeRegressor(criterion=friedman_mse, max_depth=6, max_features=0.9,min_samples_leaf=7, random_state=843828734)
+	if( ci_wt2 <= -24.5331 )
+		if( ci <= -118.934 )
+			if( ci <= -193.155 )
+				if( ci <= -233.498 )
+					if( ci <= -264.171 )
+						if( wt2 <= -27.0821 )
+							ret := 0.090909
+						if( wt2 > -27.0821 )
+							ret := 1.000000 // buy
+					if( ci > -264.171 )
+						if( ci <= -247.196 )
+							ret := -0.866667 // sell
+						if( ci > -247.196 )
+							ret := -0.071429
+				if( ci > -233.498 )
+					if( tci <= -0.024322 )
+						if( d <= 0.15091 )
+							ret := 0.603774
+						if( d > 0.15091 )
+							ret := 0.958333 // buy
+					if( tci > -0.024322 )
+						ret := 0.333333
+			if( ci > -193.155 )
+				if( esa <= 246.322 )
+					if( ci_wt2 <= -143.375 )
+						if( esa <= 212.689 )
+							ret := -0.644444
+						if( esa > 212.689 )
+							ret := 0.129979
+					if( ci_wt2 > -143.375 )
+						if( ap <= 207.557 )
+							ret := -0.212766
+						if( ap > 207.557 )
+							ret := 0.332120
+				if( esa > 246.322 )
+					if( wt2 <= 26.7814 )
+						if( wt2 <= -51.7871 )
+							ret := 0.538462
+						if( wt2 > -51.7871 )
+							ret := -0.046460
+					if( wt2 > 26.7814 )
+						if( tci <= 25.2558 )
+							ret := 0.603774
+						if( tci > 25.2558 )
+							ret := 0.153846
+		if( ci > -118.934 )
+			if( esa <= 254.104 )
+				if( d <= 0.702432 )
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.

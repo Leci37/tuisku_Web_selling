@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: L_Stochastic_RSI, L_Triple_EMA
+// ID_model: SHOP_1Min_2ST0_9fb20c01 Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_SHOP_1Min_2ST0_9fb20c01", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_SHOP_1Min_9fb20c01(d_k, d, rsi1, k, smoothD_d, smoothK_k, ema1, tema, ema12, ema2, ema3, ema13)=>
+	var float ret = 0  // # DecisionTreeRegressor(criterion=friedman_mse, max_depth=8, max_features=0.7,min_samples_leaf=4, min_samples_split=5,random_state=843828734)
+	if( d <= 94.8675 )
+		if( ema12 <= -0.106011 )
+			if( d_k <= 23.3314 )
+				if( k <= 93.1563 )
+					if( ema3 <= 80.974 )
+						if( smoothD_d <= -2.92138 )
+							if( tema <= 77.9024 )
+								if( ema1 <= 70.049 )
+									ret := -0.347826
+								if( ema1 > 70.049 )
+									ret := 0.468750
+							if( tema > 77.9024 )
+								if( ema12 <= -0.120313 )
+									ret := -1.000000 // sell
+								if( ema12 > -0.120313 )
+									ret := -0.500000
+						if( smoothD_d > -2.92138 )
+							if( ema13 <= -0.133932 )
+								if( d <= 4.26655 )
+									ret := 0.267184
+								if( d > 4.26655 )
+									ret := 0.104560
+							if( ema13 > -0.133932 )
+								if( rsi1 <= 33.5513 )
+									ret := 0.357143
+								if( rsi1 > 33.5513 )
+									ret := 0.975610 // buy
+					if( ema3 > 80.974 )
+						if( rsi1 <= 38.7397 )
+							if( ema1 <= 83.3398 )
+								if( rsi1 <= 29.1817 )
+									ret := 0.659574
+								if( rsi1 > 29.1817 )
+									ret := 0.901961 // buy
+							if( ema1 > 83.3398 )
+								ret := -0.250000
+						if( rsi1 > 38.7397 )
+							if( k <= 27.7952 )
+								if( ema3 <= 82.3845 )
+									ret := 1.000000 // buy
+								if( ema3 > 82.3845 )
+									ret := 0.000000
+							if( k > 27.7952 )
+								if( smoothD_d <= 44.0307 )
+									ret := -1.000000 // sell
+								if( smoothD_d > 44.0307 )
+									ret := 1.000000 // buy
+				if( k > 93.1563 )
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.

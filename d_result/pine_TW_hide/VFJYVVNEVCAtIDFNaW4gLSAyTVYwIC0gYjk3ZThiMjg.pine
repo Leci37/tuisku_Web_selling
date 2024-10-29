@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: L_Money_Flow_Index, L_Vortex_Indicator
+// ID_model: TRXUSDT_1Min_2MV0_b97e8b28 Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_TRXUSDT_1Min_2MV0_b97e8b28", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_TRXUSDT_1Min_b97e8b28(Negative_Money_Flow_Sum, MFI_High, Raw_Money_Flow, MFI_Low, Negative_Money_Flow, Money_Flow_Ratio, Typical_Price, MFI, Positive_Money_Flow_Sum, Positive_Money_Flow, VIP_VIM, VIM, VIP)=>
+	var float ret = 0  // # DecisionTreeRegressor(max_depth=8, max_features=0.75, max_leaf_nodes=12,min_samples_leaf=4, min_samples_split=10,random_state=843828734)
+	if( Negative_Money_Flow <= 0.510965 )
+		if( Positive_Money_Flow <= 0.168149 )
+			ret := -0.012219
+		if( Positive_Money_Flow > 0.168149 )
+			if( Typical_Price <= 0.126651 )
+				ret := -0.045452
+			if( Typical_Price > 0.126651 )
+				if( Raw_Money_Flow <= 13901.3 )
+					ret := -0.293959
+				if( Raw_Money_Flow > 13901.3 )
+					ret := -0.104946
+	if( Negative_Money_Flow > 0.510965 )
+		if( Negative_Money_Flow <= 13560.7 )
+			if( Typical_Price <= 0.12547 )
+				ret := 0.085687
+			if( Typical_Price > 0.12547 )
+				if( VIP_VIM <= 0.250934 )
+					if( Negative_Money_Flow_Sum <= 39909.8 )
+						ret := 0.617292
+					if( Negative_Money_Flow_Sum > 39909.8 )
+						if( Positive_Money_Flow <= 45.5558 )
+							ret := 0.436298
+						if( Positive_Money_Flow > 45.5558 )
+							ret := 0.114669
+				if( VIP_VIM > 0.250934 )
+					ret := 0.125774
+		if( Negative_Money_Flow > 13560.7 )
+			if( Typical_Price <= 0.129331 )
+				ret := 0.064917
+			if( Typical_Price > 0.129331 )
+				if( Raw_Money_Flow <= 27644.3 )
+					ret := 0.353517
+				if( Raw_Money_Flow > 27644.3 )
+					ret := 0.176892
+	
+    ret //return
+// Define expected timeframe based on the selected interval: 1Min pine_value: 1   Trigger an alert and show a label if the timeframe is incorrect
+alert_message_time_wrong = "The current candle TIMEframe is WRONG: "+ str.tostring(timeframe.period) + ", CHANGE it to the CORRECT one:  1MIN !!"
+if (str.tostring(timeframe.period) != "1")
+    alert(alert_message_time_wrong, alert.freq_once_per_bar_close)
+    label.new(bar_index -300, high+30, text = alert_message_time_wrong, style = label.style_label_down,size = size.large, color = color.red, textcolor = color.white)
+    log.error(alert_message_time_wrong)
+
+//CODE associated with the technical indicator L_Money_Flow_Index 
+//@version=5
+//indicator title="Money Flow Index (MFI)", shorttitle="MFI", format=format.price, precision=2, timeframe="", timeframe_gaps=true)
+
+// Input parameters
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.

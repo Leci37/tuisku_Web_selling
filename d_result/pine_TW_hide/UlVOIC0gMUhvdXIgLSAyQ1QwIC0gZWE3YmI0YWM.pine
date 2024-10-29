@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: L_Chaikin_Money_Flow, L_Triple_EMA
+// ID_model: RUN_1Hour_2CT0_ea7bb4ac Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_RUN_1Hour_2CT0_ea7bb4ac", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_RUN_1Hour_ea7bb4ac(mf, ad, ad_mf, ema1, tema, ema12, ema2, ema3, ema13)=>
+	var float ret = 0  // # DecisionTreeRegressor(criterion=friedman_mse, max_depth=6,max_features=sqrt, min_samples_split=10,random_state=843828734)
+	if( ema2 <= 9.11274 )
+		if( ad_mf <= -800.349 )
+			if( mf <= 0.080068 )
+				if( ema3 <= 8.96729 )
+					ret := 0.500000
+				if( ema3 > 8.96729 )
+					ret := 0.000000
+			if( mf > 0.080068 )
+				ret := 0.800000 // buy
+		if( ad_mf > -800.349 )
+			if( ad_mf <= 458901 )
+				if( ad <= 3092.21 )
+					ret := 1.000000 // buy
+				if( ad > 3092.21 )
+					if( ad_mf <= 9624.43 )
+						ret := 0.000000
+					if( ad_mf > 9624.43 )
+						if( ema12 <= 0.05222 )
+							ret := 0.888889 // buy
+						if( ema12 > 0.05222 )
+							ret := 0.000000
+			if( ad_mf > 458901 )
+				ret := -0.333333
+	if( ema2 > 9.11274 )
+		if( ad <= -1.79397e+06 )
+			if( ad_mf <= -2.22971e+06 )
+				if( ad <= -2.47754e+06 )
+					if( ad_mf <= -3.14146e+06 )
+						if( tema <= 24.7451 )
+							ret := -0.024390
+						if( tema > 24.7451 )
+							ret := 0.882353 // buy
+					if( ad_mf > -3.14146e+06 )
+						if( ema13 <= 0.125165 )
+							ret := 0.384615
+						if( ema13 > 0.125165 )
+							ret := 0.918919 // buy
+				if( ad > -2.47754e+06 )
+					if( ema12 <= 0.377001 )
+						if( ema2 <= 11.9261 )
+							ret := -0.909091 // sell
+						if( ema2 > 11.9261 )
+							ret := -0.321429
+					if( ema12 > 0.377001 )
+						ret := 0.400000
+			if( ad_mf > -2.22971e+06 )
+				if( ad <= -2.17125e+06 )
+					if( ema2 <= 18.4732 )
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.

@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: Wave_Trend_Calculation
+// ID_model: META_1Min_1WAV_0d3d471f Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_META_1Min_1WAV_0d3d471f", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_META_1Min_0d3d471f(d, esa, d_tci, ci_wt2, wt2, ci, ap, tci)=>
+	var float ret = 0  // # DecisionTreeRegressor(max_depth=8, max_features=sqrt, min_samples_leaf=7,min_samples_split=5, random_state=843828734)
+	if( wt2 <= 3.42406 )
+		if( ci_wt2 <= 144.671 )
+			if( tci <= -19.3596 )
+				if( ci <= -44.6022 )
+					if( ap <= 430.821 )
+						if( d_tci <= 35.1977 )
+							if( wt2 <= -16.1138 )
+								if( ci_wt2 <= -54.6738 )
+									ret := -0.302326
+								if( ci_wt2 > -54.6738 )
+									ret := 0.550000
+							if( wt2 > -16.1138 )
+								if( wt2 <= -9.40878 )
+									ret := 0.500000
+								if( wt2 > -9.40878 )
+									ret := 0.923077 // buy
+						if( d_tci > 35.1977 )
+							if( ci_wt2 <= -15.8335 )
+								if( d <= 0.311377 )
+									ret := 0.096774
+								if( d > 0.311377 )
+									ret := 0.664921
+							if( ci_wt2 > -15.8335 )
+								if( tci <= -72.7621 )
+									ret := 0.823529 // buy
+								if( tci > -72.7621 )
+									ret := 0.142857
+					if( ap > 430.821 )
+						if( ap <= 459.215 )
+							if( tci <= -69.4927 )
+								if( ap <= 445.822 )
+									ret := 0.870588 // buy
+								if( ap > 445.822 )
+									ret := -0.225000
+							if( tci > -69.4927 )
+								if( tci <= -53.6768 )
+									ret := -0.372007
+								if( tci > -53.6768 )
+									ret := -0.029070
+						if( ap > 459.215 )
+							if( ci_wt2 <= -28.175 )
+								if( tci <= -83.8433 )
+									ret := -0.833333 // sell
+								if( tci > -83.8433 )
+									ret := 0.032806
+							if( ci_wt2 > -28.175 )
+								if( d_tci <= 79.9327 )
+									ret := 0.112127
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.

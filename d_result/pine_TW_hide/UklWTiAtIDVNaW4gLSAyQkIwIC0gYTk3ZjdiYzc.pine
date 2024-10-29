@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: L_Bollinger_Bands, L_Bull_Bear_Power
+// ID_model: RIVN_5Min_2BB0_a97f7bc7 Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_RIVN_5Min_2BB0_a97f7bc7", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_RIVN_5Min_a97f7bc7(basis, Upper_Band, Lower_Band, bbm, bearPower, bbp, bullPower, BBPower_Color)=>
+	var float ret = 0  // # DecisionTreeRegressor(criterion=friedman_mse, max_depth=8, max_features=0.7,min_samples_leaf=4, min_samples_split=5,random_state=843828734)
+	if( Lower_Band <= 10.1429 )
+		if( Upper_Band <= 9.68012 )
+			if( Upper_Band <= 9.56204 )
+				if( Lower_Band <= 8.45829 )
+					if( bbm <= 0.021891 )
+						if( Upper_Band <= 8.43086 )
+							if( bearPower <= -0.006286 )
+								ret := 1.000000 // buy
+							if( bearPower > -0.006286 )
+								ret := 0.000000
+						if( Upper_Band > 8.43086 )
+							if( Upper_Band <= 8.50983 )
+								if( bearPower <= -0.001911 )
+									ret := -0.312500
+								if( bearPower > -0.001911 )
+									ret := -0.846154 // sell
+							if( Upper_Band > 8.50983 )
+								if( bbp <= 0.024021 )
+									ret := -0.111111
+								if( bbp > 0.024021 )
+									ret := 0.250000
+					if( bbm > 0.021891 )
+						if( Lower_Band <= 8.42564 )
+							if( bbm <= 0.037424 )
+								if( basis <= 8.39407 )
+									ret := 0.600000
+								if( basis > 8.39407 )
+									ret := -0.208333
+							if( bbm > 0.037424 )
+								if( Lower_Band <= 8.37474 )
+									ret := 0.553030
+								if( Lower_Band > 8.37474 )
+									ret := -0.176471
+						if( Lower_Band > 8.42564 )
+							if( Lower_Band <= 8.44653 )
+								if( Lower_Band <= 8.43968 )
+									ret := 0.937500 // buy
+								if( Lower_Band > 8.43968 )
+									ret := 0.700000 // buy
+							if( Lower_Band > 8.44653 )
+								if( bbp <= 0.061854 )
+									ret := -0.142857
+								if( bbp > 0.061854 )
+									ret := 0.700000 // buy
+				if( Lower_Band > 8.45829 )
+					if( basis <= 8.59055 )
+						if( Upper_Band <= 8.53181 )
+							if( bbp <= 0.03635 )
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.

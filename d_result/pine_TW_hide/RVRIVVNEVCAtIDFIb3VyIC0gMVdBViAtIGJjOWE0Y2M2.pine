@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: Wave_Trend_Calculation
+// ID_model: ETHUSDT_1Hour_1WAV_bc9a4cc6 Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_ETHUSDT_1Hour_1WAV_bc9a4cc6", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_ETHUSDT_1Hour_bc9a4cc6(d, esa, d_tci, ci_wt2, wt2, ci, ap, tci)=>
+	var float ret = 0  // # DecisionTreeRegressor(criterion=friedman_mse, max_depth=6, max_features=0.9,min_samples_leaf=7, random_state=843828734)
+	if( d_tci <= -21.5443 )
+		if( esa <= 1817.55 )
+			if( d <= 1.69894 )
+				if( ci <= 122.489 )
+					if( d <= 1.10601 )
+						if( ap <= 282.559 )
+							ret := 0.014493
+						if( ap > 282.559 )
+							ret := 0.444444
+					if( d > 1.10601 )
+						if( ap <= 385.34 )
+							ret := -0.213095
+						if( ap > 385.34 )
+							ret := 0.180952
+				if( ci > 122.489 )
+					if( ap <= 244.895 )
+						if( ci_wt2 <= 111.505 )
+							ret := 0.727273 // buy
+						if( ci_wt2 > 111.505 )
+							ret := 0.277778
+					if( ap > 244.895 )
+						if( esa <= 272.958 )
+							ret := -0.882353 // sell
+						if( esa > 272.958 )
+							ret := 0.419355
+			if( d > 1.69894 )
+				if( ci_wt2 <= -15.5056 )
+					if( ci_wt2 <= -46.1398 )
+						if( esa <= 155.011 )
+							ret := -0.727273 // sell
+						if( esa > 155.011 )
+							ret := 0.179641
+					if( ci_wt2 > -46.1398 )
+						if( d <= 3.56993 )
+							ret := 0.183983
+						if( d > 3.56993 )
+							ret := 0.457328
+				if( ci_wt2 > -15.5056 )
+					if( ci_wt2 <= 52.3418 )
+						if( d <= 2.95328 )
+							ret := 0.272938
+						if( d > 2.95328 )
+							ret := 0.012279
+					if( ci_wt2 > 52.3418 )
+						if( ap <= 224.406 )
+							ret := -0.256757
+						if( ap > 224.406 )
+							ret := 0.304448
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.

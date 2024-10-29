@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: L_Stochastic_RSI, L_Vortex_Indicator
+// ID_model: ADSK_15Min_2SV0_bdb6380c Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_ADSK_15Min_2SV0_bdb6380c", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_ADSK_15Min_bdb6380c(rsi1, smoothK_k, d_k, k, d, smoothD_d, VIP, VIM, VIP_VIM)=>
+	var float ret = 0  // # DecisionTreeRegressor(criterion=friedman_mse, max_depth=8,max_features=sqrt, min_samples_leaf=7,random_state=843828734)
+	if( VIP <= 0.734175 )
+		if( d <= 0.30116 )
+			if( rsi1 <= 12.5165 )
+				if( k <= 3.1e-05 )
+					if( d_k <= 0.175787 )
+						if( VIP <= 0.488943 )
+							if( VIM <= 1.51016 )
+								ret := 0.846154 // buy
+							if( VIM > 1.51016 )
+								ret := 0.200000
+						if( VIP > 0.488943 )
+							if( rsi1 <= 11.0801 )
+								if( VIP <= 0.678554 )
+									ret := -0.394737
+								if( VIP > 0.678554 )
+									ret := 0.571429
+							if( rsi1 > 11.0801 )
+								ret := 0.600000
+					if( d_k > 0.175787 )
+						ret := -0.400000
+				if( k > 3.1e-05 )
+					if( d_k <= -0.020835 )
+						if( d <= 0.116289 )
+							if( d_k <= -0.102847 )
+								ret := -0.600000
+							if( d_k > -0.102847 )
+								ret := 0.250000
+						if( d > 0.116289 )
+							if( smoothK_k <= -2.3967 )
+								ret := 0.950000 // buy
+							if( smoothK_k > -2.3967 )
+								ret := 0.181818
+					if( d_k > -0.020835 )
+						if( rsi1 <= 2.62062 )
+							ret := 0.769231 // buy
+						if( rsi1 > 2.62062 )
+							ret := 1.000000 // buy
+			if( rsi1 > 12.5165 )
+				if( VIP_VIM <= -0.735388 )
+					if( VIM <= 1.38003 )
+						ret := 0.600000
+					if( VIM > 1.38003 )
+						if( d <= 0.03663 )
+							if( smoothD_d <= -2.99968 )
+								if( VIP <= 0.594619 )
+									ret := -0.333333
+								if( VIP > 0.594619 )
+									ret := -0.666667
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.

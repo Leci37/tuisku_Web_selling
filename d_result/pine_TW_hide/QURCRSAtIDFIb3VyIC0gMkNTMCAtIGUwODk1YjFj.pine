@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: L_Chaikin_Money_Flow, L_Stochastic_RSI
+// ID_model: ADBE_1Hour_2CS0_e0895b1c Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_ADBE_1Hour_2CS0_e0895b1c", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_ADBE_1Hour_e0895b1c(ad, mf, ad_mf, rsi1, smoothK_k, d_k, k, d, smoothD_d)=>
+	var float ret = 0  // # DecisionTreeRegressor(max_depth=6, max_features=0.7, min_samples_split=10,random_state=843828734)
+	if( k <= 87.592 )
+		if( rsi1 <= 11.5547 )
+			if( mf <= -0.203901 )
+				if( k <= 1.34498 )
+					if( ad_mf <= -89751.7 )
+						if( k <= 0.959353 )
+							ret := -0.058824
+						if( k > 0.959353 )
+							ret := 1.000000 // buy
+					if( ad_mf > -89751.7 )
+						if( d <= 0.006715 )
+							ret := 1.000000 // buy
+						if( d > 0.006715 )
+							ret := -0.700000 // sell
+				if( k > 1.34498 )
+					if( ad_mf <= 2833.35 )
+						if( ad_mf <= -348818 )
+							ret := -0.545455
+						if( ad_mf > -348818 )
+							ret := -0.929577 // sell
+					if( ad_mf > 2833.35 )
+						ret := -0.400000
+			if( mf > -0.203901 )
+				if( d_k <= -0.125975 )
+					if( ad_mf <= 44256.4 )
+						if( k <= 2.42473 )
+							ret := 1.000000 // buy
+						if( k > 2.42473 )
+							ret := 0.700000 // buy
+					if( ad_mf > 44256.4 )
+						ret := 0.000000
+				if( d_k > -0.125975 )
+					if( ad <= -260.513 )
+						ret := -0.750000 // sell
+					if( ad > -260.513 )
+						ret := -0.083333
+		if( rsi1 > 11.5547 )
+			if( smoothK_k <= 0.012584 )
+				if( smoothK_k <= -0.916236 )
+					if( ad_mf <= -0.024637 )
+						if( mf <= -0.287117 )
+							ret := -0.208333
+						if( mf > -0.287117 )
+							ret := 0.227134
+					if( ad_mf > -0.024637 )
+						if( ad_mf <= 1041.89 )
+							ret := -0.293578
+						if( ad_mf > 1041.89 )
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.

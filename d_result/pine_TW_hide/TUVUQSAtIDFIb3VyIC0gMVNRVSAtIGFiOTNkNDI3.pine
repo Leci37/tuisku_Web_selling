@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: Squeeze_Momentum_Indicator
+// ID_model: META_1Hour_1SQU_ab93d427 Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_META_1Hour_1SQU_ab93d427", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_META_1Hour_ab93d427(sqzOnInt, priceRange, lowerKC, lowerBB, rangema, noSqzInt, basis, val, ma, dev, sqzOffInt, upperBB, upperKC, avgHighLow)=>
+	var float ret = 0  // # DecisionTreeRegressor(max_depth=6, max_features=0.7, min_samples_split=10,random_state=843828734)
+	if( lowerBB <= 144.439 )
+		if( upperBB <= 146.269 )
+			if( upperBB <= 140.434 )
+				if( ma <= 135.159 )
+					if( upperBB <= 135.238 )
+						if( val <= -0.252438 )
+							ret := 0.750000 // buy
+						if( val > -0.252438 )
+							ret := 0.102517
+					if( upperBB > 135.238 )
+						if( lowerKC <= 131.657 )
+							ret := -0.585586
+						if( lowerKC > 131.657 )
+							ret := 0.206349
+				if( ma > 135.159 )
+					if( rangema <= 1.50099 )
+						if( upperKC <= 140.66 )
+							ret := 0.600000
+						if( upperKC > 140.66 )
+							ret := -0.500000
+					if( rangema > 1.50099 )
+						if( lowerKC <= 134.1 )
+							ret := 1.000000 // buy
+						if( lowerKC > 134.1 )
+							ret := -0.923077 // sell
+			if( upperBB > 140.434 )
+				if( avgHighLow <= 137.414 )
+					if( upperBB <= 141.257 )
+						if( upperKC <= 138.155 )
+							ret := -0.800000 // sell
+						if( upperKC > 138.155 )
+							ret := 0.117647
+					if( upperBB > 141.257 )
+						if( dev <= 3.33661 )
+							ret := -0.500000
+						if( dev > 3.33661 )
+							ret := -0.986486 // sell
+				if( avgHighLow > 137.414 )
+					if( lowerBB <= 134.784 )
+						if( dev <= 5.94029 )
+							ret := 1.000000 // buy
+						if( dev > 5.94029 )
+							ret := 0.000000
+					if( lowerBB > 134.784 )
+						if( dev <= 2.89992 )
+							ret := -0.053779
+						if( dev > 2.89992 )
+							ret := -0.827586 // sell
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.

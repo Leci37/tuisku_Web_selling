@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: L_Bull_Bear_Power, L_Triple_EMA
+// ID_model: RUN_30Min_2BT0_c81ed293 Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_RUN_30Min_2BT0_c81ed293", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_RUN_30Min_c81ed293(bbm, bearPower, bbp, bullPower, BBPower_Color, ema1, tema, ema12, ema2, ema3, ema13)=>
+	var float ret = 0  // # DecisionTreeRegressor(max_depth=6, max_features=0.7, min_samples_split=10,random_state=843828734)
+	if( tema <= 4.88726 )
+		if( BBPower_Color <= 0.5 )
+			if( ema3 <= 5.00335 )
+				if( bbm <= 0.019842 )
+					if( ema1 <= 4.8296 )
+						ret := 1.000000 // buy
+					if( ema1 > 4.8296 )
+						if( ema3 <= 4.87392 )
+							ret := 0.000000
+						if( ema3 > 4.87392 )
+							ret := 0.913043 // buy
+				if( bbm > 0.019842 )
+					if( ema1 <= 4.74064 )
+						if( ema1 <= 4.6674 )
+							ret := 0.400000
+						if( ema1 > 4.6674 )
+							ret := 1.000000 // buy
+					if( ema1 > 4.74064 )
+						if( ema13 <= -0.108346 )
+							ret := -0.312500
+						if( ema13 > -0.108346 )
+							ret := 0.586667
+			if( ema3 > 5.00335 )
+				if( ema3 <= 5.16936 )
+					ret := 0.000000
+				if( ema3 > 5.16936 )
+					ret := -1.000000 // sell
+		if( BBPower_Color > 0.5 )
+			if( bbm <= 0.100852 )
+				if( tema <= 4.75187 )
+					if( bbp <= 0.092074 )
+						if( ema2 <= 4.72562 )
+							ret := 0.923077 // buy
+						if( ema2 > 4.72562 )
+							ret := 0.000000
+					if( bbp > 0.092074 )
+						ret := 0.000000
+				if( tema > 4.75187 )
+					if( ema1 <= 4.78038 )
+						if( ema13 <= -0.003298 )
+							ret := 0.000000
+						if( ema13 > -0.003298 )
+							ret := -1.000000 // sell
+					if( ema1 > 4.78038 )
+						if( bbp <= 0.057829 )
+							ret := -0.100000
+						if( bbp > 0.057829 )
+							ret := 0.741935 // buy
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.

@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: L_Stochastic_RSI
+// ID_model: U_30Min_1S00_b25f25b3 Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_U_30Min_1S00_b25f25b3", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_U_30Min_b25f25b3(rsi1, d, k, smoothD_d, d_k, smoothK_k)=>
+	var float ret = 0  // # DecisionTreeRegressor(criterion=friedman_mse, max_depth=6, max_features=0.82,max_leaf_nodes=30, random_state=843828734)
+	if( rsi1 <= 10.2753 )
+		if( smoothD_d <= -2.4127 )
+			if( smoothK_k <= -2.24686 )
+				if( smoothD_d <= -2.99288 )
+					ret := 0.400000
+				if( smoothD_d > -2.99288 )
+					ret := 0.976471 // buy
+			if( smoothK_k > -2.24686 )
+				ret := -1.000000 // sell
+		if( smoothD_d > -2.4127 )
+			ret := 0.347518
+	if( rsi1 > 10.2753 )
+		if( d_k <= 10.4747 )
+			if( smoothD_d <= 92.7819 )
+				if( smoothK_k <= 55.8869 )
+					if( d <= 21.6171 )
+						if( k <= 20.6202 )
+							ret := -0.017480
+						if( k > 20.6202 )
+							ret := -0.155128
+					if( d > 21.6171 )
+						if( d_k <= -16.3066 )
+							ret := 0.199045
+						if( d_k > -16.3066 )
+							ret := 0.009341
+				if( smoothK_k > 55.8869 )
+					if( rsi1 <= 54.0557 )
+						if( d_k <= -19.8553 )
+							ret := 0.133550
+						if( d_k > -19.8553 )
+							ret := -0.140639
+					if( rsi1 > 54.0557 )
+						if( smoothD_d <= 67.6914 )
+							ret := -0.140952
+						if( smoothD_d > 67.6914 )
+							ret := 0.012840
+			if( smoothD_d > 92.7819 )
+				if( rsi1 <= 79.4773 )
+					if( rsi1 <= 33.6424 )
+						ret := 0.785714 // buy
+					if( rsi1 > 33.6424 )
+						if( k <= 92.218 )
+							ret := 0.253165
+						if( k > 92.218 )
+							ret := -0.005328
+				if( rsi1 > 79.4773 )
+					if( rsi1 <= 80.9519 )
+						ret := 0.708333 // buy
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.

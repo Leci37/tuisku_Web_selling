@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: L_Stochastic_RSI, L_Vortex_Indicator
+// ID_model: ABNB_1Min_2SV0_bb661bec Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_ABNB_1Min_2SV0_bb661bec", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_ABNB_1Min_bb661bec(rsi1, smoothK_k, d_k, k, d, smoothD_d, VIP, VIM, VIP_VIM)=>
+	var float ret = 0  // # DecisionTreeRegressor(max_depth=6, max_features=0.7, min_samples_split=10,random_state=843828734)
+	if( rsi1 <= 44.4674 )
+		if( VIP <= 1.02168 )
+			if( VIP_VIM <= -0.539259 )
+				if( VIP <= 0.795092 )
+					if( smoothK_k <= 24.8065 )
+						if( smoothK_k <= 13.5235 )
+							ret := 0.109806
+						if( smoothK_k > 13.5235 )
+							ret := -0.157459
+					if( smoothK_k > 24.8065 )
+						if( d_k <= -2.34343 )
+							ret := 0.310036
+						if( d_k > -2.34343 )
+							ret := 0.008646
+				if( VIP > 0.795092 )
+					if( d <= 27.6056 )
+						if( d <= 3.96839 )
+							ret := 0.000000
+						if( d > 3.96839 )
+							ret := 0.610778
+					if( d > 27.6056 )
+						if( smoothD_d <= 68.2211 )
+							ret := -0.407407
+						if( smoothD_d > 68.2211 )
+							ret := 1.000000 // buy
+			if( VIP_VIM > -0.539259 )
+				if( smoothK_k <= -1.1396 )
+					if( d <= 0.801242 )
+						if( rsi1 <= 26.9378 )
+							ret := -0.301075
+						if( rsi1 > 26.9378 )
+							ret := 0.211823
+					if( d > 0.801242 )
+						if( d_k <= 20.2805 )
+							ret := -0.273643
+						if( d_k > 20.2805 )
+							ret := 0.348485
+				if( smoothK_k > -1.1396 )
+					if( VIM <= 0.987845 )
+						if( smoothK_k <= 46.9428 )
+							ret := 0.777778 // buy
+						if( smoothK_k > 46.9428 )
+							ret := -0.125000
+					if( VIM > 0.987845 )
+						if( rsi1 <= 37.145 )
+							ret := 0.068519
+						if( rsi1 > 37.145 )
+							ret := -0.018116
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.

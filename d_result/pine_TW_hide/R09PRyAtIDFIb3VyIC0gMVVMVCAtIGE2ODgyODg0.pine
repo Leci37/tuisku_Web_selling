@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: Ultimate_MA_MTF_V2
+// ID_model: GOOG_1Hour_1ULT_a6882884 Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_GOOG_1Hour_1ULT_a6882884", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_GOOG_1Hour_a6882884(ma_downInt, cr_upInt, avg2, cr_down2Int, cr_up2Int, cr_downInt, ma_upInt, avg)=>
+	var float ret = 0  // # DecisionTreeRegressor(max_depth=6, max_features=0.9, max_leaf_nodes=12,min_samples_split=5, random_state=843828734)
+	if( avg <= 87.4688 )
+		ret := 0.778947 // buy
+	if( avg > 87.4688 )
+		if( avg2 <= 1028.65 )
+			if( avg <= 1017.33 )
+				ret := -0.043842
+			if( avg > 1017.33 )
+				ret := -0.692308
+		if( avg2 > 1028.65 )
+			if( avg <= 1050.59 )
+				if( ma_downInt <= 0.5 )
+					if( avg <= 1034.85 )
+						if( avg2 <= 1032.63 )
+							ret := 0.750000 // buy
+						if( avg2 > 1032.63 )
+							ret := -0.458333
+					if( avg > 1034.85 )
+						if( avg2 <= 1068.24 )
+							ret := 0.647799
+						if( avg2 > 1068.24 )
+							ret := -0.909091 // sell
+				if( ma_downInt > 0.5 )
+					ret := 0.700000 // buy
+			if( avg > 1050.59 )
+				if( avg <= 2828.81 )
+					ret := 0.026106
+				if( avg > 2828.81 )
+					if( avg2 <= 2852.07 )
+						ret := -0.535461
+					if( avg2 > 2852.07 )
+						if( avg <= 2860.66 )
+							ret := 0.737374 // buy
+						if( avg > 2860.66 )
+							ret := -0.134615
+	
+    ret //return
+// Define expected timeframe based on the selected interval: 1Hour pine_value: 60   Trigger an alert and show a label if the timeframe is incorrect
+alert_message_time_wrong = "The current candle TIMEframe is WRONG: "+ str.tostring(timeframe.period) + ", CHANGE it to the CORRECT one:  1HOUR !!"
+if (str.tostring(timeframe.period) != "60")
+    alert(alert_message_time_wrong, alert.freq_once_per_bar_close)
+    label.new(bar_index -300, high+30, text = alert_message_time_wrong, style = label.style_label_down,size = size.large, color = color.red, textcolor = color.white)
+    log.error(alert_message_time_wrong)
+
+//CODE associated with the technical indicator Ultimate_MA_MTF_V2 
+//@version=5
+//indicator title="CM_Ultimate_MA_MTF_V2", shorttitle="CM_Ultimate_MA_MTF_V2", overlay=true)
+
+// Inputs
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.

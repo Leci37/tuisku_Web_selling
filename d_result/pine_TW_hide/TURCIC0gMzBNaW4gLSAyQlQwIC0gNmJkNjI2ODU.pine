@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: L_Bull_Bear_Power, L_Triple_EMA
+// ID_model: MDB_30Min_2BT0_6bd62685 Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_MDB_30Min_2BT0_6bd62685", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_MDB_30Min_6bd62685(bearPower, bbm, bbp, bullPower, BBPower_Color, ema12, ema3, ema13, tema, ema1, ema2)=>
+	var float ret = 0  // # DecisionTreeRegressor(max_depth=6, max_features=0.7, min_samples_split=10,random_state=843828734)
+	if( ema3 <= 80.1615 )
+		if( tema <= 75.8392 )
+			if( bearPower <= -0.935673 )
+				if( ema3 <= 75.5301 )
+					if( bbp <= -1.69549 )
+						if( ema2 <= 56.7743 )
+							ret := 0.406504
+						if( ema2 > 56.7743 )
+							ret := 0.698842
+					if( bbp > -1.69549 )
+						if( ema3 <= 28.8351 )
+							ret := -0.714286 // sell
+						if( ema3 > 28.8351 )
+							ret := 0.277778
+				if( ema3 > 75.5301 )
+					if( ema12 <= -2.33304 )
+						ret := 0.923077 // buy
+					if( ema12 > -2.33304 )
+						if( ema12 <= -1.07976 )
+							ret := -0.804878 // sell
+						if( ema12 > -1.07976 )
+							ret := -0.052632
+			if( bearPower > -0.935673 )
+				if( ema3 <= 26.3268 )
+					if( ema13 <= 0.323239 )
+						if( bullPower <= 0.36653 )
+							ret := 0.677419
+						if( bullPower > 0.36653 )
+							ret := 0.964286 // buy
+					if( ema13 > 0.323239 )
+						if( bbp <= 0.791705 )
+							ret := -0.166667
+						if( bbp > 0.791705 )
+							ret := 0.800000 // buy
+				if( ema3 > 26.3268 )
+					if( tema <= 74.6303 )
+						if( ema13 <= 0.116326 )
+							ret := -0.058757
+						if( ema13 > 0.116326 )
+							ret := 0.104416
+					if( tema > 74.6303 )
+						if( ema13 <= 1.30652 )
+							ret := -0.183673
+						if( ema13 > 1.30652 )
+							ret := -0.954545 // sell
+		if( tema > 75.8392 )
+			if( bbm <= 1.16839 )
+				if( tema <= 82.3832 )
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.

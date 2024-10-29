@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: L_Chaikin_Money_Flow, L_Stochastic_RSI
+// ID_model: TRXUSDT_1Min_2CS0_8007df0b Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_TRXUSDT_1Min_2CS0_8007df0b", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_TRXUSDT_1Min_8007df0b(mf, ad, ad_mf, d_k, d, rsi1, k, smoothD_d, smoothK_k)=>
+	var float ret = 0  // # DecisionTreeRegressor(max_depth=7, max_features=0.9, max_leaf_nodes=12,min_samples_split=5, random_state=843828734)
+	if( ad_mf <= -0.606523 )
+		if( rsi1 <= 60.3653 )
+			if( rsi1 <= 32.6372 )
+				if( mf <= -0.18256 )
+					ret := 0.011028
+				if( mf > -0.18256 )
+					ret := 0.305983
+			if( rsi1 > 32.6372 )
+				if( mf <= 0.120817 )
+					if( ad <= -83849.3 )
+						ret := 0.310986
+					if( ad > -83849.3 )
+						if( rsi1 <= 51.487 )
+							ret := 0.487771
+						if( rsi1 > 51.487 )
+							ret := 0.285867
+				if( mf > 0.120817 )
+					if( rsi1 <= 49.9716 )
+						ret := 0.605295
+					if( rsi1 > 49.9716 )
+						ret := 0.446875
+		if( rsi1 > 60.3653 )
+			ret := 0.068115
+	if( ad_mf > -0.606523 )
+		if( ad_mf <= 0.443438 )
+			ret := 0.009183
+		if( ad_mf > 0.443438 )
+			if( rsi1 <= 42.8575 )
+				ret := -0.129731
+			if( rsi1 > 42.8575 )
+				if( rsi1 <= 66.6662 )
+					ret := -0.360019
+				if( rsi1 > 66.6662 )
+					ret := -0.208846
+	
+    ret //return
+// Define expected timeframe based on the selected interval: 1Min pine_value: 1   Trigger an alert and show a label if the timeframe is incorrect
+alert_message_time_wrong = "The current candle TIMEframe is WRONG: "+ str.tostring(timeframe.period) + ", CHANGE it to the CORRECT one:  1MIN !!"
+if (str.tostring(timeframe.period) != "1")
+    alert(alert_message_time_wrong, alert.freq_once_per_bar_close)
+    label.new(bar_index -300, high+30, text = alert_message_time_wrong, style = label.style_label_down,size = size.large, color = color.red, textcolor = color.white)
+    log.error(alert_message_time_wrong)
+
+//CODE associated with the technical indicator L_Chaikin_Money_Flow 
+ //@version=5
+//indicator title="Chaikin Money Flow", shorttitle="CMF", format=format.price, precision=2, timeframe="", timeframe_gaps=true)
+var cumVol = 0.
+cumVol += nz(volume)
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.

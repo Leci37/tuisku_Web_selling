@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: L_Bull_Bear_Power, L_Chaikin_Money_Flow
+// ID_model: CRWD_1Min_2BC0_e04edbec Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_CRWD_1Min_2BC0_e04edbec", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_CRWD_1Min_e04edbec(bearPower, bbm, bbp, bullPower, BBPower_Color, mf, ad_mf, ad)=>
+	var float ret = 0  // # DecisionTreeRegressor(criterion=friedman_mse, max_depth=8,max_features=sqrt, min_samples_leaf=7,random_state=843828734)
+	if( bbp <= -0.510006 )
+		if( ad_mf <= 0.947775 )
+			if( ad <= -579.001 )
+				if( mf <= -0.474318 )
+					if( ad_mf <= -19419.2 )
+						if( bbp <= -2.68121 )
+							if( ad_mf <= -270680 )
+								ret := 1.000000 // buy
+							if( ad_mf > -270680 )
+								if( ad_mf <= -39084.4 )
+									ret := -0.333333
+								if( ad_mf > -39084.4 )
+									ret := 0.933333 // buy
+						if( bbp > -2.68121 )
+							if( bbp <= -1.04826 )
+								if( bbp <= -1.65046 )
+									ret := 0.952381 // buy
+								if( bbp > -1.65046 )
+									ret := 0.529412
+							if( bbp > -1.04826 )
+								ret := 1.000000 // buy
+					if( ad_mf > -19419.2 )
+						if( bullPower <= 0.086318 )
+							if( mf <= -0.653263 )
+								if( bearPower <= -0.72774 )
+									ret := -0.352941
+								if( bearPower > -0.72774 )
+									ret := 0.250000
+							if( mf > -0.653263 )
+								if( ad <= -2861.61 )
+									ret := 0.070000
+								if( ad > -2861.61 )
+									ret := 0.506849
+						if( bullPower > 0.086318 )
+							ret := -1.000000 // sell
+				if( mf > -0.474318 )
+					if( bbp <= -20.059 )
+						ret := -0.937500 // sell
+					if( bbp > -20.059 )
+						if( ad <= -1704.68 )
+							if( ad_mf <= -3122.54 )
+								if( ad <= -4528.71 )
+									ret := 0.097135
+								if( ad > -4528.71 )
+									ret := -0.086600
+							if( ad_mf > -3122.54 )
+								if( mf <= 0.116602 )
+									ret := 0.221785
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.

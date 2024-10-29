@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: Ichimoku_Cloud
+// ID_model: UNIUSDT_15Min_1ICH_33a2b95b Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_UNIUSDT_15Min_1ICH_33a2b95b", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_UNIUSDT_15Min_33a2b95b(senkou_span_a_displaced, cross_dn_tenkan_kinjunInt, kinjun_sen, chinkou_span, senkou_span_b_displaced, basis_minus, senkou_span_b, senkou_span_a, cross_up_tenkan_kinjunInt, tenkan_sen, basis_max)=>
+	var float ret = 0  // # DecisionTreeRegressor(criterion=friedman_mse, max_depth=8, max_features=0.7,min_samples_leaf=4, min_samples_split=5,random_state=843828734)
+	if( basis_max <= 0.017761 )
+		if( tenkan_sen <= 7.07051 )
+			if( chinkou_span <= 6.99021 )
+				if( kinjun_sen <= 6.81056 )
+					if( chinkou_span <= 6.34405 )
+						if( senkou_span_b <= 6.16084 )
+							if( chinkou_span <= 6.12009 )
+								if( tenkan_sen <= 5.98608 )
+									ret := 0.046935
+								if( tenkan_sen > 5.98608 )
+									ret := -0.168147
+							if( chinkou_span > 6.12009 )
+								if( tenkan_sen <= 6.11399 )
+									ret := 0.524189
+								if( tenkan_sen > 6.11399 )
+									ret := 0.118560
+						if( senkou_span_b > 6.16084 )
+							if( chinkou_span <= 6.09771 )
+								if( senkou_span_a <= 6.08091 )
+									ret := 0.108434
+								if( senkou_span_a > 6.08091 )
+									ret := -0.562028
+							if( chinkou_span > 6.09771 )
+								if( senkou_span_a <= 6.27951 )
+									ret := -0.021251
+								if( senkou_span_a > 6.27951 )
+									ret := -0.317375
+					if( chinkou_span > 6.34405 )
+						if( senkou_span_a <= 6.35368 )
+							if( chinkou_span <= 6.50123 )
+								if( tenkan_sen <= 6.21842 )
+									ret := 0.630045
+								if( tenkan_sen > 6.21842 )
+									ret := 0.357696
+							if( chinkou_span > 6.50123 )
+								if( senkou_span_b_displaced <= 6.36782 )
+									ret := 0.777966 // buy
+								if( senkou_span_b_displaced > 6.36782 )
+									ret := 0.170213
+						if( senkou_span_a > 6.35368 )
+							if( chinkou_span <= 6.5638 )
+								if( senkou_span_a <= 6.60803 )
+									ret := -0.019217
+								if( senkou_span_a > 6.60803 )
+									ret := -0.476793
+							if( chinkou_span > 6.5638 )
+								if( tenkan_sen <= 6.52789 )
+									ret := 0.539823
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.

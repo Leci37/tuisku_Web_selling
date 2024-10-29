@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: L_Bull_Bear_Power, L_Vortex_Indicator
+// ID_model: APPS_15Min_2BV0_e3a828bd Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_APPS_15Min_2BV0_e3a828bd", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_APPS_15Min_e3a828bd(bullPower, bbp, bearPower, bbm, BBPower_Color, VIP, VIM, VIP_VIM)=>
+	var float ret = 0  // # DecisionTreeRegressor(criterion=friedman_mse, max_depth=7,max_features=sqrt, min_samples_leaf=4,random_state=843828734)
+	if( bearPower <= 0.005928 )
+		if( bbm <= 0.004725 )
+			if( bearPower <= -0.004068 )
+				if( VIP <= 4.19361 )
+					if( VIM <= 1.13821 )
+						if( bearPower <= -0.007607 )
+							if( VIM <= 1.06013 )
+								ret := 0.603070
+							if( VIM > 1.06013 )
+								ret := 0.407970
+						if( bearPower > -0.007607 )
+							if( VIM <= 1.04441 )
+								ret := -0.034014
+							if( VIM > 1.04441 )
+								ret := 0.440000
+					if( VIM > 1.13821 )
+						if( bearPower <= -1.20627 )
+							if( VIM <= 1.69211 )
+								ret := 1.000000 // buy
+							if( VIM > 1.69211 )
+								ret := 0.555556
+						if( bearPower > -1.20627 )
+							if( bullPower <= -0.003254 )
+								ret := 0.287813
+							if( bullPower > -0.003254 )
+								ret := 0.602151
+				if( VIP > 4.19361 )
+					if( VIP_VIM <= 0.359702 )
+						if( bullPower <= -0.048246 )
+							if( VIP_VIM <= -0.254448 )
+								ret := 0.280000
+							if( VIP_VIM > -0.254448 )
+								ret := -0.666667
+						if( bullPower > -0.048246 )
+							if( bearPower <= -0.025687 )
+								ret := -0.821429 // sell
+							if( bearPower > -0.025687 )
+								ret := -0.965517 // sell
+					if( VIP_VIM > 0.359702 )
+						if( VIP_VIM <= 1.04877 )
+							if( VIP <= 4.94956 )
+								ret := 1.000000 // buy
+							if( VIP > 4.94956 )
+								ret := 0.714286 // buy
+						if( VIP_VIM > 1.04877 )
+							ret := 0.375000
+			if( bearPower > -0.004068 )
+				if( VIP_VIM <= 0.154196 )
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.

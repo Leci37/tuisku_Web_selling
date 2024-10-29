@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: Bollinger_RSI_Double_Strategy
+// ID_model: ETSY_1Hour_1BOL_03e167ac Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_ETSY_1Hour_1BOL_03e167ac", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_ETSY_1Hour_03e167ac(crossunder_rsi_bbupperInt, BBlower, dif_source_BBupper, crossover_rsi_bblowerInt, vrsi, BBupper, dif_source_BBlower)=>
+	var float ret = 0  // # DecisionTreeRegressor(max_depth=5, max_features=0.9, random_state=843828734)
+	if( BBupper <= 61.3964 )
+		if( BBupper <= 44.3283 )
+			if( dif_source_BBupper <= -3.14059 )
+				if( BBlower <= 39.8042 )
+					ret := 1.000000 // buy
+				if( BBlower > 39.8042 )
+					if( dif_source_BBupper <= -3.28715 )
+						ret := 0.000000
+					if( dif_source_BBupper > -3.28715 )
+						ret := 0.500000
+			if( dif_source_BBupper > -3.14059 )
+				if( vrsi <= 52.6545 )
+					if( BBupper <= 44.2611 )
+						ret := -0.066667
+					if( BBupper > 44.2611 )
+						ret := -0.829787 // sell
+				if( vrsi > 52.6545 )
+					if( vrsi <= 90.9539 )
+						ret := -0.030303
+					if( vrsi > 90.9539 )
+						ret := -0.833333 // sell
+		if( BBupper > 44.3283 )
+			if( BBupper <= 49.4285 )
+				if( vrsi <= 60.2006 )
+					if( dif_source_BBupper <= -1.90905 )
+						ret := 0.928571 // buy
+					if( dif_source_BBupper > -1.90905 )
+						ret := 0.516340
+				if( vrsi > 60.2006 )
+					if( BBlower <= 42.2616 )
+						ret := 0.037736
+					if( BBlower > 42.2616 )
+						ret := 0.947368 // buy
+			if( BBupper > 49.4285 )
+				if( vrsi <= 75.4257 )
+					if( dif_source_BBlower <= 20.6945 )
+						ret := 0.133333
+					if( dif_source_BBlower > 20.6945 )
+						ret := 0.683544
+				if( vrsi > 75.4257 )
+					if( BBlower <= 51.0866 )
+						ret := -0.322674
+					if( BBlower > 51.0866 )
+						ret := 0.213904
+	if( BBupper > 61.3964 )
+		if( BBlower <= 238.283 )
+			if( dif_source_BBupper <= -31.6928 )
+				if( dif_source_BBupper <= -53.8778 )
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.

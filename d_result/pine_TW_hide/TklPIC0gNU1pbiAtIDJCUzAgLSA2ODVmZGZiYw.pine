@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: L_Bull_Bear_Power, L_Stochastic_RSI
+// ID_model: NIO_5Min_2BS0_685fdfbc Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_NIO_5Min_2BS0_685fdfbc", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_NIO_5Min_685fdfbc(bearPower, bbm, bbp, bullPower, BBPower_Color, d, d_k, smoothK_k, k, rsi1, smoothD_d)=>
+	var float ret = 0  // # DecisionTreeRegressor(criterion=friedman_mse, max_depth=8, max_features=0.7,min_samples_leaf=4, min_samples_split=5,random_state=843828734)
+	if( rsi1 <= 49.8442 )
+		if( d_k <= -9.41433 )
+			if( d_k <= -16.9449 )
+				if( bbm <= 0.031983 )
+					if( smoothD_d <= 10.811 )
+						if( d <= 12.8807 )
+							if( rsi1 <= 41.7106 )
+								ret := 0.000000
+							if( rsi1 > 41.7106 )
+								ret := -1.000000 // sell
+						if( d > 12.8807 )
+							ret := -0.833333 // sell
+					if( smoothD_d > 10.811 )
+						if( smoothD_d <= 15.7526 )
+							if( bearPower <= -0.016854 )
+								if( d <= 18.2327 )
+									ret := -0.200000
+								if( d > 18.2327 )
+									ret := 0.600000
+							if( bearPower > -0.016854 )
+								if( d <= 16.5501 )
+									ret := 0.250000
+								if( d > 16.5501 )
+									ret := 0.900000 // buy
+						if( smoothD_d > 15.7526 )
+							if( d_k <= -27.3796 )
+								if( bbm <= 0.011849 )
+									ret := 0.042553
+								if( bbm > 0.011849 )
+									ret := -0.349398
+							if( d_k > -27.3796 )
+								if( d <= 21.5155 )
+									ret := -0.372093
+								if( d > 21.5155 )
+									ret := 0.061678
+				if( bbm > 0.031983 )
+					if( rsi1 <= 34.6376 )
+						if( bearPower <= -0.030896 )
+							if( smoothD_d <= 66.1246 )
+								if( bearPower <= -0.073472 )
+									ret := -0.060000
+								if( bearPower > -0.073472 )
+									ret := -0.475410
+							if( smoothD_d > 66.1246 )
+								if( rsi1 <= 29.9681 )
+									ret := 0.250000
+								if( rsi1 > 29.9681 )
+									ret := 1.000000 // buy
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.

@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: L_Chaikin_Money_Flow, L_Stochastic_RSI
+// ID_model: ETHUSDT_30Min_2CS0_ee14b3ff Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_ETHUSDT_30Min_2CS0_ee14b3ff", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_ETHUSDT_30Min_ee14b3ff(mf, ad_mf, ad, d, d_k, smoothK_k, k, rsi1, smoothD_d)=>
+	var float ret = 0  // # DecisionTreeRegressor(max_depth=5, max_features=0.7, random_state=843828734)
+	if( k <= 26.3397 )
+		if( rsi1 <= 41.6386 )
+			if( d_k <= -1.36806 )
+				if( k <= 11.0748 )
+					if( rsi1 <= 34.013 )
+						ret := -0.644945
+					if( rsi1 > 34.013 )
+						ret := -0.253219
+				if( k > 11.0748 )
+					if( ad_mf <= -5402.2 )
+						ret := 0.071304
+					if( ad_mf > -5402.2 )
+						ret := -0.260640
+			if( d_k > -1.36806 )
+				if( rsi1 <= 30.5033 )
+					if( ad <= -52384.4 )
+						ret := -0.152542
+					if( ad > -52384.4 )
+						ret := -0.752426 // sell
+				if( rsi1 > 30.5033 )
+					if( d_k <= 3.59623 )
+						ret := -0.400393
+					if( d_k > 3.59623 )
+						ret := -0.617634
+		if( rsi1 > 41.6386 )
+			if( d_k <= 1.26637 )
+				if( ad <= -4680.77 )
+					if( k <= 19.3123 )
+						ret := 0.310707
+					if( k > 19.3123 )
+						ret := 0.594714
+				if( ad > -4680.77 )
+					if( smoothK_k <= 15.7759 )
+						ret := -0.015145
+					if( smoothK_k > 15.7759 )
+						ret := 0.176307
+			if( d_k > 1.26637 )
+				if( ad <= 3985.41 )
+					if( rsi1 <= 54.5562 )
+						ret := -0.256551
+					if( rsi1 > 54.5562 )
+						ret := 0.094411
+				if( ad > 3985.41 )
+					if( rsi1 <= 52.4245 )
+						ret := -0.514170
+					if( rsi1 > 52.4245 )
+						ret := -0.116046
+	if( k > 26.3397 )
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.

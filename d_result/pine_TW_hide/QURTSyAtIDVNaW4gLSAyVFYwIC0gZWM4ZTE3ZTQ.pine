@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: L_Triple_EMA, L_Vortex_Indicator
+// ID_model: ADSK_5Min_2TV0_ec8e17e4 Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_ADSK_5Min_2TV0_ec8e17e4", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_ADSK_5Min_ec8e17e4(ema3, tema, ema2, ema12, ema13, ema1, VIP, VIM, VIP_VIM)=>
+	var float ret = 0  // # DecisionTreeRegressor(criterion=friedman_mse, max_depth=6, max_features=0.82,max_leaf_nodes=30, random_state=843828734)
+	if( ema1 <= 202.214 )
+		if( ema1 <= 201.516 )
+			if( ema12 <= 0.558726 )
+				if( VIP_VIM <= -0.662588 )
+					if( ema12 <= -0.796698 )
+						if( VIP <= 0.693687 )
+							ret := -0.526316
+						if( VIP > 0.693687 )
+							ret := 0.666667
+					if( ema12 > -0.796698 )
+						ret := 0.643275
+				if( VIP_VIM > -0.662588 )
+					if( ema3 <= 201.089 )
+						if( tema <= 200.162 )
+							ret := 0.062981
+						if( tema > 200.162 )
+							ret := 0.333333
+					if( ema3 > 201.089 )
+						if( ema2 <= 201.091 )
+							ret := -0.627451
+						if( ema2 > 201.091 )
+							ret := -0.048544
+			if( ema12 > 0.558726 )
+				if( VIP <= 1.33893 )
+					ret := 0.741935 // buy
+				if( VIP > 1.33893 )
+					if( VIP_VIM <= 0.802057 )
+						ret := -0.792857 // sell
+					if( VIP_VIM > 0.802057 )
+						ret := 0.113636
+		if( ema1 > 201.516 )
+			if( VIM <= 1.31174 )
+				if( ema13 <= -0.607686 )
+					ret := -0.396825
+				if( ema13 > -0.607686 )
+					ret := 0.319788
+			if( VIM > 1.31174 )
+				if( VIP <= 2.87131 )
+					ret := 0.814815 // buy
+				if( VIP > 2.87131 )
+					ret := -1.000000 // sell
+	if( ema1 > 202.214 )
+		if( tema <= 205.865 )
+			if( ema2 <= 205.263 )
+				if( VIM <= 2.39752 )
+					if( ema3 <= 201.935 )
+						ret := -0.602564
+					if( ema3 > 201.935 )
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.

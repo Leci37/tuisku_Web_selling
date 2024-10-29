@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: L_Chaikin_Money_Flow, L_Stochastic_RSI
+// ID_model: AVAXUSDT_1Hour_2CS0_931d83de Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_AVAXUSDT_1Hour_2CS0_931d83de", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_AVAXUSDT_1Hour_931d83de(ad, mf, ad_mf, rsi1, smoothK_k, d_k, k, d, smoothD_d)=>
+	var float ret = 0  // # DecisionTreeRegressor(criterion=friedman_mse, max_depth=6, max_features=0.9,min_samples_leaf=7, random_state=843828734)
+	if( d_k <= 0.494218 )
+		if( rsi1 <= 51.7366 )
+			if( ad_mf <= -57077.5 )
+				if( mf <= -0.050054 )
+					if( d <= 5.47974 )
+						if( d_k <= -0.254972 )
+							ret := 0.155963
+						if( d_k > -0.254972 )
+							ret := -0.345679
+					if( d > 5.47974 )
+						if( k <= 64.2565 )
+							ret := 0.581032
+						if( k > 64.2565 )
+							ret := 0.142857
+				if( mf > -0.050054 )
+					if( smoothK_k <= 43.8552 )
+						if( mf <= 0.132822 )
+							ret := 0.265152
+						if( mf > 0.132822 )
+							ret := -0.491803
+					if( smoothK_k > 43.8552 )
+						if( smoothK_k <= 56.0772 )
+							ret := -0.568182
+						if( smoothK_k > 56.0772 )
+							ret := -0.092784
+			if( ad_mf > -57077.5 )
+				if( rsi1 <= 38.9565 )
+					if( d_k <= -3.50866 )
+						if( d <= 8.76349 )
+							ret := 0.241470
+						if( d > 8.76349 )
+							ret := -0.111695
+					if( d_k > -3.50866 )
+						if( smoothK_k <= 15.5439 )
+							ret := -0.190689
+						if( smoothK_k > 15.5439 )
+							ret := -0.411924
+				if( rsi1 > 38.9565 )
+					if( d_k <= -8.79585 )
+						if( mf <= 0.007402 )
+							ret := 0.272843
+						if( mf > 0.007402 )
+							ret := 0.010727
+					if( d_k > -8.79585 )
+						if( smoothD_d <= 16.8295 )
+							ret := 0.137491
+						if( smoothD_d > 16.8295 )
+							ret := -0.073997
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.

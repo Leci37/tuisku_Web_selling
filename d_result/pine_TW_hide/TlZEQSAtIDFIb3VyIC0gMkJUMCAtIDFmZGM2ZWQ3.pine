@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: L_Bull_Bear_Power, L_Triple_EMA
+// ID_model: NVDA_1Hour_2BT0_1fdc6ed7 Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_NVDA_1Hour_2BT0_1fdc6ed7", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_NVDA_1Hour_1fdc6ed7(bearPower, bbm, bbp, bullPower, BBPower_Color, ema12, ema3, ema13, tema, ema1, ema2)=>
+	var float ret = 0  // # DecisionTreeRegressor(criterion=friedman_mse, max_depth=6, max_features=0.5,max_leaf_nodes=30, min_samples_split=10,random_state=843828734)
+	if( bearPower <= -3.11982 )
+		if( ema13 <= -6.75803 )
+			if( ema2 <= 285.533 )
+				if( tema <= 167.46 )
+					if( ema1 <= 145.576 )
+						ret := 0.642857
+					if( ema1 > 145.576 )
+						if( ema12 <= -4.22617 )
+							ret := -0.819672 // sell
+						if( ema12 > -4.22617 )
+							ret := 0.217391
+				if( tema > 167.46 )
+					if( tema <= 222.757 )
+						ret := 0.744565 // buy
+					if( tema > 222.757 )
+						ret := 0.366812
+			if( ema2 > 285.533 )
+				if( bbp <= -8.40565 )
+					if( ema3 <= 309.486 )
+						ret := -0.662921
+					if( ema3 > 309.486 )
+						if( ema3 <= 531.768 )
+							ret := 0.351220
+						if( ema3 > 531.768 )
+							ret := -0.044753
+				if( bbp > -8.40565 )
+					ret := -0.445455
+		if( ema13 > -6.75803 )
+			if( ema12 <= -1.16987 )
+				if( tema <= 106.627 )
+					ret := 0.639344
+				if( tema > 106.627 )
+					if( ema2 <= 261.203 )
+						if( tema <= 248.626 )
+							ret := -0.276309
+						if( tema > 248.626 )
+							ret := -0.918519 // sell
+					if( ema2 > 261.203 )
+						if( bbm <= 4.60723 )
+							ret := 0.021127
+						if( bbm > 4.60723 )
+							ret := -0.318801
+			if( ema12 > -1.16987 )
+				if( bullPower <= -0.291043 )
+					if( ema1 <= 493.812 )
+						ret := 0.095823
+					if( ema1 > 493.812 )
+						ret := 0.525547
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.

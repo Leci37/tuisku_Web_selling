@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: MACD_ULT_MTF
+// ID_model: SHOP_1Min_1MAC_e744b75e Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_SHOP_1Min_1MAC_e744b75e", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_SHOP_1Min_e744b75e(signal, histA_IsDownInt, macd, hist, histA_IsUpInt, histB_IsDownInt, histB_IsUpInt, macd_IsBelowInt, macd_IsAboveInt)=>
+	var float ret = 0  // # DecisionTreeRegressor(criterion=friedman_mse, max_depth=8, max_features=0.7,min_samples_leaf=4, min_samples_split=5,random_state=843828734)
+	if( histB_IsDownInt <= 0.5 )
+		if( histA_IsUpInt <= 0.5 )
+			if( hist <= 0.001066 )
+				if( macd <= -0.301431 )
+					if( macd <= -0.357679 )
+						if( macd <= -0.640774 )
+							if( hist <= -1.7452 )
+								ret := -0.500000
+							if( hist > -1.7452 )
+								if( hist <= -1.28177 )
+									ret := 0.500000
+								if( hist > -1.28177 )
+									ret := 0.952381 // buy
+						if( macd > -0.640774 )
+							if( macd <= -0.416999 )
+								if( hist <= -0.037362 )
+									ret := -0.730769 // sell
+								if( hist > -0.037362 )
+									ret := -0.363636
+							if( macd > -0.416999 )
+								if( macd <= -0.403178 )
+									ret := 1.000000 // buy
+								if( macd > -0.403178 )
+									ret := 0.100000
+					if( macd > -0.357679 )
+						if( signal <= -0.324841 )
+							ret := 0.500000
+						if( signal > -0.324841 )
+							if( macd <= -0.354237 )
+								ret := 1.000000 // buy
+							if( macd > -0.354237 )
+								if( macd <= -0.352061 )
+									ret := 0.500000
+								if( macd > -0.352061 )
+									ret := 0.887324 // buy
+				if( macd > -0.301431 )
+					if( hist <= -0.04827 )
+						if( hist <= -0.149259 )
+							if( macd <= 0.710168 )
+								if( signal <= 0.309776 )
+									ret := 0.200000
+								if( signal > 0.309776 )
+									ret := 0.952381 // buy
+							if( macd > 0.710168 )
+								if( hist <= -0.252683 )
+									ret := 0.600000
+								if( hist > -0.252683 )
+									ret := -0.500000
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.

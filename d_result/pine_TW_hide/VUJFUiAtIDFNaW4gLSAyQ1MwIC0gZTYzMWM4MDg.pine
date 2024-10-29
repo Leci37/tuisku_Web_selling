@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: L_Chaikin_Money_Flow, L_Stochastic_RSI
+// ID_model: UBER_1Min_2CS0_e631c808 Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_UBER_1Min_2CS0_e631c808", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_UBER_1Min_e631c808(ad_mf, mf, ad, rsi1, d, k, smoothD_d, d_k, smoothK_k)=>
+	var float ret = 0  // # DecisionTreeRegressor(criterion=friedman_mse, max_depth=8,max_features=sqrt, min_samples_leaf=7,random_state=843828734)
+	if( ad_mf <= 0.545782 )
+		if( d_k <= 0.343204 )
+			if( k <= 98.0239 )
+				if( rsi1 <= 49.1599 )
+					if( ad <= -1694.45 )
+						if( k <= 9.95181 )
+							if( ad <= -27224.7 )
+								if( d <= 1.24122 )
+									ret := -0.137097
+								if( d > 1.24122 )
+									ret := 0.176895
+							if( ad > -27224.7 )
+								if( smoothK_k <= 5.611 )
+									ret := -0.097233
+								if( smoothK_k > 5.611 )
+									ret := -0.418919
+						if( k > 9.95181 )
+							if( ad <= -2356.65 )
+								if( k <= 94.0919 )
+									ret := 0.044040
+								if( k > 94.0919 )
+									ret := -0.293750
+							if( ad > -2356.65 )
+								if( ad <= -2188.39 )
+									ret := -0.517241
+								if( ad > -2188.39 )
+									ret := -0.076923
+					if( ad > -1694.45 )
+						if( d <= 49.5187 )
+							if( smoothK_k <= 32.1322 )
+								if( d <= 26.5253 )
+									ret := 0.145551
+								if( d > 26.5253 )
+									ret := 0.639456
+							if( smoothK_k > 32.1322 )
+								if( ad <= -593.555 )
+									ret := -0.254545
+								if( ad > -593.555 )
+									ret := 0.073171
+						if( d > 49.5187 )
+							if( mf <= -0.270897 )
+								if( rsi1 <= 34.94 )
+									ret := 0.647059
+								if( rsi1 > 34.94 )
+									ret := -0.106383
+							if( mf > -0.270897 )
+								if( rsi1 <= 43.5458 )
+									ret := 0.500000
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.

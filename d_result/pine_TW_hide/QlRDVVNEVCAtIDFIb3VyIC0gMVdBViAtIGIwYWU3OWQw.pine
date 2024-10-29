@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: Wave_Trend_Calculation
+// ID_model: BTCUSDT_1Hour_1WAV_b0ae79d0 Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_BTCUSDT_1Hour_1WAV_b0ae79d0", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_BTCUSDT_1Hour_b0ae79d0(tci, ci, d_tci, esa, d, ci_wt2, wt2, ap)=>
+	var float ret = 0  // # DecisionTreeRegressor(max_depth=6, max_features=0.7, min_samples_split=10,random_state=843828734)
+	if( wt2 <= 56.4337 )
+		if( ci <= 96.6256 )
+			if( esa <= 5326.61 )
+				if( tci <= 17.2239 )
+					if( ci <= 49.0321 )
+						if( ci_wt2 <= -89.1963 )
+							ret := -0.800000 // sell
+						if( ci_wt2 > -89.1963 )
+							ret := 0.761006 // buy
+					if( ci > 49.0321 )
+						if( tci <= -14.449 )
+							ret := -0.909091 // sell
+						if( tci > -14.449 )
+							ret := 0.533333
+				if( tci > 17.2239 )
+					if( ap <= 5276.97 )
+						ret := 0.000000
+					if( ap > 5276.97 )
+						if( tci <= 19.8278 )
+							ret := 0.000000
+						if( tci > 19.8278 )
+							ret := -1.000000 // sell
+			if( esa > 5326.61 )
+				if( ap <= 5781.59 )
+					if( ap <= 5234.88 )
+						ret := 0.230769
+					if( ap > 5234.88 )
+						if( d <= 45.0192 )
+							ret := -0.117647
+						if( d > 45.0192 )
+							ret := -0.869159 // sell
+				if( ap > 5781.59 )
+					if( ap <= 20215.1 )
+						if( esa <= 12780.2 )
+							ret := -0.025618
+						if( esa > 12780.2 )
+							ret := 0.100155
+					if( ap > 20215.1 )
+						if( esa <= 24723.7 )
+							ret := -0.138167
+						if( esa > 24723.7 )
+							ret := -0.031013
+		if( ci > 96.6256 )
+			if( d_tci <= 18.3641 )
+				if( ci_wt2 <= 87.5624 )
+					if( esa <= 6887.93 )
+						ret := -0.769231 // sell
+					if( esa > 6887.93 )
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.

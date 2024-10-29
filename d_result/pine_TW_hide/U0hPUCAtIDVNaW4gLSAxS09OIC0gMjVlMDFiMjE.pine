@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: Blai5_Koncorde_v10
+// ID_model: SHOP_5Min_1KON_25e01b21 Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_SHOP_5Min_1KON_25e01b21", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_SHOP_5Min_25e01b21(nvimin, azul, nvim, marron_mean, marron, nvimax, pvi, pvi_ema, oscp, verde, source, stoc, verde_mean, xrsi, media, xmf, tprice, pvimin, media_azul, verde_media, BollOsc, pvimax, nvi_ema, azul_mean, pvim, nvi, verde_azul)=>
+	var float ret = 0  // # DecisionTreeRegressor(max_depth=6, max_features=0.7, min_samples_split=10,random_state=843828734)
+	if( verde_media <= -100.212 )
+		if( verde_azul <= -41.2501 )
+			if( BollOsc <= -76.2154 )
+				if( media <= 12.1318 )
+					if( xrsi <= 10.5825 )
+						ret := 1.000000 // buy
+					if( xrsi > 10.5825 )
+						ret := -1.000000 // sell
+				if( media > 12.1318 )
+					if( xmf <= 6.75823 )
+						if( azul <= -3.95953 )
+							ret := 0.750000 // buy
+						if( azul > -3.95953 )
+							ret := -0.185185
+					if( xmf > 6.75823 )
+						if( marron_mean <= 12.1496 )
+							ret := 0.045455
+						if( marron_mean > 12.1496 )
+							ret := 0.836364 // buy
+			if( BollOsc > -76.2154 )
+				if( pvimax <= 0.309033 )
+					if( BollOsc <= -74.1664 )
+						if( marron <= 8.13939 )
+							ret := -0.818182 // sell
+						if( marron > 8.13939 )
+							ret := 1.000000 // buy
+					if( BollOsc > -74.1664 )
+						if( marron_mean <= -7.67889 )
+							ret := -0.325000
+						if( marron_mean > -7.67889 )
+							ret := 0.282051
+				if( pvimax > 0.309033 )
+					if( xrsi <= 17.0586 )
+						ret := 1.000000 // buy
+					if( xrsi > 17.0586 )
+						if( verde_mean <= 40.715 )
+							ret := -0.776596 // sell
+						if( verde_mean > 40.715 )
+							ret := 0.500000
+		if( verde_azul > -41.2501 )
+			if( media <= 39.3699 )
+				if( marron <= -12.1121 )
+					if( xmf <= 9.54942 )
+						if( xrsi <= 12.7464 )
+							ret := 0.000000
+						if( xrsi > 12.7464 )
+							ret := 1.000000 // buy
+					if( xmf > 9.54942 )
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.

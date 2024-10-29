@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: L_Chaikin_Money_Flow, L_Stochastic_RSI
+// ID_model: BTCUSDT_1Hour_2CS0_29f9608a Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_BTCUSDT_1Hour_2CS0_29f9608a", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_BTCUSDT_1Hour_29f9608a(ad, mf, ad_mf, rsi1, smoothK_k, d_k, k, d, smoothD_d)=>
+	var float ret = 0  // # DecisionTreeRegressor(criterion=friedman_mse, max_depth=6, max_features=0.9,min_samples_leaf=7, random_state=843828734)
+	if( rsi1 <= 52.0143 )
+		if( d_k <= -1.3414 )
+			if( ad_mf <= -541.921 )
+				if( rsi1 <= 27.5537 )
+					if( k <= 9.60113 )
+						if( ad_mf <= -2385.26 )
+							ret := 0.576271
+						if( ad_mf > -2385.26 )
+							ret := 0.096774
+					if( k > 9.60113 )
+						if( ad <= -1516.97 )
+							ret := -0.037190
+						if( ad > -1516.97 )
+							ret := -0.470149
+				if( rsi1 > 27.5537 )
+					if( d <= 15.4349 )
+						if( ad_mf <= -1070.34 )
+							ret := 0.613014
+						if( ad_mf > -1070.34 )
+							ret := 0.253788
+					if( d > 15.4349 )
+						if( mf <= -0.049712 )
+							ret := 0.329545
+						if( mf > -0.049712 )
+							ret := 0.056204
+			if( ad_mf > -541.921 )
+				if( d_k <= -5.84009 )
+					if( d <= 16.129 )
+						if( rsi1 <= 29.3685 )
+							ret := 0.000000
+						if( rsi1 > 29.3685 )
+							ret := 0.346440
+					if( d > 16.129 )
+						if( mf <= 0.035979 )
+							ret := 0.023158
+						if( mf > 0.035979 )
+							ret := -0.191038
+				if( d_k > -5.84009 )
+					if( ad <= 1312.04 )
+						if( rsi1 <= 30.1289 )
+							ret := -0.302128
+						if( rsi1 > 30.1289 )
+							ret := -0.001422
+					if( ad > 1312.04 )
+						if( smoothD_d <= 83.2818 )
+							ret := -0.327399
+						if( smoothD_d > 83.2818 )
+							ret := 0.372340
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.

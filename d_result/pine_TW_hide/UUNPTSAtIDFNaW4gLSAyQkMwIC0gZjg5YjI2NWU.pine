@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: L_Bull_Bear_Power, L_Chaikin_Money_Flow
+// ID_model: QCOM_1Min_2BC0_f89b265e Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_QCOM_1Min_2BC0_f89b265e", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_QCOM_1Min_f89b265e(bbp, bullPower, BBPower_Color, bearPower, bbm, ad_mf, mf, ad)=>
+	var float ret = 0  // # DecisionTreeRegressor(criterion=friedman_mse, max_depth=8, max_features=0.7,min_samples_leaf=4, min_samples_split=5,random_state=843828734)
+	if( bearPower <= 0.539177 )
+		if( bullPower <= -0.298244 )
+			if( mf <= 0.150462 )
+				if( bbm <= 0.001307 )
+					if( ad_mf <= 0.322746 )
+						if( ad_mf <= 0.153564 )
+							if( bbp <= -1.74041 )
+								if( mf <= -0.003966 )
+									ret := 0.725490 // buy
+								if( mf > -0.003966 )
+									ret := -0.420290
+							if( bbp > -1.74041 )
+								if( bullPower <= -0.562627 )
+									ret := 0.559322
+								if( bullPower > -0.562627 )
+									ret := 0.290254
+						if( ad_mf > 0.153564 )
+							if( bbp <= -1.4251 )
+								if( bearPower <= -0.819686 )
+									ret := 0.047619
+								if( bearPower > -0.819686 )
+									ret := 0.545455
+							if( bbp > -1.4251 )
+								if( mf <= -0.183657 )
+									ret := -0.147959
+								if( mf > -0.183657 )
+									ret := -0.539474
+					if( ad_mf > 0.322746 )
+						if( bearPower <= -1.00211 )
+							if( ad_mf <= 0.476318 )
+								if( mf <= -0.410552 )
+									ret := 0.600000
+								if( mf > -0.410552 )
+									ret := 1.000000 // buy
+							if( ad_mf > 0.476318 )
+								ret := 1.000000 // buy
+						if( bearPower > -1.00211 )
+							if( bearPower <= -0.422573 )
+								if( bbp <= -1.04559 )
+									ret := 0.541667
+								if( bbp > -1.04559 )
+									ret := 0.049180
+							if( bearPower > -0.422573 )
+								if( mf <= -0.361686 )
+									ret := 0.602151
+								if( mf > -0.361686 )
+									ret := 0.937500 // buy
+				if( bbm > 0.001307 )
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.

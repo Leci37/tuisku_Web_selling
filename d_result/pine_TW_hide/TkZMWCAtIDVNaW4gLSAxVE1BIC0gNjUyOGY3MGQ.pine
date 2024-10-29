@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: TMA_Overlay
+// ID_model: NFLX_5Min_1TMA_6528f70d Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_NFLX_5Min_1TMA_6528f70d", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_NFLX_5Min_6528f70d(bullishEngulfingInt, smma4, bullSigInt, smma2, ema2, bearSigInt, bearishEngulfingInt, smma3, smma1)=>
+	var float ret = 0  // # DecisionTreeRegressor(criterion=friedman_mse, max_depth=6, max_features=0.9,min_samples_leaf=7, random_state=843828734)
+	if( ema2 <= 321.783 )
+		if( smma1 <= 321.076 )
+			if( smma3 <= 320.543 )
+				if( smma4 <= 321.99 )
+					if( smma4 <= 321.422 )
+						if( smma3 <= 320.406 )
+							ret := 0.666667
+						if( smma3 > 320.406 )
+							ret := 0.880000 // buy
+					if( smma4 > 321.422 )
+						if( smma3 <= 320.499 )
+							ret := 1.000000 // buy
+						if( smma3 > 320.499 )
+							ret := 0.900000 // buy
+				if( smma4 > 321.99 )
+					ret := 0.500000
+			if( smma3 > 320.543 )
+				if( ema2 <= 319.452 )
+					if( smma2 <= 319.367 )
+						if( ema2 <= 318.025 )
+							ret := 1.000000 // buy
+						if( ema2 > 318.025 )
+							ret := 0.473684
+					if( smma2 > 319.367 )
+						if( smma2 <= 320.312 )
+							ret := -0.391304
+						if( smma2 > 320.312 )
+							ret := 0.060000
+				if( ema2 > 319.452 )
+					if( smma4 <= 321.394 )
+						if( smma1 <= 320.997 )
+							ret := 0.000000
+						if( smma1 > 320.997 )
+							ret := 0.100000
+					if( smma4 > 321.394 )
+						if( smma2 <= 320.321 )
+							ret := -0.370370
+						if( smma2 > 320.321 )
+							ret := -0.893333 // sell
+		if( smma1 > 321.076 )
+			if( smma2 <= 327.018 )
+				if( smma2 <= 322.51 )
+					if( smma2 <= 321.072 )
+						if( smma4 <= 321.369 )
+							ret := 0.916667 // buy
+						if( smma4 > 321.369 )
+							ret := -0.157895
+					if( smma2 > 321.072 )
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.

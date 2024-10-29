@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: L_Chaikin_Money_Flow, L_Stochastic_RSI
+// ID_model: UNIUSDT_15Min_2CS0_ba5c0be3 Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_UNIUSDT_15Min_2CS0_ba5c0be3", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_UNIUSDT_15Min_ba5c0be3(ad_mf, mf, ad, rsi1, d, k, smoothD_d, d_k, smoothK_k)=>
+	var float ret = 0  // # DecisionTreeRegressor(criterion=friedman_mse, max_depth=8,max_features=sqrt, min_samples_leaf=7,random_state=843828734)
+	if( smoothD_d <= 67.621 )
+		if( d <= 16.0109 )
+			if( k <= 11.0874 )
+				if( rsi1 <= 37.4993 )
+					if( ad <= -8937.85 )
+						if( mf <= -0.162815 )
+							if( d_k <= -0.089139 )
+								if( d <= 7.21928 )
+									ret := -0.587302
+								if( d > 7.21928 )
+									ret := -0.282051
+							if( d_k > -0.089139 )
+								if( d_k <= 10.4332 )
+									ret := -0.047407
+								if( d_k > 10.4332 )
+									ret := -0.705882 // sell
+						if( mf > -0.162815 )
+							if( smoothD_d <= 5.08779 )
+								if( d_k <= 2.20939 )
+									ret := -0.634554
+								if( d_k > 2.20939 )
+									ret := -0.359249
+							if( smoothD_d > 5.08779 )
+								if( ad <= -57151.5 )
+									ret := -0.755556 // sell
+								if( ad > -57151.5 )
+									ret := -0.175123
+					if( ad > -8937.85 )
+						if( k <= 0.000149 )
+							if( d <= 0.002235 )
+								if( rsi1 <= 9.33351 )
+									ret := -0.935484 // sell
+								if( rsi1 > 9.33351 )
+									ret := -0.232558
+							if( d > 0.002235 )
+								if( ad <= 1414.52 )
+									ret := -0.300000
+								if( ad > 1414.52 )
+									ret := -0.586022
+						if( k > 0.000149 )
+							if( k <= 3.86607 )
+								if( rsi1 <= 6.83661 )
+									ret := 0.000000
+								if( rsi1 > 6.83661 )
+									ret := -0.622775
+							if( k > 3.86607 )
+								if( rsi1 <= 28.5647 )
+									ret := -0.572309
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.

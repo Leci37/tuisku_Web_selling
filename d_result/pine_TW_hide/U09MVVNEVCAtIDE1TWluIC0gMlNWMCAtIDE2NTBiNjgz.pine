@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: L_Stochastic_RSI, L_Vortex_Indicator
+// ID_model: SOLUSDT_15Min_2SV0_1650b683 Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_SOLUSDT_15Min_2SV0_1650b683", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_SOLUSDT_15Min_1650b683(d_k, d, rsi1, k, smoothD_d, smoothK_k, VIP_VIM, VIM, VIP)=>
+	var float ret = 0  // # DecisionTreeRegressor(criterion=friedman_mse, max_depth=7, max_features=0.65,max_leaf_nodes=30, random_state=843828734)
+	if( rsi1 <= 50.8861 )
+		if( VIP_VIM <= -0.017956 )
+			if( rsi1 <= 40.6009 )
+				if( VIP <= 0.888432 )
+					if( VIP_VIM <= -0.384964 )
+						if( rsi1 <= 32.413 )
+							if( VIP <= 0.645851 )
+								ret := 0.190796
+							if( VIP > 0.645851 )
+								ret := -0.144901
+						if( rsi1 > 32.413 )
+							ret := 0.182304
+					if( VIP_VIM > -0.384964 )
+						if( d <= 5.66367 )
+							if( rsi1 <= 26.819 )
+								ret := -0.762906 // sell
+							if( rsi1 > 26.819 )
+								ret := -0.094858
+						if( d > 5.66367 )
+							if( rsi1 <= 28.8218 )
+								ret := -0.494949
+							if( rsi1 > 28.8218 )
+								ret := -0.090593
+				if( VIP > 0.888432 )
+					if( rsi1 <= 31.107 )
+						ret := -0.730850 // sell
+					if( rsi1 > 31.107 )
+						if( VIP_VIM <= -0.119976 )
+							ret := -0.225626
+						if( VIP_VIM > -0.119976 )
+							ret := -0.524883
+			if( rsi1 > 40.6009 )
+				if( VIM <= 1.14412 )
+					if( VIP <= 0.892701 )
+						ret := 0.235067
+					if( VIP > 0.892701 )
+						ret := -0.007004
+				if( VIM > 1.14412 )
+					if( VIP <= 0.87988 )
+						ret := 0.441176
+					if( VIP > 0.87988 )
+						ret := -0.071882
+		if( VIP_VIM > -0.017956 )
+			if( rsi1 <= 44.4315 )
+				ret := -0.653753
+			if( rsi1 > 44.4315 )
+				if( VIM <= 0.933029 )
+					ret := -0.501100
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.

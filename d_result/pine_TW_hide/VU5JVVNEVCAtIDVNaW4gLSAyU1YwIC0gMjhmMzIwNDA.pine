@@ -1,0 +1,62 @@
+//Welcome to © Tuisku Trading Strategy, a sophisticated and optimised solution created by the experienced team at Tuisku.eu. Our team of experts specialise in random forest AI, harnessing its powerful capabilities to improve trading performance.
+//Tuisku's commitment to quality and innovation shines through in every aspect of this strategy.
+
+
+// Technical base pattern: L_Stochastic_RSI, L_Vortex_Indicator
+// ID_model: UNIUSDT_5Min_2SV0_28f32040 Date Creation: 2024/10/18 Recommended expiry date : 2025/06/18
+//@version=5
+strategy("Tuisku_UNIUSDT_5Min_2SV0_28f32040", overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)
+//RANDOM FOREST AI 
+decision_tree_0_UNIUSDT_5Min_28f32040(rsi1, d, k, smoothD_d, d_k, smoothK_k, VIP, VIP_VIM, VIM)=>
+	var float ret = 0  // # DecisionTreeRegressor(max_depth=5, max_features=0.9, random_state=843828734)
+	if( d_k <= 0.755596 )
+		if( rsi1 <= 38.9344 )
+			if( d_k <= -7.25651 )
+				if( d_k <= -12.7075 )
+					if( VIP <= 0.695623 )
+						ret := 0.633380
+					if( VIP > 0.695623 )
+						ret := 0.222923
+				if( d_k > -12.7075 )
+					if( rsi1 <= 24.8102 )
+						ret := -0.305085
+					if( rsi1 > 24.8102 )
+						ret := 0.113892
+			if( d_k > -7.25651 )
+				if( rsi1 <= 25.9712 )
+					if( d <= 2.63787 )
+						ret := -0.691978
+					if( d > 2.63787 )
+						ret := -0.458633
+				if( rsi1 > 25.9712 )
+					if( VIP_VIM <= -0.170594 )
+						ret := -0.194137
+					if( VIP_VIM > -0.170594 )
+						ret := -0.553398
+		if( rsi1 > 38.9344 )
+			if( smoothK_k <= 10.1887 )
+				if( k <= 2.40161 )
+					if( VIM <= 0.689089 )
+						ret := 0.888889 // buy
+					if( VIM > 0.689089 )
+						ret := -0.383017
+				if( k > 2.40161 )
+					if( rsi1 <= 49.3862 )
+						ret := -0.042343
+					if( rsi1 > 49.3862 )
+						ret := 0.259634
+			if( smoothK_k > 10.1887 )
+				if( rsi1 <= 61.3339 )
+					if( VIP <= 0.857995 )
+						ret := 0.630947
+					if( VIP > 0.857995 )
+						ret := 0.269894
+				if( rsi1 > 61.3339 )
+					if( VIP_VIM <= 0.103193 )
+						ret := 0.767502 // buy
+					if( VIP_VIM > 0.103193 )
+						ret := 0.579528
+	if( d_k > 0.755596 )
+
+	...
+The rest of this Pine script is part of the paid version. Visit the website for more info.
