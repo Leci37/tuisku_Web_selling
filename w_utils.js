@@ -337,3 +337,26 @@ function copyEmailToClipboard() {
     showTemporaryText(copyIcon,"Email sales@tuisku.eu address copied to clipboard!");
 }
 
+
+function getIconPath(fileName) {
+    const localPath = "d_result/icons/${fileName}";
+    const fallbackPath = "https://raw.githubusercontent.com/Leci37/tuisku_Web_selling/refs/heads/main/d_result/icons/${fileName}";
+
+    try {
+        // Try to fetch the local file
+        const response = await fetch(localPath, { method: 'HEAD' });
+
+        // If file exists (status code 200), return the local path
+        if (response.ok) {
+            return localPath;
+        } else {
+            // File does not exist locally, return the fallback URL
+            return fallbackPath;
+        }
+    } catch (error) {
+        // Any error, return the fallback path
+        return fallbackPath;
+    }
+}
+
+

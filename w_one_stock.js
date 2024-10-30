@@ -5,6 +5,8 @@ function generateHtmlForRow(row, pathCandle, pathStra) {
 
     // Generate technical pattern info
     const technicalPatternInfo = getTechnicalPatternInfo(row);
+    // Path to the TradingView icon
+    const twIconPath = getIconPath("_TW_ICO.png") ;
 
     return `
     <html>
@@ -29,7 +31,7 @@ function generateHtmlForRow(row, pathCandle, pathStra) {
             <div>
             <h4 class="h4_url_tw" >
                 <a href="${tradingViewUrl}" target="_blank">
-                    <img src="d_result/icons/_TW_ICO.png" alt="TW icon" style="width: 1.2em; height:  1.2em; vertical-align: middle;">
+                    <img src="${twIconPath}" alt="TW icon" style="width: 1.2em; height:  1.2em; vertical-align: middle;">
                     ${row['Name']} (${row['ticker']})
                 </a>
             <h4><p class="h4_url_tw" style="font-style: italic; font-size: 1.2em; align-items: center; justify-content: center;">
@@ -63,7 +65,7 @@ function generateHtmlForRow(row, pathCandle, pathStra) {
 
             <h4>
                 <a href="${tradingViewUrl}" target="_blank">Open in TradingView
-                    <img src="d_result/icons/_TW_ICO.png" alt="TW icon" style="width: 1.2em; height:  1.2em; vertical-align: middle;">
+                    <img src="${twIconPath}"  alt="TW icon" style="width: 1.2em; height:  1.2em; vertical-align: middle;">
                     ${row['Name']} (${row['ticker']})
                 </a>
             </h4>

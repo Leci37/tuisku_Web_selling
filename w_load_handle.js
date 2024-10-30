@@ -13,7 +13,7 @@ function handleNameColumn(row) {
     const tradingViewUrl = generateTradingViewPath(row);
 
     // Path to the TradingView icon
-    const twIconPath = 'd_result/icons/_TW_ICO_16px.ico';
+    const twIconPath = getIconPath("_TW_ICO_16px.ico") ;
 
     // Create the image element for the company icon (no div for this as per request)
     const iconImg = `<img src="${iconPath}" alt="${ticker} icon" style="width: 1.75em; height: 1.75em; vertical-align: middle; margin-left: 0.8em;">`;
