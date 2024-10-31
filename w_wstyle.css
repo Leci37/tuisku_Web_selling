@@ -214,6 +214,7 @@ button.simpleCart_checkout:hover, button.simpleCart_empty:hover {
     align-items: center;
     padding-top: 2em;
     gap: 0.2em;
+    min-width: 13em;
 }
 
 /* Main container for the discount information */
@@ -292,4 +293,79 @@ button.simpleCart_checkout:hover, button.simpleCart_empty:hover {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+
+
+@media (max-width: 760px) {
+    .hide-column {
+        font-size: 0.9em; /* Slightly reduce font size for all elements within hide-column */
+    }
+
+    /* Make h3 and h4 elements smaller */
+    .hide-column h3,
+    .hide-column h4 {
+        font-size: 0.9em;
+    }
+
+    /* Reduce padding and spacing within the hide-column div */
+    .hide-column p,
+    .hide-column label {
+        font-size: 0.9em; /* Smaller font for text elements */
+    }
+
+    .hide-column .checkbox-wrapper {
+        padding: 4px 6px; /* Smaller padding around checkboxes */
+    }
+
+    /* Reduce the size of the cart icon */
+    .hide-column i.fas.fa-shopping-cart {
+        font-size: 0.9em;
+    }
+
+    /* Adjust input and select elements */
+    .hide-column input[type="checkbox"],
+    .hide-column select,
+    .hide-column button {
+        font-size: 0.9em; /* Smaller font for form elements */
+        padding: 4px 8px; /* Reduced padding */
+    }
+
+    /* For any cart items table */
+    .simple_cart_table th,
+    .simple_cart_table td {
+        font-size: 0.85em; /* Slightly smaller font for table headers and cells */
+        padding: 6px; /* Reduced padding within table cells */
+    }
+}
+
+/* Slightly smaller elements at screen widths under 890px */
+@media (max-width: 890px) {
+    .Select-Columns-to-Display h4 {
+        font-size: 0.95em; /* Reduce font size slightly */
+    }
+    .Select-Columns-to-Display label {
+        font-size: 0.9em; /* Reduce label font size */
+    }
+    .Select-Columns-to-Display input[type="checkbox"] {
+        transform: scale(0.9); /* Scale down checkboxes slightly */
+    }
+}
+
+/* Even smaller elements at screen widths under 540px */
+@media (max-width: 540px) {
+    .Select-Columns-to-Display h4 {
+        font-size: 0.85em; /* Further reduce font size */
+    }
+    .Select-Columns-to-Display label {
+        font-size: 0.8em; /* Further reduce label font size */
+    }
+    .Select-Columns-to-Display input[type="checkbox"] {
+        transform: scale(0.8); /* Further scale down checkboxes */
+    }
+    .Select-Columns-to-Display .checkbox-wrapper {
+        padding: 1px 4px; /* Further reduce padding */
+    }
+}
+
+
+
 

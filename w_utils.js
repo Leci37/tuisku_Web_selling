@@ -344,7 +344,7 @@ function getIconPath(fileName) {
 
     try {
         // Try to fetch the local file
-        const response = await fetch(localPath, { method: 'HEAD' });
+        const response = fetch(localPath, { method: 'HEAD' });
 
         // If file exists (status code 200), return the local path
         if (response.ok) {

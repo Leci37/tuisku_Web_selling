@@ -315,16 +315,125 @@ function resetRangeWithSlider(idPrefix, minValue, maxValue) {
     $(`#slider-range-${idPrefix}`).slider("values", [minValue, maxValue]); // jQuery UI slider
 }
 
-// Helper function to reset multi-select dropdowns
-//function resetMultiSelect(dropdownId) {
-//    const dropdown = document.querySelector(dropdownId);
-//    const options = dropdown && dropdown.options;
-//    if (options) {
-//        for (let i = 0; i < options.length; i++) {
-//            options[i].selected = true; // Select all options
-//        }
-//    }
+////XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 //
-//    // Update the dropdown to reflect the selection
-//    $(dropdownId).trigger('change');
+//// Toggle function for filter column
+//function toggleFilterColumn() {
+//    const filterColumn = document.querySelector('.filter-column');
+//
+//    if (filterColumn.style.display === 'block') {
+//        filterColumn.style.display = 'none';
+//    } else {
+//        filterColumn.style.display = 'block';
+//        filterColumn.scrollIntoView({ behavior: 'smooth', block: 'start' });
+//    }
 //}
+//
+//// Toggle function for PayPal container
+//function togglePayContainer() {
+//    const payContainer = document.getElementById('paypal-button-container');
+//
+//    if (payContainer.style.display === 'block') {
+//        payContainer.style.display = 'none';
+//    } else {
+//        payContainer.style.display = 'block';
+//        payContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+//    }
+//}
+//
+//// Event listeners for toggle buttons
+//document.getElementById('toggleFilterButton').addEventListener('click', toggleFilterColumn);
+//document.getElementById('togglePayButton').addEventListener('click', togglePayContainer);
+//
+//// Screen resizing function to adjust visibility for both buttons and containers
+//function handleResize() {
+//    const filterColumn = document.querySelector('.filter-column');
+//    const toggleFilterButton = document.getElementById('toggleFilterButton');
+//    const payContainer = document.getElementById('paypal-button-container');
+//    const togglePayButton = document.getElementById('togglePayButton');
+//
+//    if (window.innerWidth <= 1000) {
+//        // Show buttons, hide containers by default on small screens
+//        toggleFilterButton.style.display = 'inline-flex';
+//        filterColumn.style.display = 'none';
+//
+//        togglePayButton.style.display = 'inline-flex';
+//        payContainer.style.display = 'none';
+//    } else {
+//        // Show containers and hide buttons on larger screens
+//        toggleFilterButton.style.display = 'none';
+//        filterColumn.style.display = 'block';
+//
+//        togglePayButton.style.display = 'none';
+//        payContainer.style.display = 'block';
+//    }
+//}
+//
+//// Run resize handling on load and when the window resizes
+//window.addEventListener('resize', handleResize);
+//handleResize();
+
+// Toggle function for filter column
+function toggleFilterColumn() {
+    const filterColumn = document.querySelector('.filter-column');
+
+    if (filterColumn.style.display === 'block') {
+        filterColumn.style.display = 'none';
+    } else {
+        filterColumn.style.display = 'block';
+        filterColumn.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+}
+
+// Toggle function for PayPal container
+function togglePayContainer() {
+    const payContainer = document.getElementById('paypal-button-container');
+
+    if (payContainer.style.display === 'block') {
+        payContainer.style.display = 'none';
+    } else {
+        payContainer.style.display = 'block';
+        payContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+}
+
+// Event listeners for toggle buttons
+document.getElementById('toggleFilterButton').addEventListener('click', toggleFilterColumn);
+document.getElementById('togglePayButton').addEventListener('click', togglePayContainer);
+
+// Screen resizing function to adjust visibility based on separate breakpoints
+function handleResize() {
+    const filterColumn = document.querySelector('.filter-column');
+    const toggleFilterButton = document.getElementById('toggleFilterButton');
+    const payContainer = document.getElementById('paypal-button-container');
+    const togglePayButton = document.getElementById('togglePayButton');
+
+    // For filter column elements, resize at 1100px
+    if (window.innerWidth <= 1100) {
+        toggleFilterButton.style.display = 'inline-flex';
+        filterColumn.style.display = 'none';
+    } else {
+        toggleFilterButton.style.display = 'none';
+        filterColumn.style.display = 'block';
+    }
+
+    // For PayPal container elements, resize at 1350px
+    if (window.innerWidth <= 1350) {
+        togglePayButton.style.display = 'inline-flex';
+        payContainer.style.display = 'none';
+    } else {
+        togglePayButton.style.display = 'none';
+        payContainer.style.display = 'block';
+    }
+}
+
+// Run resize handling on load and when the window resizes
+window.addEventListener('resize', handleResize);
+handleResize();
+
+
+
+
+
+
+

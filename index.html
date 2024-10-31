@@ -23,6 +23,20 @@
   <script src="fSelect.js"></script>
 </head>
 <body>
+<div style="display: flex; gap: 10px; align-items: center;" >
+    <!-- Filter Toggle Button for Small Screens -->
+    <button id="toggleFilterButton" style="display: none;">
+        <i class="fas fa-filter"></i> Show filters
+    </button>
+    <!-- Pay Toggle Button for Small Screens -->
+    <button id="togglePayButton" style="display: none;">
+        <i class="fas fa-credit-card"></i> Payment
+    </button>
+<!--    &lt;!&ndash; Pay Toggle Button for Small Screens &ndash;&gt;-->
+<!--    <button id="togglePayButton" style="display: none;">-->
+<!--        <i class="fas fa-credit-card"></i> Pay-->
+<!--    </button>-->
+</div>
 <!-- Main container to hold the filters on the left and table in the center -->
 <div class="layout-container">
   <div class="layout-container_B">
@@ -43,7 +57,7 @@
         <div class="row-container">
             <div class="hide-column">
                 <div id="loadingMessage">Loading Strategies, please wait...</div>
-                <div style="display: inline-flex; align-items: center;">
+                <div style="display: inline-flex; align-items: center;"  class="Select-Columns-to-Display">
                     <h4>Select Columns to Display:</h4>
                     <div id="column-toggle-container"></div>
                 </div>

@@ -288,3 +288,213 @@ button.btn_select_all, button.btn_deselect_all {
 #keyTechsDropdown option {
     font-style: italic;
 }
+
+
+@media (max-width: 1200px) {
+    #toggleFilterButton {
+        display: inline-flex; /* Show button on smaller screens */
+        align-items: center;
+        padding: 8px;
+        font-size: 1.2em;
+        background-color: #3BAF75; /* Button background color */
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        position: fixed; /* Fix the position for visibility */
+        top: 10px;
+        left: 10px; /* Position it to the left for visibility on narrow screens */
+        z-index: 1000;
+        margin-left: 1.3em;
+        max-width: calc(100% - 20px); /* Prevent overflow */
+        white-space: nowrap; /* Ensure text stays in one line */
+    }
+    #toggleFilterButton i {
+        margin-right: 8px; /* Space between icon and text */
+    }
+
+    /* Make the filter column content smaller */
+    .filter-column {
+        font-size: 0.9em; /* Reduce font size for all text inside the filter column */
+    }
+
+    /* Adjust labels, inputs, and dropdowns within the filter column */
+    .filter-column label {
+        font-size: 0.9em; /* Smaller labels */
+    }
+
+    .filter-column input[type="number"],
+    .filter-column select {
+        font-size: 0.9em; /* Smaller font size */
+        padding: 4px 8px; /* Smaller padding */
+        margin: 5px 0; /* Reduced margin for compact layout */
+    }
+
+    .filter-column .p_filter_block {
+        margin-bottom: 8px; /* Reduced margin between filter blocks */
+    }
+
+    /* Adjust dropdown widths */
+    .filter-column select {
+        width: 100%; /* Ensure select elements still fit the container */
+        padding: 4px;
+    }
+
+    /* Smaller slider handles and ranges */
+    .ui-slider-handle {
+        width: 16px;
+        height: 16px;
+    }
+    .ui-slider-range {
+        height: 6px; /* Reduced slider thickness */
+    }
+
+    #histogram-container-trainingMonths, #histogram-container-profitUsd, #histogram-container-price {
+        height: 24px;
+    }
+}
+
+/*XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX*/
+/* Styles for .filter-column at 1100px */
+@media (max-width: 1100px) {
+    #toggleFilterButton {
+        display: inline-flex; /* Show filter toggle button */
+        align-items: center;
+        padding: 8px;
+        font-size: 1.2em;
+        background-color: #3BAF75;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        position: fixed;
+        top: 0.8em;
+        left: 0em;
+        z-index: 1000;
+        max-width: calc(100% - 20px);
+        white-space: nowrap;
+    }
+
+    #toggleFilterButton i {
+        margin-right: 8px;
+    }
+
+    /* Styling for .filter-column contents at 1100px */
+    .filter-column {
+        font-size: 0.9em;
+    }
+
+    .filter-column label {
+        font-size: 0.9em;
+    }
+
+    .filter-column input[type="number"],
+    .filter-column select {
+        font-size: 0.9em;
+        padding: 4px 8px;
+        margin: 5px 0;
+    }
+
+    .filter-column .p_filter_block {
+        margin-bottom: 8px;
+    }
+
+    .filter-column select {
+        width: 100%;
+        padding: 4px;
+    }
+
+    .ui-slider-handle {
+        width: 16px;
+        height: 16px;
+    }
+
+    .ui-slider-range {
+        height: 6px;
+    }
+
+    #histogram-container-trainingMonths,
+    #histogram-container-profitUsd,
+    #histogram-container-price {
+        height: 24px;
+    }
+}
+
+/* Styles for #paypal-button-container at 1350px */
+@media (max-width: 1350px) {
+    #togglePayButton {
+        display: inline-flex; /* Show Pay toggle button */
+        align-items: center;
+        padding: 8px;
+        font-size: 1.2em;
+        background-color: #FFA726;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        position: fixed;
+        top: 0.8em; /* Adjusted position to avoid overlap with filter button */
+        left: 10em;
+        z-index: 1000;
+        max-width: calc(100% - 20px);
+        white-space: nowrap;
+    }
+
+    #togglePayButton i {
+        margin-right: 8px;
+    }
+
+    /* Adjustments for #paypal-button-container similar to .filter-column */
+    #paypal-button-container {
+        font-size: 0.9em;
+    }
+
+    #paypal-button-container label {
+        font-size: 0.9em;
+    }
+
+    #paypal-button-container input[type="number"],
+    #paypal-button-container select {
+        font-size: 0.9em;
+        padding: 4px 8px;
+        margin: 5px 0;
+    }
+
+    #paypal-button-container .p_filter_block {
+        margin-bottom: 8px;
+    }
+
+    #paypal-button-container select {
+        width: 100%;
+        padding: 4px;
+    }
+
+    /* Smaller slider handles and ranges for consistency */
+    #paypal-button-container .ui-slider-handle {
+        width: 16px;
+        height: 16px;
+    }
+
+    #paypal-button-container .ui-slider-range {
+        height: 6px;
+    }
+
+    /* Reduced height for histogram containers in PayPal section */
+    #paypal-button-container #histogram-container-trainingMonths,
+    #paypal-button-container #histogram-container-profitUsd,
+    #paypal-button-container #histogram-container-price {
+        height: 24px;
+    }
+}
+/* Resize both toggle buttons by 15% on screens less than 650px */
+@media (max-width: 600px) {
+    #toggleFilterButton, #togglePayButton {
+        font-size: 0.91em; /* 15% smaller than original 1.2em */
+        padding: 6px; /* 15% smaller than original 8px padding */
+        max-width: calc(100% - 15px);
+    }
+}
+
+
+
+
