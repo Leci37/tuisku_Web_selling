@@ -314,6 +314,9 @@ button.simpleCart_checkout:hover, button.simpleCart_empty:hover {
     .hide-column label {
         font-size: 0.9em; /* Smaller font for text elements */
     }
+    #onlyFreeCheckbox{
+        font-size: 1em !important; /* Smaller font for text elements */
+    }
 
     .hide-column .checkbox-wrapper {
         padding: 4px 6px; /* Smaller padding around checkboxes */

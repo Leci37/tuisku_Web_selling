@@ -499,6 +499,33 @@ button.btn_select_all, button.btn_deselect_all {
 
 
 /*XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX Responsive settings for PayPal button container */
+/* Style for the filter checkbox */
+.p_filter_block_checkbox_HIDE {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1em;
+    padding: 0.5em;
+}
+
+/* Hide the filter checkbox by default */
+.p_filter_block_checkbox_HIDE {
+    display: none;
+}
+
+/* Show the filter checkbox above "Select Columns to Display" on smaller screens */
+@media (max-width: 1000px) {
+    .p_filter_block_checkbox_HIDE {
+        display: block;
+        margin-bottom: 1em; /* Adds space below for separation */
+        font-size: 1.0em !important;
+    }
+
+    .select-columns-container {
+        display: block;
+        margin-top: 0.5em;
+        font-size: 1.0em !important;
+    }
+}
 
 
 

@@ -1,4 +1,4 @@
-// Function to filter only the free ones
+
 function filterOnlyFreeRows(row, headers, display) {
     const onlyFreeChecked = document.getElementById('onlyFreeCheckbox').checked;
 
@@ -413,6 +413,34 @@ function handleResize() {
 // Run resize handling on load and when the window resizes
 window.addEventListener('resize', handleResize);
 handleResize();
+
+
+// This setup makes both onlyFreeCheckbox and onlyFreeCheckbox_HIDE sync their states as soon as either of them is changed.
+document.addEventListener('DOMContentLoaded', function () {
+    function initCheckboxSync() {
+        const onlyFreeCheckbox = document.getElementById('onlyFreeCheckbox');
+        const onlyFreeCheckbox_HIDE = document.getElementById('onlyFreeCheckbox_HIDE');
+
+        if (onlyFreeCheckbox && onlyFreeCheckbox_HIDE) {
+            // Sync function for 'onlyFreeCheckbox' to update 'onlyFreeCheckbox_HIDE'
+            onlyFreeCheckbox.addEventListener('change', function () {
+                onlyFreeCheckbox_HIDE.checked = this.checked; // Sync the hidden checkbox
+                filterTable(); // Apply filtering
+            });
+
+            // Sync function for 'onlyFreeCheckbox_HIDE' to update 'onlyFreeCheckbox'
+            onlyFreeCheckbox_HIDE.addEventListener('change', function () {
+                onlyFreeCheckbox.checked = this.checked; // Sync the main checkbox
+                filterTable(); // Apply filtering
+            });
+        } else {
+            // Retry after a short delay if elements are not yet available
+            setTimeout(initCheckboxSync, 900);
+        }
+    }
+
+    initCheckboxSync(); // Start the initialization check
+});
 
 
 
