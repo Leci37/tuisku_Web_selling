@@ -339,8 +339,8 @@ function copyEmailToClipboard() {
 
 
 function getIconPath(fileName) {
-    const localPath = "d_result/icons/${fileName}";
-    const fallbackPath = "https://raw.githubusercontent.com/Leci37/tuisku_Web_selling/refs/heads/main/d_result/icons/${fileName}";
+    const localPath = `d_result/icons/${fileName}`;
+    const fallbackPath = `https://raw.githubusercontent.com/Leci37/tuisku_Web_selling/refs/heads/main/d_result/icons/${fileName}`;
 
     try {
         // Try to fetch the local file
