@@ -300,3 +300,88 @@ pre {
     padding-left: 2em;
     background-color: white;
 }
+
+
+
+/* Existing styles for table */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th, td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: center;
+    vertical-align: middle;
+}
+
+th {
+    background: linear-gradient(to bottom, #3BD7C8, #478ac9);
+    color: white;
+    text-transform: uppercase;
+}
+
+tbody tr:nth-child(odd) {
+    background-color: #f9f9f9;
+}
+
+/* Responsive Column Hiding */
+@media (max-width: 2000px) {
+    th:nth-child(19), td:nth-child(19) { display: none; } /* Training (Months) */
+}
+
+@media (max-width: 1900px) {
+    th:nth-child(18), td:nth-child(18) { display: none; } /* Release Date */
+}
+
+@media (max-width: 1800px) {
+    th:nth-child(17), td:nth-child(17) { display: none; } /* Avg Bars/Trade */
+}
+
+@media (max-width: 1700px) {
+    th:nth-child(16), td:nth-child(16) { display: none; } /* Avg Profit (%) */
+}
+
+@media (max-width: 1600px) {
+    th:nth-child(15), td:nth-child(15) { display: none; } /* Avg Profit ($) */
+}
+
+@media (max-width: 1500px) {
+    th:nth-child(14), td:nth-child(14) { display: none; } /* Max Loss (%) */
+}
+
+@media (max-width: 1400px) {
+    th:nth-child(13), td:nth-child(13) { display: none; } /* Max Loss ($) */
+}
+
+@media (max-width: 1300px) {
+    th:nth-child(12), td:nth-child(12) { display: none; } /* Profit Factor */
+}
+
+@media (max-width: 1200px) {
+    th:nth-child(11), td:nth-child(11) { display: none; } /* Win Rate (%) */
+}
+
+@media (max-width: 1100px) {
+    th:nth-child(10), td:nth-child(10) { display: none; } /* Closed Trades */
+}
+
+@media (max-width: 1000px) {
+    th:nth-child(9), td:nth-child(9) { display: none; } /* Net Profit (%) */
+}
+
+@media (max-width: 900px) {
+    th:nth-child(8), td:nth-child(8) { display: none; } /* Symbol */
+}
+
+@media (max-width: 800px) {
+    th:nth-child(7), td:nth-child(7) { display: none; } /* Index */
+}
+
+@media (max-width: 700px) {
+    th:nth-child(6), td:nth-child(6) { display: none; } /* Indicators */
+}
+
+

@@ -385,200 +385,87 @@ td.full-indicator-name {
   text-decoration: underline;
 }
 
-/* Always hide the ID column */
+/* Hide ID column always */
 .simple_cart_table th.item-name,
 .simple_cart_table td.item-name {
     display: none;
 }
 
-/* Start hiding columns as screen width decreases in increments of approximately 90px */
+/* Priority Column Hiding for Smaller Screens */
+@media (max-width: 550px) {
+    /* Ensure only the first three columns (Shop, Name, Strategy Chart) remain visible at the smallest widths */
+    #dataTable th:not(:nth-child(1)):not(:nth-child(3)):not(:nth-child(5)),
+    #dataTable td:not(:nth-child(1)):not(:nth-child(3)):not(:nth-child(5)) {
+        display: none !important; /* Override inline display */
+    }
+}
+
+@media (max-width: 450px) {
+    /* Ensure only essential columns (Name, Price, Remove) stay visible */
+    .simple_cart_table th:not(.item-name-name):not(.item-price):not(.item-remove),
+    .simple_cart_table td:not(.item-name-name):not(.item-price):not(.item-remove) {
+        display: none !important;
+    }
+}
+
+/* Priority Column Hiding by Screen Size */
 @media (max-width: 1360px) {
     .simple_cart_table th.item-months-trained,
     .simple_cart_table td.item-months-trained {
-        display: none;
+        display: none !important;
     }
 }
-
 @media (max-width: 1270px) {
     .simple_cart_table th.item-release-date,
     .simple_cart_table td.item-release-date {
-        display: none;
+        display: none !important;
     }
 }
-
 @media (max-width: 1180px) {
     .simple_cart_table th.item-total-closed-trades,
     .simple_cart_table td.item-total-closed-trades {
-        display: none;
+        display: none !important;
     }
 }
-
 @media (max-width: 1090px) {
     .simple_cart_table th.item-win-rate-per,
     .simple_cart_table td.item-win-rate-per {
-        display: none;
+        display: none !important;
     }
 }
-
 @media (max-width: 900px) {
     .simple_cart_table th.item-index,
     .simple_cart_table td.item-index {
-        display: none;
+        display: none !important;
     }
 }
-
 @media (max-width: 810px) {
     .simple_cart_table th.item-indicator-name,
     .simple_cart_table td.item-indicator-name {
-        display: none;
+        display: none !important;
     }
 }
-
 @media (max-width: 720px) {
     .simple_cart_table th.item-net-profit-per,
     .simple_cart_table td.item-net-profit-per {
-        display: none;
+        display: none !important;
     }
 }
-
 @media (max-width: 630px) {
     .simple_cart_table th.item-net-profit-usd,
     .simple_cart_table td.item-net-profit-usd {
-        display: none;
+        display: none !important;
     }
 }
-
 @media (max-width: 540px) {
     .simple_cart_table th.item-interval,
     .simple_cart_table td.item-interval {
-        display: none;
-    }
-}
-
-/* Ensure only Name, Price, and Remove columns are visible at smallest widths */
-@media (max-width: 450px) {
-    .simple_cart_table th:not(.item-name-name):not(.item-price):not(.item-remove),
-    .simple_cart_table td:not(.item-name-name):not(.item-price):not(.item-remove) {
-        display: none;
+        display: none !important;
     }
 }
 
 
-/* Start with all columns displayed at 2000px screen width */
-/* Starting point: All columns displayed for screens up to 2300px */
 
-/* Hide 'Tree Deep' at 2185px */
-@media (max-width: 2185px) {
-    #dataTable th:nth-child(16), /* Tree Deep */
-    #dataTable td:nth-child(16) {
-        display: none;
-    }
-}
-
-/* Hide 'Precision f1 (%)' at 2070px */
-@media (max-width: 2070px) {
-    #dataTable th:nth-child(15), /* Precision f1 (%) */
-    #dataTable td:nth-child(15) {
-        display: none;
-    }
-}
-
-/* Hide 'Numbers Candles' at 1955px */
-@media (max-width: 1950px) {
-    #dataTable th:nth-child(14), /* Numbers Candles */
-    #dataTable td:nth-child(14) {
-        display: none !important; /* Ensure this overrides any inline styles */
-    }
-}
-
-/* Hide 'Trades Per Candle' at 1840px */
-@media (max-width: 1840px) {
-    #dataTable th:nth-child(13), /* Trades Per Candle */
-    #dataTable td:nth-child(13) {
-        display: none;
-    }
-}
-
-/* Hide 'Months Trained' at 1725px */
-@media (max-width: 1725px) {
-    #dataTable th:nth-child(12), /* Months Trained */
-    #dataTable td:nth-child(12) {
-        display: none;
-    }
-}
-
-/* Hide 'Release Date' at 1610px */
-@media (max-width: 1610px) {
-    #dataTable th:nth-child(11), /* Release Date */
-    #dataTable td:nth-child(11) {
-        display: none;
-    }
-}
-
-/* Hide 'Avg Bars/Trade' at 1495px */
-@media (max-width: 1495px) {
-    #dataTable th:nth-child(10), /* Avg Bars/Trade */
-    #dataTable td:nth-child(10) {
-        display: none;
-    }
-}
-
-/* Hide 'Avg Profit (%)' at 1380px */
-@media (max-width: 1380px) {
-    #dataTable th:nth-child(9), /* Avg Profit (%) */
-    #dataTable td:nth-child(9) {
-        display: none;
-    }
-}
-
-/* Hide 'Avg Profit ($)' at 1265px */
-@media (max-width: 1265px) {
-    #dataTable th:nth-child(8), /* Avg Profit ($) */
-    #dataTable td:nth-child(8) {
-        display: none;
-    }
-}
-
-/* Hide 'Max Loss (%)' at 1150px */
-@media (max-width: 1150px) {
-    #dataTable th:nth-child(7), /* Max Loss (%) */
-    #dataTable td:nth-child(7) {
-        display: none;
-    }
-}
-
-/* Hide 'Max Loss ($)' at 1035px */
-@media (max-width: 805px) {
-    #dataTable th:nth-child(6), /* Max Loss ($) */
-    #dataTable td:nth-child(6) {
-        display: none;
-    }
-}
-
-/* Hide 'Win Rate (%)' at 805px */
-@media (max-width: 705px) {
-    #dataTable th:nth-child(4), /* Win Rate (%) */
-    #dataTable td:nth-child(4) {
-        display: none;
-    }
-}
-
-/* Hide 'Net Profit (%)' at 575px */
-@media (max-width: 600px) {
-    #dataTable th:nth-child(2), /* Net Profit (%) */
-    #dataTable td:nth-child(2) {
-        display: none;
-    }
-}
-
-
-/* Ensure only the first three columns (Shop, Name, Strategy Chart) remain visible at the smallest widths */
-@media (max-width: 550px) {
-    #dataTable th:not(:nth-child(1)):not(:nth-child(3)):not(:nth-child(5)),
-    #dataTable td:not(:nth-child(1)):not(:nth-child(3)):not(:nth-child(5)) {
-        display: none !important; /* Ensure this overrides any inline styles */
-    }
-}
 
 
 

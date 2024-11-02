@@ -70,7 +70,7 @@ function generateHtmlForRow(row, pathCandle, pathStra) {
                 </a>
             </h4>
             <p style="font-style: italic; font-size: 1.2em;">*In TW update the candles Time: <span style="font-weight: bold; background-color: yellow;">- ${row['interval']} </span></p>
-                    <button class="copy-btn" onclick="copyCode()">
+                    <button class="copy-btn" onclick="copyCode_one_stock_tab()">
                         <i class="fas fa-copy"></i>
                         <div>Copy</div>
                     </button>
@@ -101,39 +101,31 @@ function generateHtmlForRow(row, pathCandle, pathStra) {
                         });
                 });
 
+                function copyCode_one_stock_tab() {
+                    const codeBlock = document.getElementById('javaCode');
+                    const range = document.createRange();
+                    range.selectNode(codeBlock);
+                    window.getSelection().removeAllRanges();
+                    window.getSelection().addRange(range);
+                    document.execCommand('copy');
+                    window.getSelection().removeAllRanges();
 
+                    const copyButton = document.querySelector('.copy-btn');
+                    const originalText = copyButton.querySelector('div').textContent;
+                    copyButton.style.backgroundColor = '#28a745';
+                    copyButton.querySelector('div').textContent = 'Copied';
+
+                    setTimeout(() => {
+                        copyButton.style.backgroundColor = '';
+                        copyButton.querySelector('div').textContent = originalText;
+                    }, 3000);
+                }
             </script>
         </body>
     </html>
     `;
 }
 
-
-function copyCode() {
-    const codeBlock = document.getElementById('javaCode');
-
-    // Select the code
-    const range = document.createRange();
-    range.selectNode(codeBlock);
-    window.getSelection().removeAllRanges(); // Clear existing selection
-    window.getSelection().addRange(range); // Select the text
-    document.execCommand('copy'); // Copy the text to clipboard
-    window.getSelection().removeAllRanges(); // Deselect text
-
-    // Get the button element
-    const copyButton = document.querySelector('.copy-btn');
-    const originalText = copyButton.querySelector('div').textContent; // Store the original text
-
-    // Change the button text and color to indicate copy success
-    copyButton.style.backgroundColor = '#28a745'; // Green background for success
-    copyButton.querySelector('div').textContent = 'Copied'; // Change the text to "Copied"
-
-    // Revert the button text and color back after 3 seconds
-    setTimeout(() => {
-        copyButton.style.backgroundColor = ''; // Reset to original background color
-        copyButton.querySelector('div').textContent = originalText; // Restore original text "Copy"
-    }, 3000); // 3 seconds delay
-}
 
 
 

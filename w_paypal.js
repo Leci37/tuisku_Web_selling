@@ -159,5 +159,9 @@ paypal.Buttons({
     }
 }).render('#paypal-button-container');  // Display PayPal button in the container
 
+
+
+// Add event listener to PayPal toggle button
+document.getElementById('togglePayButton').addEventListener('click', togglePayContainer);
 // Initial cart total update based on existing items
 updateCartTotal();

@@ -27,11 +27,28 @@ const columnTooltips = {
     "Tree Deep": "Represents the depth of the decision tree model (if used). Higher depth indicates greater model complexity, affecting decision making."
 };
 
+// Responsive breakpoints for hiding specific columns based on screen size
+const responsiveBreakpoints = [
+    { width: 2185, columns: [16] }, // Tree Deep
+    { width: 2070, columns: [15] }, // Precision f1 (%)
+    { width: 1955, columns: [14] }, // Numbers Candles
+    { width: 1840, columns: [13] }, // Trades Per Candle
+    { width: 1725, columns: [12] }, // Months Trained
+    { width: 1610, columns: [11] }, // Release Date
+    { width: 1495, columns: [10] }, // Avg Bars/Trade
+    { width: 1380, columns: [9] },  // Avg Profit (%)
+    { width: 1265, columns: [8] },  // Avg Profit ($)
+    { width: 1150, columns: [7] },  // Max Loss (%)
+    { width: 1035, columns: [6] },  // Max Loss ($)
+    { width: 805, columns: [4] },   // Win Rate (%)
+    { width: 600, columns: [2] }    // Net Profit (%)
+];
 
 // Main function to initialize the column toggle functionality
 function initializeColumnToggleHideColumns() {
     initializeColumnCheckboxes();
     bindCheckboxEvents();
+    applyResponsiveColumnHiding(); // Apply responsive hiding based on screen size
 }
 
 // Function to initialize checkboxes based on table headers
@@ -65,7 +82,7 @@ function initializeColumnCheckboxes() {
 
         // Apply initial column visibility based on checkbox state
         const checkbox = checkboxWrapper.find('input[type="checkbox"]');
-        toggleColumnVisibility(index, checkbox.is(':checked'));
+        toggleColumnVisibility(index, checkbox.is(':checked'), false);
     });
 }
 
@@ -105,18 +122,31 @@ function createCheckboxWrapper(index, columnName, uncheckedColumns) {
 function bindCheckboxEvents() {
     $('#column-toggle-container input[type="checkbox"]').change(function() {
         const columnIndex = $(this).data('column-index');
-        toggleColumnVisibility(columnIndex, $(this).is(':checked'));
+        toggleColumnVisibility(columnIndex, $(this).is(':checked'), true);
+        saveColumnPreferences();
     });
 }
 
-// Function to show/hide the columns based on checkbox state
-function toggleColumnVisibility(columnIndex, isVisible) {
+// Show/hide columns based on checkbox state with optional highlight
+function toggleColumnVisibility(columnIndex, isVisible, highlight) {
     const th = $(`#dataTable th:nth-child(${columnIndex + 1})`);
     const td = $(`#dataTable td:nth-child(${columnIndex + 1})`);
 
     if (isVisible) {
         th.show();
         td.show();
+
+        // Apply highlight transition if user clicked to show
+        if (highlight) {
+            // Set initial orange-red color for header
+            th.css({ backgroundColor: '#FFA07A' }); // Orange-red highlight color for th
+            td.css({ backgroundColor: '#FFF9C4' }); // Soft yellow highlight color for td
+            setTimeout(() => {
+                // Transition back to default with a 1.5s transition for the th
+                th.css({ transition: 'background-color 3.5s', backgroundColor: '' });
+                td.css({ transition: 'background-color 3.5s', backgroundColor: '' });
+            }, 0);
+        }
     } else {
         th.hide();
         td.hide();
@@ -124,6 +154,19 @@ function toggleColumnVisibility(columnIndex, isVisible) {
 }
 
 
+// Function to apply responsive column hiding based on breakpoints
+function applyResponsiveColumnHiding() {
+    $(window).resize(() => {
+        const width = $(window).width();
+        responsiveBreakpoints.forEach(({ width: breakpoint, columns }) => {
+            columns.forEach(columnIndex => {
+                const th = $(`#dataTable th:nth-child(${columnIndex})`);
+                const td = $(`#dataTable td:nth-child(${columnIndex})`);
+                width < breakpoint ? (th.hide(), td.hide()) : (th.show(), td.show());
+            });
+        });
+    }).resize(); // Trigger initial resize event
+}
 
 
 

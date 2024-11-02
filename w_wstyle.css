@@ -188,10 +188,10 @@ button.simpleCart_checkout:hover, button.simpleCart_empty:hover {
 /* Flexbox container for the hide-column and PayPal button */
 .row-container {
     display: flex;
-    justify-content: space-between;
+/*    justify-content: space-evenly;*/
     align-items: center;
     padding: 1em;
-    background-color: #f9f9f9;
+  /*   background-color: #f9f9f9; */
   border: 1px solid #ccc;
   border-radius: 5px;
   margin-bottom: 0.8em;
@@ -215,6 +215,9 @@ button.simpleCart_checkout:hover, button.simpleCart_empty:hover {
     padding-top: 2em;
     gap: 0.2em;
     min-width: 13em;
+    background-color: #f9f9f9;
+    border: 1px solid #ccc;
+    border-radius: 5px;
 }
 
 /* Main container for the discount information */
@@ -365,6 +368,11 @@ button.simpleCart_checkout:hover, button.simpleCart_empty:hover {
         padding: 1px 4px; /* Further reduce padding */
     }
 }
+
+
+
+
+
 
 
 

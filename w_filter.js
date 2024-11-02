@@ -315,63 +315,38 @@ function resetRangeWithSlider(idPrefix, minValue, maxValue) {
     $(`#slider-range-${idPrefix}`).slider("values", [minValue, maxValue]); // jQuery UI slider
 }
 
-////XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-//
-//// Toggle function for filter column
-//function toggleFilterColumn() {
-//    const filterColumn = document.querySelector('.filter-column');
-//
-//    if (filterColumn.style.display === 'block') {
-//        filterColumn.style.display = 'none';
-//    } else {
-//        filterColumn.style.display = 'block';
-//        filterColumn.scrollIntoView({ behavior: 'smooth', block: 'start' });
-//    }
-//}
-//
-//// Toggle function for PayPal container
-//function togglePayContainer() {
-//    const payContainer = document.getElementById('paypal-button-container');
-//
-//    if (payContainer.style.display === 'block') {
-//        payContainer.style.display = 'none';
-//    } else {
-//        payContainer.style.display = 'block';
-//        payContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
-//    }
-//}
-//
-//// Event listeners for toggle buttons
-//document.getElementById('toggleFilterButton').addEventListener('click', toggleFilterColumn);
-//document.getElementById('togglePayButton').addEventListener('click', togglePayContainer);
-//
-//// Screen resizing function to adjust visibility for both buttons and containers
-//function handleResize() {
-//    const filterColumn = document.querySelector('.filter-column');
-//    const toggleFilterButton = document.getElementById('toggleFilterButton');
-//    const payContainer = document.getElementById('paypal-button-container');
-//    const togglePayButton = document.getElementById('togglePayButton');
-//
-//    if (window.innerWidth <= 1000) {
-//        // Show buttons, hide containers by default on small screens
-//        toggleFilterButton.style.display = 'inline-flex';
-//        filterColumn.style.display = 'none';
-//
-//        togglePayButton.style.display = 'inline-flex';
-//        payContainer.style.display = 'none';
-//    } else {
-//        // Show containers and hide buttons on larger screens
-//        toggleFilterButton.style.display = 'none';
-//        filterColumn.style.display = 'block';
-//
-//        togglePayButton.style.display = 'none';
-//        payContainer.style.display = 'block';
-//    }
-//}
-//
-//// Run resize handling on load and when the window resizes
-//window.addEventListener('resize', handleResize);
-//handleResize();
+
+// Event listeners for toggle buttons
+document.getElementById('toggleFilterButton').addEventListener('click', toggleFilterColumn);
+document.getElementById('togglePayButton').addEventListener('click', togglePayContainer);
+
+// Screen resizing function to adjust visibility for both buttons and containers
+function handleResize() {
+    const filterColumn = document.querySelector('.filter-column');
+    const toggleFilterButton = document.getElementById('toggleFilterButton');
+    const payContainer = document.getElementById('paypal-button-container');
+    const togglePayButton = document.getElementById('togglePayButton');
+
+    if (window.innerWidth <= 1000) {
+        // Show buttons, hide containers by default on small screens
+        toggleFilterButton.style.display = 'inline-flex';
+        filterColumn.style.display = 'none';
+
+        togglePayButton.style.display = 'inline-flex';
+        payContainer.style.display = 'none';
+    } else {
+        // Show containers and hide buttons on larger screens
+        toggleFilterButton.style.display = 'none';
+        filterColumn.style.display = 'block';
+
+        togglePayButton.style.display = 'none';
+        payContainer.style.display = 'block';
+    }
+}
+
+// Run resize handling on load and when the window resizes
+window.addEventListener('resize', handleResize);
+handleResize();
 
 // Toggle function for filter column
 function toggleFilterColumn() {
@@ -394,8 +369,16 @@ function togglePayContainer() {
     } else {
         payContainer.style.display = 'block';
         payContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+        // Ensure it fits within the screen on small screens
+        if (window.innerWidth <= 1000) {
+            payContainer.style.maxWidth = '95%';  // Restrict width to avoid overflow
+            payContainer.style.overflowX = 'auto'; // Allow horizontal scrolling if necessary
+            payContainer.style.margin = '0 auto';  // Center the container
+        }
     }
 }
+
 
 // Event listeners for toggle buttons
 document.getElementById('toggleFilterButton').addEventListener('click', toggleFilterColumn);
