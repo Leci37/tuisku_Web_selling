@@ -406,6 +406,7 @@ function getUniqueIndicatorPairs(data) {
 
 
 // Populate dropdown with {SVG Icon} {Name} ({ticker}) display
+// Populate dropdown with {SVG Icon} {Name} ({ticker}) display
 function populateDropdownWithNamesAndTickers(dropdownId, tickerNamePairs) {
     const dropdown = document.querySelector(dropdownId);
     dropdown.innerHTML = ''; // Clear previous options
@@ -414,10 +415,14 @@ function populateDropdownWithNamesAndTickers(dropdownId, tickerNamePairs) {
         const option = document.createElement('option');
         option.value = ticker;
 
-        const iconPath = tickerNamePairs[ticker].iconPath;
-        const iconImg = `<img src="${iconPath}" alt="${ticker} icon" style="width: 1.1em; height: 1.1em; vertical-align: middle; margin-right: 1px;">`;
+        // Generate the CSS class name for the mosaic icon based on the ticker
+        const tickerClassMosaic = `icon-${ticker}_18x18`;
 
-        option.innerHTML = `${iconImg} ${tickerNamePairs[ticker].name} (${ticker})`;
+        // Create a span element with the mosaic class instead of an img element
+        const iconSpan = `<span class="${tickerClassMosaic}" style="width: 18px; height: 18px; vertical-align: middle; margin-right: 1px; display: inline-block;"></span>`;
+
+        // Set the option's innerHTML to include the icon and ticker name
+        option.innerHTML = `${iconSpan} ${tickerNamePairs[ticker].name} (${ticker})`;
 
         dropdown.appendChild(option);
     });

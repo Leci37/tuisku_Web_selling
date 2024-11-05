@@ -2,68 +2,93 @@
 
 // Handles the rendering of the "Name" column, including an icon and ticker with TradingView link and icon.
 // Handles the rendering of the "Name" column, including an icon, name, and ticker with TradingView link and icon.
-// Handles the rendering of the "Name" column, including an icon, name, and ticker with TradingView link and icon.
 function handleNameColumn(row) {
     const td = document.createElement('td');
-    const iconPath = row['path_ico'];
+    const iconClass = `icon-${row['ticker']}_big_28x28`; // Construct class based on ticker with size suffix
     const name = row['Name'];
     const ticker = row['ticker'];
 
     // Generate the TradingView URL using the previously defined function
     const tradingViewUrl = generateTradingViewPath(row);
 
-    // Path to the TradingView icon
-    const twIconPath = getIconPath("_TW_ICO_16px.ico") ;
+    // Mosaic class for the TradingView icon
+    const twIconClass = "icon-TW_ICO_18x18"; // Class for the TradingView icon in the mosaic
 
-    // Create the image element for the company icon (no div for this as per request)
-    const iconImg = `<img src="${iconPath}" alt="${ticker} icon" style="width: 1.75em; height: 1.75em; vertical-align: middle; margin-left: 0.8em;">`;
+    // Create a span element for the company icon using the mosaic class
+    const iconSpan = `<span class="${iconClass}" style="width: 28px; height: 28px; vertical-align: middle; margin-right: 0.12em; display: inline-block; overflow: hidden; flex-shrink: 0;"></span>`;
 
-    // Create the name div
-    //const nameDiv = `<div ><span class="name-text">${name}</span></div>`;
-    const nameDiv = `${name} `;
-
-
-    // Create the ticker div, with the TradingView icon and ticker as links
+    // Create the ticker and name content, including the TradingView icon as a span with mosaic class
     const tickerDiv = `
-    <div  style="display: inline-flex; align-items: center;">
-            <img src="${twIconPath}" href="${tradingViewUrl}" alt="TW icon" style="width: 1.1em; height: 1.1em; vertical-align: middle; margin-right: 4px;">
-            <a href="${tradingViewUrl}" target="_blank" style="color: #3BAF75; ">${ticker}</a>
-     </div>
-    `;
+    <div style="display: inline-flex; align-items: center; flex-wrap: nowrap;">
+        ${iconSpan}
+        <div class="ticker-name-div" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+            ${name}
+            <div style="display: inline-flex; align-items: center; margin-left: 0.5em;">
+                <span class="${twIconClass}" style="width: 18px; height: 18px; vertical-align: middle; margin-right: 4px; display: inline-block;"></span>
+                <a href="${tradingViewUrl}" target="_blank" style="color: #3BAF75;">${ticker}</a>
+            </div>
+        </div>
+    </div>`;
 
-    // Combine all parts into the table cell
-    td.innerHTML = `<div class="td_name_ico_div">${iconImg}<div  class="ticker-name-div" > ${nameDiv} ${tickerDiv}</div></div>`;
-    td.classList.add('td_name_ico'); // Add the specific class for styling
+    // Set the HTML content of the table cell
+    td.innerHTML = `<div class="td_name_ico_div">${tickerDiv}</div>`;
+    td.classList.add('td_name_ico'); // Add specific class for styling
 
     return td;
 }
 
+// Handles the rendering of columns containing image paths using mosaic CSS classes.
+//function handleImageColumn(row, key) {
+//    const td = document.createElement('td');
+//    const imgPath = row[key];
+//
+//    if (imgPath) {
+//        // Extract the file name without extension to use as part of the class name
+//        const fileName = imgPath.split('/').pop().split('.').slice(0, -1).join('.');
+//        const imgClass = `img-${fileName}`; // Class name from the CSS sprite mosaic
+//
+//        // Create a span instead of img to use the CSS background-image
+//        const span = document.createElement('span');
+//        span.classList.add(imgClass); // Apply the CSS class for the sprite
+//        span.style.width = '200px'; // Ensure the width and height match the sprite settings
+////        span.style.height = '200px';
+//        span.style.display = 'inline-block';
+//
+//        td.classList.add('td_img_path');
+//
+//        const link = document.createElement('a');
+//        link.href = '#'; // Dummy href
+//        link.addEventListener('click', function(event) {
+//            event.preventDefault(); // Prevent default anchor behavior
+//            const newWindow = window.open('', '_blank');
+//            newWindow.document.write(generateHtmlForRow(row, row['path_candle'], row['path_stra']));
+//            newWindow.document.close();
+//        });
+//
+//        link.appendChild(span);
+//        td.appendChild(link);
+//    } else {
+//        td.textContent = 'N/A';
+//    }
+//
+//    return td;
+//}
 
-
-
-
-
-// Handles the rendering of columns containing image paths.
+// Handles the rendering of columns containing image paths using mosaic CSS classes.
 function handleImageColumn(row, key) {
     const td = document.createElement('td');
     const imgPath = row[key];
 
     if (imgPath) {
-        const img = document.createElement('img');
-        img.src = imgPath.replace(/\\/g, '/'); // Correct path format
-        img.classList.add('th_img_path');
+        const imgClass = extractImageClass(imgPath);
+        const span = createImageSpan(imgClass);
+
+        // Set up hover effect for full-size image display
+        span.addEventListener('mouseenter', () => showFullSizeImage(span, imgPath));
+
         td.classList.add('td_img_path');
+        const link = createClickableLink(span, row);
 
-        const link = document.createElement('a');
-        link.href = '#'; // Dummy href
-        link.addEventListener('click', function(event) {
-            event.preventDefault(); // Prevent default anchor behavior
-            const newWindow = window.open('', '_blank');
-            newWindow.document.write(generateHtmlForRow(row, row['path_candle'], row['path_stra']));
-            newWindow.document.close();
-        });
-
-        link.appendChild(img);
         td.appendChild(link);
     } else {
         td.textContent = 'N/A';
@@ -71,6 +96,61 @@ function handleImageColumn(row, key) {
 
     return td;
 }
+
+// Extract the file name from imgPath to use as a CSS class name
+function extractImageClass(imgPath) {
+    const fileName = imgPath.split('/').pop().split('.').slice(0, -1).join('.');
+    return `img-${fileName}`;
+}
+
+// Create a span element with the given CSS class for the initial image display
+function createImageSpan(imgClass) {
+    const span = document.createElement('span');
+    span.classList.add(imgClass);
+    span.style.width = '200px';
+    span.style.display = 'inline-block';
+    span.style.position = 'relative';
+    return span;
+}
+
+// Show the full-size image on hover with the specified style
+function showFullSizeImage(span, imgPath) {
+    const fullSizeImg = document.createElement('img');
+    fullSizeImg.src = imgPath;
+    styleFullSizeImage(fullSizeImg);
+
+    // Append and remove the full-size image on hover
+    span.appendChild(fullSizeImg);
+    span.addEventListener('mouseleave', () => span.removeChild(fullSizeImg), { once: true });
+}
+
+// Apply styles to the full-size image for the hover effect
+function styleFullSizeImage(img) {
+    img.style.position = 'absolute';
+    img.style.zIndex = '9999';
+    img.style.maxWidth = 'none';
+    img.style.top = '25%';
+    img.style.left = '25%';
+    img.style.transform = 'translate(-25%, -25%) scale(6)';
+    img.style.boxShadow = '0 4px 15px rgba(0, 0, 0, 0.3)';
+    img.style.transition = 'transform 0.3s ease, box-shadow 0.3s ease';
+}
+
+// Create a clickable link wrapping the span element
+function createClickableLink(span, row) {
+    const link = document.createElement('a');
+    link.href = '#'; // Dummy href
+    link.addEventListener('click', function(event) {
+        event.preventDefault();
+        const newWindow = window.open('', '_blank');
+        newWindow.document.write(generateHtmlForRow(row, row['path_candle'], row['path_stra']));
+        newWindow.document.close();
+    });
+    link.appendChild(span);
+    return link;
+}
+
+
 
 // Handles the rendering of the "Shop" column, including free and buyable items.
 function handleShopColumn(row, price) {
@@ -195,6 +275,12 @@ function createSimpleCartFields(row, price, id_encodedKey) {
     return simpleCartDiv;
 }
 
+function getIconSpan(ticker) {
+    const tickerClassMosaic = `icon-${ticker}_21x21`; // Construct the mosaic CSS class for the 18x18 icon
+    return `<span class="${tickerClassMosaic}" style="width: 21px; height: 21px; margin-right: 4px; display: inline-block; vertical-align: middle; flex-shrink: 0;"></span>`;
+}
+
+
 // SimpleCart.js Configuration
 
 simpleCart({
@@ -202,7 +288,13 @@ simpleCart({
     cartColumns: [
         { attr: "name", label: "ID" },
         { attr: "name-name", label: "Name", view: function(item) {
-            return `<div style="display: flex; align-items: center;"> <p style=" margin: 0px;">  ${item.get('name-name')} &ensp;(${item.get('ticker')})</p> &ensp; <img style="width: 1em; height: 1em;" src="${item.get('path-ico')}" alt="Icon"> </div>`;
+            // Use getIconSpan to get the icon based on the ticker
+            const iconSpan = getIconSpan(item.get('ticker')); // Assuming 'ticker' holds the identifier for the mosaic icon
+            return `
+                <div style="display: flex; align-items: center;">
+                    ${iconSpan}
+                    <p style="margin: 0px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${item.get('name-name')} &ensp;(${item.get('ticker')})</p>
+                </div>`;
         } },
         { attr: "price", label: "Price" , view: 'currency' },
         { attr: "interval", label: "Interval" },
