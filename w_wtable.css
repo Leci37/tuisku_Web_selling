@@ -68,12 +68,6 @@
     object-fit: cover; /* Ensure the image fills the space without distortion */
 }
 
-/* Ensure the table cells themselves have no padding that could interfere */
-.td_img_path {
-    padding: 0px !important;
-    position: relative; /* Position relative for hover effect */
-}
-
 
 /*--------------------------------------------------------*/
 
@@ -111,6 +105,10 @@
     transform: translate(-25%, -25%) scale(6); /* Center the image and scale it to full size */
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); /* Add subtle shadow for floating effect */
 }
+
+
+
+
 
 /* Flexbox container to ensure the image and text are aligned */
 .td_name_ico_div {
@@ -391,14 +389,7 @@ td.full-indicator-name {
     display: none;
 }
 
-/* Priority Column Hiding for Smaller Screens */
-@media (max-width: 550px) {
-    /* Ensure only the first three columns (Shop, Name, Strategy Chart) remain visible at the smallest widths */
-    #dataTable th:not(:nth-child(1)):not(:nth-child(3)):not(:nth-child(5)),
-    #dataTable td:not(:nth-child(1)):not(:nth-child(3)):not(:nth-child(5)) {
-        display: none !important; /* Override inline display */
-    }
-}
+
 
 @media (max-width: 450px) {
     /* Ensure only essential columns (Name, Price, Remove) stay visible */
