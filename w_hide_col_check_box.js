@@ -28,21 +28,36 @@ const columnTooltips = {
 };
 
 // Responsive breakpoints for hiding specific columns based on screen size
+// Responsive breakpoints for hiding specific columns based on screen size
 const responsiveBreakpoints = [
-    { width: 2185, columns: [16] }, // Tree Deep
-    { width: 2070, columns: [15] }, // Precision f1 (%)
-    { width: 1955, columns: [14] }, // Numbers Candles
-    { width: 1840, columns: [13] }, // Trades Per Candle
-    { width: 1725, columns: [12] }, // Months Trained
-    { width: 1610, columns: [11] }, // Release Date
-    { width: 1495, columns: [10] }, // Avg Bars/Trade
-    { width: 1380, columns: [9] },  // Avg Profit (%)
-    { width: 1265, columns: [8] },  // Avg Profit ($)
-    { width: 1150, columns: [7] },  // Max Loss (%)
-    { width: 1035, columns: [6] },  // Max Loss ($)
-    { width: 805, columns: [4] },   // Win Rate (%)
-    { width: 600, columns: [2] }    // Net Profit (%)
+    // { width: 2700, columns: [26] }, // Tree Deep
+    // { width: 2600, columns: [25] }, // Precision f1 (%)
+    // { width: 2500, columns: [24] }, // Numbers Candles
+    { width: 2400, columns: [23] }, // Trades Per Candle
+    // { width: 2300, columns: [22] }, // Months Trained
+    // { width: 2200, columns: [21] }, // Release Date
+    { width: 2100, columns: [20] }, // Avg Bars/Trade
+    { width: 2000, columns: [19] }, // Avg Profit (%)
+    { width: 1900, columns: [18] }, // Avg Profit ($)
+    // { width: 1800, columns: [17] }, // Max Loss (%)
+    // { width: 1700, columns: [16] }, // Max Loss ($)
+    // { width: 1600, columns: [15] }, // Profit Factor
+    { width: 1500, columns: [14] }, // Win Rate (%)
+    { width: 1400, columns: [13] }, // Closed Trades
+    { width: 1300, columns: [12] }, // Net Profit (%)
+    // { width: 1200, columns: [11] }, // Symbol
+    { width: 1100, columns: [10] }, // Index
+    // { width: 1000, columns: [9] },  // Indicators
+    { width: 700, columns: [8] },   // Indicators Name
+    { width: 500, columns: [7] },   // Net Profit ($)
+    { width: 750, columns: [6] },   // Candle Chart
+    // { width: 600, columns: [5] },   // Strategy Chart
+    { width: 700, columns: [4] },   // Time Frame
+    // { width: 400, columns: [3] },   // Name
+    { width: 200, columns: [2] },   // Price
 ];
+
+
 
 // Main function to initialize the column toggle functionality
 function initializeColumnToggleHideColumns() {
@@ -61,49 +76,71 @@ function initializeColumnCheckboxes() {
     // List of columns that should not have checkboxes (like "Shop")
     const excludedColumns = ['Shop'];
 
-    // List of columns that should be unchecked by default
+    // List of columns that should be unchecked by default, prioritized for hiding
     const uncheckedColumns = [
-        'Indicators','Symbol', 'Max Loss ($)', 'Max Loss (%)', 'Profit Factor', 'Avg Bars/Trade', 'Numbers candles', 'Months trained',"Release Date","Months Trained","Numbers Candles", 'Precision f1 (%)', 'Tree Deep'
+        'Indicators', 'Symbol', 'Max Loss ($)', 'Max Loss (%)', 'Profit Factor',
+        'Avg Bars/Trade', 'Numbers candles', 'Months trained', 'Release Date',
+        'Months Trained', 'Numbers Candles', 'Precision f1 (%)', 'Tree Deep'
     ];
+
+    // Determine which columns should be visible based on screen width
+    const screenWidth = $(window).width();
+    let visibleColumns = Array.from({ length: tableHeaders.length }, (_, i) => true);
+
+    // Loop through breakpoints to hide columns as per screen size
+    responsiveBreakpoints.forEach(({ width, columns }) => {
+        if (screenWidth < width) {
+            columns.forEach(index => {
+                visibleColumns[index - 1] = false; // Set visibility to false based on 1-based index
+            });
+        }
+    });
 
     tableHeaders.each(function(index) {
         const columnName = $(this).text();
 
         // Skip generating a checkbox for the "Shop" column
-        if (excludedColumns.includes(columnName)) {
-            return; // Skip the "Shop" column
-        }
+        if (excludedColumns.includes(columnName)) return;
+
+        // Check if column is visible based on the screen width and default unchecked list
+        const isVisible = visibleColumns[index] && !uncheckedColumns.includes(columnName);
 
         // Create a div to wrap the checkbox and label
-        const checkboxWrapper = createCheckboxWrapper(index, columnName, uncheckedColumns);
+        const checkboxWrapper = createCheckboxWrapper(index, columnName, isVisible);
 
         // Append the wrapper div to the container
         checkboxContainer.append(checkboxWrapper);
 
-        // Apply initial column visibility based on checkbox state
-        const checkbox = checkboxWrapper.find('input[type="checkbox"]');
-        toggleColumnVisibility(index, checkbox.is(':checked'), false);
+        // Set initial visibility of the column based on checkbox state
+        toggleColumnVisibility(index, isVisible, false);
     });
 }
 
-
-// Function to create a checkbox wrapper (div) with a checkbox and label
-function createCheckboxWrapper(index, columnName, uncheckedColumns) {
-
-    // Create a div to wrap the checkbox and label
-    const checkboxWrapper = $('<div>', {
-        class: 'checkbox-wrapper' // Add a class for custom styling
+// Function to apply responsive column hiding based on breakpoints
+function applyResponsiveColumnHiding() {
+    $(window).resize(() => {
+        const width = $(window).width();
+        responsiveBreakpoints.forEach(({ width: breakpoint, columns }) => {
+            columns.forEach(columnIndex => {
+                const th = $(`#dataTable th:nth-child(${columnIndex})`);
+                const td = $(`#dataTable td:nth-child(${columnIndex})`);
+                width < breakpoint ? (th.hide(), td.hide()) : (th.show(), td.show());
     });
+        });
+    }).resize(); // Trigger initial resize event
+}
 
-    // Create a checkbox for each column
+// Function to create a checkbox wrapper with initial visibility state
+function createCheckboxWrapper(index, columnName, isChecked) {
+    const checkboxWrapper = $('<div>', { class: 'checkbox-wrapper' });
+
     const checkbox = $('<input>', {
         type: 'checkbox',
         id: `column-toggle-${index}`,
         'data-column-index': index,
-        checked: !uncheckedColumns.includes(columnName) // Uncheck if the column is in the list
+        checked: isChecked // Set initial checked state based on visibility
     });
 
-    // Create a label for the checkbox with a tooltip
     const label = $('<label>', {
         for: `column-toggle-${index}`,
         text: columnName,
