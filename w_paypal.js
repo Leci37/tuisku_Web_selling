@@ -93,15 +93,15 @@ function updateCartTotal() {
 function getDynamicDiscount(totalAmount) {
     let discountRate = 0;  // Default discount is 0%
     if (totalAmount > 2500) {
-        discountRate = 0.6;  // 60% discount
+        discountRate = 0.70;  // 60% discount
     } else if (totalAmount > 1000) {
-        discountRate = 0.4;  // 40% discount
-    } else if (totalAmount > 800) {
-        discountRate = 0.25;  // 25% discount
+        discountRate = 0.40;  // 40% discount
     } else if (totalAmount > 500) {
+        discountRate = 0.25;  // 25% discount
+    } else if (totalAmount > 290) {
         discountRate = 0.2;  // 20% discount
-    } else if (totalAmount > 200) {
-        discountRate = 0.1;  // 10% discount
+    } else if (totalAmount > 160) {
+        discountRate = 0.15;  // 10% discount
     }
     return discountRate;
 }

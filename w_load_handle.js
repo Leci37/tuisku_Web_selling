@@ -321,7 +321,7 @@ simpleCart({
         sandbox: true  // Set this to false for live payments
     },
     currency: "USD",
-    taxRate: 0.10,
+    taxRate: 0.00,
     shippingFlatRate: 0.00,
     language: "english-us",
 
