@@ -6,6 +6,7 @@
     <title>Thank You for Your Purchase</title>
     <script src="w_utils.js"></script>
     <link rel="stylesheet" href="w_thankyou.css">
+    <link rel="stylesheet" href="d_result/mosaico/icons_sprite_mosaic_21x21.css">
       <!-- Font Awesome 6 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
@@ -91,6 +92,8 @@
                 var decode = item.get('name');
                 var decode_B = encodeKey(decodeKey_B(decode));
                 var url_buy = "d_result/pine_TW_b/" + decode_B + ".pine";
+                // Use getIconSpan function to get the icon span HTML
+                const iconSpan = getIconSpan(item.get('ticker'));
 
                 row.innerHTML = `
 <td onclick="downloadFile('${url_buy}', '${decodeKey(item.get('name')).replaceAll(' - ', '_')}', this)">
@@ -101,7 +104,12 @@
     <a href="javascript:void(0);" style="color: #3BD7C8; font-weight: bold; cursor: pointer;" >Download</a>
         <a href="javascript:void(0);" >${decodeKey(item.get('name')).replaceAll(' - ', '_')}</a>
 </td>
-                    <td>${item.get('name-name')} <img src="${item.get('path-ico')}" style="width:1em;height:1em;"></td>
+                     <td>
+                        <div style="display: flex; align-items: center;">
+                            ${iconSpan}
+                            <span>${item.get('name-name')}</span>
+                        </div>
+                    </td>
                     <td>$${parseFloat(item.get('price')).toFixed(2)}</td> <!-- Format as currency -->
                     <td>${item.get('interval')}</td>
                     <td>$${parseFloat(item.get('net-profit-usd') || 0).toFixed(2)}</td> <!-- Ensure it is a number and format as currency -->
@@ -199,6 +207,12 @@ function copyToClipboard() {
 
     // Provide feedback to the user
     alert("Information copied to clipboard!");
+}
+
+// Updated getIconSpan function to return a string with the span element
+function getIconSpan(ticker) {
+    const tickerClassMosaic = `icon-${ticker}_21x21`; // Construct the CSS class name
+    return `<span class="${tickerClassMosaic}" style="width: 21px; height: 21px; margin-right: 4px; display: inline-block; vertical-align: middle; flex-shrink: 0;"></span>`;
 }
     </script>
 </body>
