@@ -371,11 +371,11 @@ function togglePayContainer() {
         payContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
         // Ensure it fits within the screen on small screens
-        if (window.innerWidth <= 1000) {
-            payContainer.style.maxWidth = '95%';  // Restrict width to avoid overflow
-            payContainer.style.overflowX = 'auto'; // Allow horizontal scrolling if necessary
-            payContainer.style.margin = '0 auto';  // Center the container
-        }
+//        if (window.innerWidth <= 1000) {
+//            payContainer.style.maxWidth = '95%';  // Restrict width to avoid overflow
+//            payContainer.style.overflowX = 'auto'; // Allow horizontal scrolling if necessary
+//            payContainer.style.margin = '0 auto';  // Center the container
+//        }
     }
 }
 
