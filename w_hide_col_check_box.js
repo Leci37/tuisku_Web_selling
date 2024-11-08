@@ -116,19 +116,7 @@ function initializeColumnCheckboxes() {
     });
 }
 
-// Function to apply responsive column hiding based on breakpoints
-function applyResponsiveColumnHiding() {
-    $(window).resize(() => {
-        const width = $(window).width();
-        responsiveBreakpoints.forEach(({ width: breakpoint, columns }) => {
-            columns.forEach(columnIndex => {
-                const th = $(`#dataTable th:nth-child(${columnIndex})`);
-                const td = $(`#dataTable td:nth-child(${columnIndex})`);
-                width < breakpoint ? (th.hide(), td.hide()) : (th.show(), td.show());
-    });
-        });
-    }).resize(); // Trigger initial resize event
-}
+
 
 // Function to create a checkbox wrapper with initial visibility state
 function createCheckboxWrapper(index, columnName, isChecked) {
@@ -164,7 +152,33 @@ function bindCheckboxEvents() {
     });
 }
 
-// Show/hide columns based on checkbox state with optional highlight
+// Array to store the visibility state of columns toggled by the user
+const userToggledColumns = {};
+
+// Function to apply responsive column hiding based on breakpoints, considering user toggles
+function applyResponsiveColumnHiding() {
+    $(window).resize(() => {
+        const width = $(window).width();
+        responsiveBreakpoints.forEach(({ width: breakpoint, columns }) => {
+            columns.forEach(columnIndex => {
+                // Check if the column has been manually toggled by the user
+                if (userToggledColumns[columnIndex] !== undefined) return;
+
+                const th = $(`#dataTable th:nth-child(${columnIndex})`);
+                const td = $(`#dataTable td:nth-child(${columnIndex})`);
+                if (width < breakpoint) {
+                    th.hide();
+                    td.hide();
+                } else {
+                    th.show();
+                    td.show();
+                }
+            });
+        });
+    }).resize(); // Trigger initial resize event
+}
+
+// Modified toggleColumnVisibility to update userToggledColumns state
 function toggleColumnVisibility(columnIndex, isVisible, highlight) {
     const th = $(`#dataTable th:nth-child(${columnIndex + 1})`);
     const td = $(`#dataTable td:nth-child(${columnIndex + 1})`);
@@ -172,14 +186,11 @@ function toggleColumnVisibility(columnIndex, isVisible, highlight) {
     if (isVisible) {
         th.show();
         td.show();
-
-        // Apply highlight transition if user clicked to show
+        userToggledColumns[columnIndex] = true;  // Mark as manually toggled to show
         if (highlight) {
-            // Set initial orange-red color for header
-            th.css({ backgroundColor: '#FFA07A' }); // Orange-red highlight color for th
-            td.css({ backgroundColor: '#FFF9C4' }); // Soft yellow highlight color for td
+            th.css({ backgroundColor: '#FFA07A' });
+            td.css({ backgroundColor: '#FFF9C4' });
             setTimeout(() => {
-                // Transition back to default with a 1.5s transition for the th
                 th.css({ transition: 'background-color 3.5s', backgroundColor: '' });
                 td.css({ transition: 'background-color 3.5s', backgroundColor: '' });
             }, 0);
@@ -187,23 +198,10 @@ function toggleColumnVisibility(columnIndex, isVisible, highlight) {
     } else {
         th.hide();
         td.hide();
+        delete userToggledColumns[columnIndex];  // Remove manual toggle state
     }
 }
 
-
-// Function to apply responsive column hiding based on breakpoints
-function applyResponsiveColumnHiding() {
-    $(window).resize(() => {
-        const width = $(window).width();
-        responsiveBreakpoints.forEach(({ width: breakpoint, columns }) => {
-            columns.forEach(columnIndex => {
-                const th = $(`#dataTable th:nth-child(${columnIndex})`);
-                const td = $(`#dataTable td:nth-child(${columnIndex})`);
-                width < breakpoint ? (th.hide(), td.hide()) : (th.show(), td.show());
-            });
-        });
-    }).resize(); // Trigger initial resize event
-}
 
 
 
@@ -227,7 +225,9 @@ function loadColumnPreferences() {
 // Call save function whenever a checkbox changes
 $('#column-toggle-container input[type=checkbox]').on('change', saveColumnPreferences);
 
-// Call load function on page load
+// Ensure user toggles are applied on page load
 $(document).ready(function() {
     loadColumnPreferences();
+    initializeColumnToggleHideColumns();
+    applyResponsiveColumnHiding();
 });
