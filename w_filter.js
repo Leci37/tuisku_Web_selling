@@ -343,10 +343,29 @@ function handleResize() {
         payContainer.style.display = 'block';
     }
 }
+// Function to keep filter column visible when interacting with dropdowns
+function setupDropdownFocusHandlers() {
+    const dropdowns = document.querySelectorAll('select[id$="Dropdown"]');
+    const filterColumn = document.querySelector('.filter-column');
 
-// Run resize handling on load and when the window resizes
-window.addEventListener('resize', handleResize);
-handleResize();
+    dropdowns.forEach(dropdown => {
+        dropdown.addEventListener('focus', () => {
+            filterColumn.style.display = 'block';
+        });
+        dropdown.addEventListener('blur', () => {
+            if (window.innerWidth <= 1000) {
+                filterColumn.style.display = 'none';  // Optional: Hide after interaction
+            }
+        });
+    });
+}
+
+// Initialize event handlers on DOMContentLoaded
+document.addEventListener('DOMContentLoaded', () => {
+    handleResize();
+    setupDropdownFocusHandlers();
+    window.addEventListener('resize', handleResize);
+});
 
 // Toggle function for filter column
 function toggleFilterColumn() {
@@ -371,11 +390,11 @@ function togglePayContainer() {
         payContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
         // Ensure it fits within the screen on small screens
-//        if (window.innerWidth <= 1000) {
-//            payContainer.style.maxWidth = '95%';  // Restrict width to avoid overflow
-//            payContainer.style.overflowX = 'auto'; // Allow horizontal scrolling if necessary
-//            payContainer.style.margin = '0 auto';  // Center the container
-//        }
+        if (window.innerWidth <= 1000) {
+            payContainer.style.maxWidth = '95%';  // Restrict width to avoid overflow
+            payContainer.style.overflowX = 'auto'; // Allow horizontal scrolling if necessary
+            payContainer.style.margin = '0 auto';  // Center the container
+        }
     }
 }
 
