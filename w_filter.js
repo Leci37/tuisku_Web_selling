@@ -211,6 +211,7 @@ function toggleDeselectButton(dropdownId, buttonId, selectAllButtonId) {
 
     // Add green outline to Select All button
     selectAllButton.style.outline = '2px solid #32CD32'; // Lime green
+    console.log(`Deselect button for ${dropdownId} disabled.`);
   } else {
     deselectButton.disabled = false;
     deselectButton.classList.remove('disabled-button');
@@ -219,6 +220,7 @@ function toggleDeselectButton(dropdownId, buttonId, selectAllButtonId) {
 
     // Remove green outline from Select All button
     selectAllButton.style.outline = ''; // Reset to default
+    console.log(`Deselect button for ${dropdownId} enabled.`);
   }
 }
 
@@ -260,6 +262,7 @@ function sortTable(columnIndex) {
     const sortedDirection = isAscending ? 'asc' : 'desc';
     thElements[columnIndex].setAttribute('data-active', 'true');
     thElements[columnIndex].setAttribute('data-sorted', sortedDirection);
+    console.log(`Column ${columnIndex} sorted in ${sortedDirection} order.`);
 
     // Toggle the sort direction
     tbody.setAttribute('data-sorted', `col${columnIndex}-${sortedDirection}`);
@@ -300,7 +303,7 @@ function resetFilters() {
     selectAll('#keyTechsDropdown');
     selectAll('#indexDropdown');
     selectAll('#releaseDateDropdown');
-
+    console.log("Filters reset to original values.");
     // Call filterTable to apply the reset values
     filterTable();
 }
@@ -334,6 +337,7 @@ function handleResize() {
 
         togglePayButton.style.display = 'inline-flex';
         payContainer.style.display = 'none';
+        console.log(`Resized to ${window.innerWidth}px: Hiding filter and PayPal containers.`);
     } else {
         // Show containers and hide buttons on larger screens
         toggleFilterButton.style.display = 'none';
@@ -341,6 +345,7 @@ function handleResize() {
 
         togglePayButton.style.display = 'none';
         payContainer.style.display = 'block';
+        console.log(`Resized to ${window.innerWidth}px: Showing filter and PayPal containers.`);
     }
 }
 // Function to keep filter column visible when interacting with dropdowns
@@ -365,7 +370,12 @@ document.addEventListener('DOMContentLoaded', () => {
     handleResize();
     setupDropdownFocusHandlers();
     window.addEventListener('resize', handleResize);
+	console.log(`addEventListener XXX`);
 });
+
+// Run resize handling on load and when the window resizes
+window.addEventListener('resize', handleResize);
+handleResize();
 
 // Toggle function for filter column
 function toggleFilterColumn() {
@@ -377,6 +387,7 @@ function toggleFilterColumn() {
         filterColumn.style.display = 'block';
         filterColumn.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
+    console.log(`Filter column display toggled to ${filterColumn.style.display}.`);
 }
 
 // Toggle function for PayPal container
@@ -396,6 +407,7 @@ function togglePayContainer() {
             payContainer.style.margin = '0 auto';  // Center the container
         }
     }
+    console.log(`PayPal container display toggled to ${payContainer.style.display}.`);
 }
 
 
@@ -445,12 +457,14 @@ document.addEventListener('DOMContentLoaded', function () {
             onlyFreeCheckbox.addEventListener('change', function () {
                 onlyFreeCheckbox_HIDE.checked = this.checked; // Sync the hidden checkbox
                 filterTable(); // Apply filtering
+                console.log(`OnlyFreeCheckbox synced to ${this.checked}`);
             });
 
             // Sync function for 'onlyFreeCheckbox_HIDE' to update 'onlyFreeCheckbox'
             onlyFreeCheckbox_HIDE.addEventListener('change', function () {
                 onlyFreeCheckbox.checked = this.checked; // Sync the main checkbox
                 filterTable(); // Apply filtering
+                console.log(`OnlyFreeCheckbox_HIDE synced to ${this.checked}`);
             });
         } else {
             // Retry after a short delay if elements are not yet available
