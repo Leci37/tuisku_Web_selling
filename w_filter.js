@@ -348,30 +348,6 @@ function handleResize() {
         console.log(`Resized to ${window.innerWidth}px: Showing filter and PayPal containers.`);
     }
 }
-// Function to keep filter column visible when interacting with dropdowns
-function setupDropdownFocusHandlers() {
-    const dropdowns = document.querySelectorAll('select[id$="Dropdown"]');
-    const filterColumn = document.querySelector('.filter-column');
-
-    dropdowns.forEach(dropdown => {
-        dropdown.addEventListener('focus', () => {
-            filterColumn.style.display = 'block';
-        });
-        dropdown.addEventListener('blur', () => {
-            if (window.innerWidth <= 1000) {
-                filterColumn.style.display = 'none';  // Optional: Hide after interaction
-            }
-        });
-    });
-}
-
-// Initialize event handlers on DOMContentLoaded
-document.addEventListener('DOMContentLoaded', () => {
-    handleResize();
-    setupDropdownFocusHandlers();
-    window.addEventListener('resize', handleResize);
-	console.log(`addEventListener XXX`);
-});
 
 // Run resize handling on load and when the window resizes
 window.addEventListener('resize', handleResize);
