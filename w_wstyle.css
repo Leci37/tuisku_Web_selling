@@ -346,7 +346,7 @@ button.simpleCart_checkout:hover, button.simpleCart_empty:hover {
 /* Slightly smaller elements at screen widths under 890px */
 @media (max-width: 890px) {
     .Select-Columns-to-Display h4 {
-        font-size: 0.95em; /* Reduce font size slightly */
+        font-size: 1em !important; /* Reduce font size slightly */
     }
     .Select-Columns-to-Display label {
         font-size: 0.9em; /* Reduce label font size */
@@ -359,7 +359,7 @@ button.simpleCart_checkout:hover, button.simpleCart_empty:hover {
 /* Even smaller elements at screen widths under 540px */
 @media (max-width: 540px) {
     .Select-Columns-to-Display h4 {
-        font-size: 0.85em; /* Further reduce font size */
+        font-size: 0.95em !important; /* Further reduce font size */
     }
     .Select-Columns-to-Display label {
         font-size: 0.8em; /* Further reduce label font size */

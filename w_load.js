@@ -1,5 +1,6 @@
 // Global Constants
 let binCount = 50; // Increased number of bins for a more compact histogram
+let inital_count_data = 0;
 
 // Log start of data loading process
 console.log("Starting the data loading process...");
@@ -32,6 +33,8 @@ function loadData() {
         complete: function(results) {
             console.log("Data loaded successfully.");
             const data = results.data;
+
+            inital_count_data = data.length;
 
             initializeDropdowns(data);
             initializeHistograms(data);
@@ -362,6 +365,7 @@ function triggerPostLoadActions() {
     updateHistogramOpacity(0, 6500000, 'profitUsd');
     updateHistogramOpacity(1.00, 140, 'price');
     updateHistogramOpacity(0, 400, 'trainingMonths');
+    document.getElementById('visibleRowCount').textContent = inital_count_data;
 }
 
 // Get unique Name, Ticker, and Icon pairs
