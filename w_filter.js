@@ -429,47 +429,87 @@ function isAnyContainerShown() {
 let resizeAllowed = true;
 
 // Unified toggle function to manage visibility for filter and PayPal containers
-function toggleVisibility(containerIdToShow, containerIdToHide) {
-    const containerToShow = document.getElementById(containerIdToShow);
-    const containerToHide = document.getElementById(containerIdToHide);
+//function toggleVisibility(containerIdToShow, containerIdToHide) {
+//    const containerToShow = document.getElementById(containerIdToShow);
+//    const containerToHide = document.getElementById(containerIdToHide);
+//
+//    // Toggle the visibility of the container to show and hide the other container
+//    if (containerToShow.style.display === 'block') {
+//        containerToShow.style.display = 'none';
+//        console.log(`${containerIdToShow} hidden, resizing allowed.`);
+//    } else {
+//        containerToShow.style.display = 'block';
+//        containerToShow.scrollIntoView({ behavior: 'smooth', block: 'start' });
+//        console.log(`${containerIdToShow} displayed, resizing disabled.`);
+//    }
+//    containerToHide.style.display = 'none';
+//    console.log(`${containerIdToHide} hidden.`);
+//    resizeAllowed = ! isAnyContainerShown()
+//
+//    // Additional style adjustment for PayPal container on small screens
+//    if (containerIdToShow === 'paypal-button-container' && window.innerWidth <= 1000) {
+//        containerToShow.style.maxWidth = '95%';
+//        containerToShow.style.overflowX = 'auto';
+//        containerToShow.style.margin = '0 auto';
+//    }
+//}
 
-    // Toggle the visibility of the container to show and hide the other container
-    if (containerToShow.style.display === 'block') {
-        containerToShow.style.display = 'none';
-        console.log(`${containerIdToShow} hidden, resizing allowed.`);
+// Toggle visibility of the Filter container
+function toggleFilterContainer() {
+    const filterColumn = document.getElementById('filters-container');
+    const toggleFilterButton = document.getElementById('toggleFilterButton');
+
+    if (filterColumn.style.display === 'block') {
+        filterColumn.style.display = 'none';
+        console.log("Filter container hidden, resizing allowed.");
     } else {
-        containerToShow.style.display = 'block';
-        containerToShow.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        console.log(`${containerIdToShow} displayed, resizing disabled.`);
+        filterColumn.style.display = 'block';
+        filterColumn.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        console.log("Filter container displayed, resizing disabled.");
     }
-    containerToHide.style.display = 'none';
-    console.log(`${containerIdToHide} hidden.`);
     resizeAllowed = ! isAnyContainerShown()
-
-    // Additional style adjustment for PayPal container on small screens
-    if (containerIdToShow === 'paypal-button-container' && window.innerWidth <= 1000) {
-        containerToShow.style.maxWidth = '95%';
-        containerToShow.style.overflowX = 'auto';
-        containerToShow.style.margin = '0 auto';
-    }
 }
+
+// Toggle visibility of the PayPal container
+function togglePayContainer() {
+    const payContainer = document.getElementById('paypal-button-container');
+    const togglePayButton = document.getElementById('togglePayButton');
+
+    if (payContainer.style.display === 'block') {
+        payContainer.style.display = 'none';
+        console.log("PayPal container hidden, resizing allowed.");
+    } else {
+        payContainer.style.display = 'block';
+        payContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        console.log("PayPal container displayed, resizing disabled.");
+    }
+    // Style adjustments for PayPal container on smaller screens
+    if (window.innerWidth <= 1000) {
+        payContainer.style.maxWidth = '95%';
+        payContainer.style.overflowX = 'auto';
+        payContainer.style.margin = '0 auto';
+    }
+    resizeAllowed = ! isAnyContainerShown()
+}
+
 
 // Event listeners setup for buttons to toggle filter and PayPal containers
 function setupEventListeners() {
     const toggleFilterButton = document.getElementById('toggleFilterButton');
     const togglePayButton = document.getElementById('togglePayButton');
 
-    // Toggle filter and PayPal containers with click or touchstart to prevent double-toggling
-    toggleFilterButton.addEventListener('click', () => toggleVisibility('filters-container', 'paypal-button-container'));
+    // Toggle Filter container
+    toggleFilterButton.addEventListener('click', toggleFilterContainer);
     toggleFilterButton.addEventListener('touchstart', (e) => {
         e.preventDefault();
-        toggleVisibility('filters-container', 'paypal-button-container');
+        toggleFilterContainer();
     });
 
-    togglePayButton.addEventListener('click', () => toggleVisibility('paypal-button-container', 'filters-container'));
+    // Toggle PayPal container
+    togglePayButton.addEventListener('click', togglePayContainer);
     togglePayButton.addEventListener('touchstart', (e) => {
         e.preventDefault();
-        toggleVisibility('paypal-button-container', 'filters-container');
+        togglePayContainer();
     });
 }
 
@@ -485,18 +525,32 @@ function handleResize() {
     const payContainer = document.getElementById('paypal-button-container');
     const togglePayButton = document.getElementById('togglePayButton');
 
-    if (window.innerWidth <= 1000) {
-        toggleFilterButton.style.display = 'inline-flex';
-        filterColumn.style.display = 'none';
-        togglePayButton.style.display = 'inline-flex';
-        payContainer.style.display = 'none';
-        console.log("Small screen detected - containers hidden, toggle buttons shown.");
-    } else {
+    // Use document.documentElement.clientWidth for more accurate viewport width
+    const viewportWidth = document.documentElement.clientWidth;
+
+    if (viewportWidth > 1350) {
+        // Greater than 1350px: Show containers, hide toggle buttons
         toggleFilterButton.style.display = 'none';
-        filterColumn.style.display = 'block';
         togglePayButton.style.display = 'none';
+        filterColumn.style.display = 'block';
         payContainer.style.display = 'block';
-        console.log("Large screen detected - containers displayed, toggle buttons hidden.");
+        console.log("Width > 1350px - containers displayed, toggle buttons hidden.");
+
+    } else if (viewportWidth <= 1350 && viewportWidth > 1000) {
+        // Between 1350px and 1000px: Show togglePayButton, hide payContainer, show filterColumn
+        toggleFilterButton.style.display = 'none';
+        togglePayButton.style.display = 'inline-flex';
+        filterColumn.style.display = 'block';
+        payContainer.style.display = 'none';
+        console.log("Width between 1350px and 1000px - filter displayed, Pay toggle button shown, Pay container hidden.");
+
+    } else if (viewportWidth <= 1000) {
+        // Less than 1000px: Show both toggle buttons, hide both containers
+        toggleFilterButton.style.display = 'inline-flex';
+        togglePayButton.style.display = 'inline-flex';
+        filterColumn.style.display = 'none';
+        payContainer.style.display = 'none';
+        console.log("Width <= 1000px - containers hidden, both toggle buttons shown.");
     }
 }
 
