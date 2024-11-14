@@ -12,7 +12,7 @@ function generateHtmlForRow(row, pathCandle, pathStra) {
     <html>
         <head>
             <title>${row['ticker']} - ${row['interval']} - ${row['key_techs']}</title>
-            <link rel="icon" href="d_result/icons/_tuisku_favicon.ico">
+            <link rel="icon" href="https://raw.githubusercontent.com/Leci37/tuisku_Web_selling/refs/heads/main/d_result/icons/_tuisku_favicon.ico">
             <link rel="stylesheet" href="w_wtable.css"> <!-- Link to table styles -->
             <link rel="stylesheet" href="w_one_stock.css"> <!-- Link to one stock styles -->
 
