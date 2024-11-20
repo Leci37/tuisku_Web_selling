@@ -57,25 +57,42 @@ function sortTable(columnIndex) {
 // Function to handle the file download for FREE items
 // Function to handle the click event for FREE downloads
 function handleFreeClick(row, td) {
+    // Show temporary downloading text
     showTemporaryText(td, "Downloading " + `${row['ticker']}`);
 
-    const filePath = row['pine_path_shadow'];
+    const fileUrl = row['pine_path_shadow']; // URL of the file to download
     const newFileName = `Tuisku_TraderView_${row['ticker']} - ${row['interval']} - ${row['key_techs']}.pine`;
 
-    // Create a link element to trigger the download
-    const downloadLink = document.createElement('a');
-    downloadLink.href = filePath; // Set the file path
-    downloadLink.download = newFileName; // Set the new file name
-    document.body.appendChild(downloadLink);
-    downloadLink.click(); // Trigger the download
-    document.body.removeChild(downloadLink); // Remove the link after download
+    // Fetch the file content
+    fetch(fileUrl)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok ' + response.statusText);
+            }
+            return response.blob(); // Convert the response to a blob
+        })
+        .then(blob => {
+            // Create a download link
+            const downloadLink = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            downloadLink.href = url;
+            downloadLink.download = newFileName;
+            document.body.appendChild(downloadLink);
+            downloadLink.click(); // Trigger the download
+            document.body.removeChild(downloadLink); // Clean up
 
-    // Change icon color to indicate the download
-    const icon_free = td.querySelector('i');
-    icon_free.style.color = '#75acb4'; // Change to a success green color
-    const spam_free = td.querySelector('spam');
-    icon_free.style.color = '#75acb4'; // Change to a success green color
+            // Update the icon or UI to indicate success
+            const icon_free = td.querySelector('i');
+            if (icon_free) icon_free.style.color = '#75acb4'; // Success color
+            const span_free = td.querySelector('span');
+            if (span_free) span_free.style.color = '#75acb4'; // Success color
+        })
+        .catch(error => {
+            console.error('There has been a problem with your fetch operation:', error);
+            showTemporaryText(td, "Failed to download");
+        });
 }
+
 
 // Function to handle the Buy click event with cookie toggle functionality
 function handleBuyClick(row, td) {
