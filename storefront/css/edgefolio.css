@@ -39,4 +39,4 @@ a:hover{text-decoration:underline}
 
 /* Latin names cut with an ellipsis carry dir="auto", so in Arabic they are cut at their own end;
    they still line up with the page (right in Arabic), as the text around them does. */
-[dir="auto"]{text-align:match-parent}
+[dir="auto"]{text-align:-webkit-match-parent;text-align:match-parent}
