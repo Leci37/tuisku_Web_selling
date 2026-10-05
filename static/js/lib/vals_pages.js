@@ -2,23 +2,20 @@
 // tutorial, the welcome tour, the free-download dialog, the phone bar, the footer and errors.
 import { tvInterval, tvChartUrl } from './fmt.js';
 
+// Las páginas legales son las del núcleo, en esta misma web.
 const LEGAL = { legalPrivacyUrl: '/legal/privacidad', legalCookiesUrl: '/legal/cookies', legalTermsUrl: '/legal/terminos', legalNoticeUrl: '/legal/aviso-legal' };
 
 export function pageVals(c) {
   const { app, s, t, tx, f } = c;
-  // the legal pages and the contact address are the server's settings: no link until /api/config is in
-  const base = ((s.cfg && s.cfg.legal_base_url) || '').replace(/\/+$/, '');
-  const legal = {};
-  if (base) Object.keys(LEGAL).forEach(k => { legal[k] = base + LEGAL[k]; });
   const TS = s.tourStep;
   const closeTour = () => app.closeTour();
   // above the Lite cart bar when it shows, so the toast never hides the total or Checkout
   const errBottom = (s.vw < 640 ? 76 : 16) + (s.page === 'shop' && s.mode !== 'pro' && (s.cart.length + s.bundles.length > 0) ? 84 : 0);
   return {
     ...detailVals(c), ...compareVals(c), ...mineVals(c), ...thanksVals(c), ...installVals(c), ...freeVals(c),
-    ...legal, legalOn: !!base, contactOn: !!c.contact, contactUrl: c.contact ? 'mailto:' + c.contact : '',
+    ...LEGAL, legalOn: true, contactOn: !!c.contact, contactUrl: c.contact ? 'mailto:' + c.contact : '',
     errOpen: !!s.error, errTitle: tx.errServer, closeErr: () => app.setState({ error: '' }),
-    errText: t(s.error) + ((s.error === 'errPayment' || s.error === 'errLater') && c.contact ? ' ' + t('contactProblems', { e: c.contact }) : ''),
+    errText: t(s.error, s.errorVars || undefined) + ((s.error === 'errPayment' || s.error === 'errLater' || s.error === 'errPayPal') && c.contact ? ' ' + t('contactProblems', { e: c.contact }) : ''),
     errBottom: errBottom + 'px',
     cmpBottom: (s.vw < 640 ? 76 : 16) + 'px',
     // on a phone the bottom bar takes the last 60px: the floating cart sits above it, as the compare pill does
@@ -30,7 +27,7 @@ export function pageVals(c) {
       ['shop', t('navShop'), 'fa-solid fa-house', () => app.go({ page: 'shop' })],
       ['search', t('searchSmall'), 'fa-solid fa-magnifying-glass', () => app.focusSearch()],
       ['cart', tx.cart, 'fa-solid fa-cart-shopping', () => app.showCart()],
-      ['mine', t('navMine'), 'fa-regular fa-folder-open', () => app.go({ page: 'mine' })]
+      ['mine', t('navMine'), 'fa-regular fa-folder-open', () => app.goMine()]
     ].map(([k, label, icon, go]) => ({ label, icon, go, color: (k === 'shop' && s.page === 'shop') || (k === 'mine' && s.page === 'mine') ? '#0950e3' : '#5a6b80',
       hasBadge: k === 'cart' && c.cartN > 0, badge: f.int(c.cartN) })),
     tourOpen: TS >= 0, tourS1: TS <= 0, tourS2: TS === 1, tourS3: TS === 2, tourHasBack: TS > 0,
@@ -40,11 +37,11 @@ export function pageVals(c) {
     tourNextLabel: TS === 2 ? t('tourStart') : t('tourNext'),
     tourNext: () => { if (TS >= 2) closeTour(); else app.setState({ tourStep: TS + 1 }); },
     tourBack: () => app.setState({ tourStep: Math.max(0, TS - 1) }),
-    closeTour, openTour: () => app.setState({ tourStep: 0, langOpen: false }),
+    closeTour, openTour: () => app.setState({ tourStep: 0 }),
     tourDots: [0, 1, 2].map(i => ({ w: i === TS ? '22px' : '8px', bg: i === TS ? '#0950e3' : '#cfd8e3' })),
     // step 3's PayPal → .pine → TradingView reads the other way in Arabic
     arrowFwd: c.rtl ? 'fa-solid fa-arrow-left' : 'fa-solid fa-arrow-right',
-    tourIcons: ['AAPL', 'NVDA', 'AMZN', 'ADBE', 'BTC+USDT', 'ETH+USDT'].map(k => ({ src: '/assets/icons/' + k + '_big.svg' })),
+    tourIcons: ['AAPL', 'NVDA', 'AMZN', 'ADBE', 'BTC+USDT', 'ETH+USDT'].map(k => ({ src: '/static/assets/icons/' + k + '_big.svg' })),
     tourPD: e => app.swDown(e), tourPU: e => app.swUp(e, 'tourStep')
   };
 }
@@ -152,19 +149,22 @@ function compareVals(c) {
 }
 
 function mineVals(c) {
-  const { app, s, t, tx, f } = c;
+  const { app, s, t, f } = c;
   const email = (s.me && s.me.email) || '';
   const items = (s.mine && s.mine.items) || [];
-  const confirm = !!s.signAs && s.signAs !== email;
-  const asText = t('signInAs', { e: '\u0001' }).split('\u0001');
+  // el enlace de un correo de confirmación, abierto: de qué correo es, y el clic que lo confirma
+  const confirm = !!s.proofAs;
+  const asText = t('proofAs', { e: '\u0001' }).split('\u0001');
   return {
-    isMine: s.page === 'mine', signedIn: !!email, signedOut: !!s.me && !email && !confirm,
-    // the emailed link, opened: who it signs in, and the click that does it
-    signConfirm: confirm, confirmSignIn: () => app.confirmSignIn(),
-    signAsBefore: asText[0], signAsEmail: s.signAs, signAsAfter: asText.slice(1).join(''),
+    isMine: s.page === 'mine', signedIn: !!email,
+    proofConfirm: confirm, confirmProof: () => app.confirmProof(),
+    proofAsBefore: asText[0], proofAsEmail: s.proofAs, proofAsAfter: asText.slice(1).join(''),
+    // ¿compró sin cuenta? Hasta que la cuenta confirma su correo, lo que se hizo con él sin sesión no sale
+    proofOffer: !confirm && !!email && (s.proofExpired || !!(s.mine && s.mine.proof_needed)),
     signedAs: t('signedAs', { e: email }), avatar: email.slice(0, 1).toUpperCase(),
-    signEmail: s.signEmail, onSignEmail: e => app.setState({ signEmail: e.target.value }),
-    signIn: () => app.signIn(), signKey: e => { if (e.key === 'Enter') app.signIn(); }, signSent: s.signSent, signNotSent: !s.signSent, signExpired: s.signExpired && !s.signSent,
+    proofEmail: s.proofEmail || email, onProofEmail: e => app.setState({ proofEmail: e.target.value }),
+    askProof: () => app.askProof(), proofKey: e => { if (e.key === 'Enter') app.askProof(); },
+    proofSent: s.proofSent, proofNotSent: !s.proofSent, proofExpired: s.proofExpired && !s.proofSent,
     signOut: () => app.signOut(),
     mineHas: items.length > 0,
     mineRows: items.map(it => ({ ...c.mk(it.row),
@@ -216,7 +216,7 @@ function installVals(c) {
     instTitle: t('i' + (Math.max(0, IS) + 1) + 'T'), instText: t('i' + (Math.max(0, IS) + 1) + 'X', { sym: r0.ticker || '', int: iv }),
     instNextLabel: IS >= 4 ? t('instDone') : t('tourNext'),
     instNext: () => { if (IS >= 4) closeInst(); else go(IS + 1); }, instBack: () => go(Math.max(0, IS - 1)), closeInst,
-    openInst0: () => app.setState({ instStep: 0, langOpen: false }),
+    openInst0: () => app.setState({ instStep: 0 }),
     instDots: [0, 1, 2, 3, 4].map(i => ({ w: i === IS ? '22px' : '8px', bg: i === IS ? '#0950e3' : '#cfd8e3', go: () => go(i), label: t('tourStepOf', { n: f.int(i + 1), total: f.int(5) }) })),
     instCards: [1, 2, 3, 4, 5].map(i => ({ n: f.int(i), title: t('i' + i + 'T'), go: () => go(i - 1) })),
     instIcon: r0.icon || '', instName: r0.name ? r0.name + ' · ' + r0.ticker : '', instFile: (r0.file || 'strategy') + '.pine',

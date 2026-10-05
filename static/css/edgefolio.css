@@ -1,19 +1,12 @@
-/* Edgefolio storefront. Colours, type and spacing live inline in the views, as in the v7
-   reference design (docs/design); this file holds what inline styles cannot: the fonts, the page
-   base and the hover/focus states. */
-@font-face{font-family:"Ubuntu";font-weight:400;font-display:swap;src:url("../fonts/Ubuntu-400-latin.woff2") format("woff2")}
-@font-face{font-family:"Ubuntu";font-weight:500;font-display:swap;src:url("../fonts/Ubuntu-500-latin.woff2") format("woff2")}
-@font-face{font-family:"Ubuntu";font-weight:700;font-display:swap;src:url("../fonts/Ubuntu-700-latin.woff2") format("woff2")}
-*,*::before,*::after{box-sizing:border-box}
-html,body{height:100%;margin:0}
-body{background:#f4f8fb}
-#app,#app>.sc-host{height:100%}
+/* La tienda de Edgefolio. Los colores, la letra y el espaciado van en línea en las vistas, como en el
+   diseño v7 (docs/design); aquí, lo que no cabe en línea: los estados al pasar el ratón y con el foco.
+   La letra (Ubuntu), el fondo y la página los pone la carcasa del núcleo (shell.css). */
 a{color:#0950e3;text-decoration:none}
 a:hover{text-decoration:underline}
-/* a button that reads as a link (Sign out): the link's hover */
+/* un botón que se lee como un enlace (Salir): el subrayado del enlace */
 .sf-link:hover{text-decoration:underline}
 
-/* hover and focus states (style-hover / style-focus in the design) */
+/* los estados al pasar el ratón y con el foco (style-hover / style-focus en el diseño) */
 .sf-hover0:hover{border-color:#cfd6e6 !important}
 .sf-hover1:hover{background:#f4f6fb !important}
 .sf-hover2:hover{box-shadow:0 14px 36px rgba(22,38,58,.10) !important;border-color:#cfd6e6 !important}
@@ -33,10 +26,15 @@ a:hover{text-decoration:underline}
 .tr-hover2:hover{background:#e9f0fd !important}
 .tr-hover3:hover{border-color:#9fb8ef !important}
 
-/* On a phone the code, totals and Checkout of the Pro cart strip need a line of their own; with
-   flex:0 0 auto (as designed) they could not wrap and pushed the page sideways. */
+/* En un móvil, el código, los totales y «Pagar» de la franja del carrito de Pro necesitan un renglón
+   propio: con flex:0 0 auto (como en el diseño) no podían partirse y empujaban la página de lado. */
 @media (max-width:560px){.sf-cartend{flex:1 1 100% !important}}
 
-/* Latin names cut with an ellipsis carry dir="auto", so in Arabic they are cut at their own end;
-   they still line up with the page (right in Arabic), as the text around them does. */
+/* Los nombres latinos cortados con puntos suspensivos llevan dir="auto", así que en árabe se cortan por
+   su final; siguen alineados con la página (a la derecha en árabe), como el texto de alrededor. */
 [dir="auto"]{text-align:-webkit-match-parent;text-align:match-parent}
+
+/* Los huecos de la barra del núcleo (topbar_start, topbar_end): sin caja propia, sus chips son de la
+   fila de la barra, como en el diseño. */
+.ef-bar{display:contents}
+.ef-noscript{padding:24px}

@@ -1,6 +1,8 @@
-// Edgefolio storefront: the logic of the v7 design (class Component of Storefront v7.dc.html) on the
-// real API. State, loading and actions live here; lib/vals.js turns the state into the values the
-// views read. Nothing is computed here that the server owns: prices, totals and lists come from it.
+// La tienda de Edgefolio: la lógica del diseño v7 (class Component de Storefront v7.dc.html) sobre la API
+// de verdad. El estado, lo que se carga y las acciones viven aquí; lib/vals.js convierte el estado en los
+// valores que leen las vistas. Nada de lo que es del servidor se calcula aquí: precios, totales y listas.
+// Los textos son los del diccionario del núcleo (/zt/i18n.json: los de la tienda más los comunes) y el
+// idioma, el de la carcasa (<html lang>): al cambiarlo en su menú, «zt:language» repinta la página.
 import { Component } from '../vendor/preact.module.js';
 import Storefront from './views/storefront.js';
 import { api, post } from './lib/api.js';
@@ -12,14 +14,13 @@ import { renderVals } from './lib/vals.js';
 import { PRO_SIZE } from './lib/vals_shop.js';
 import { withoutOverlap } from './lib/vals_cart.js';
 
-const LANGS = ['es', 'en', 'pt', 'fr', 'de', 'zh', 'ar', 'hi'];
 const LITE_SIZE = 24;
 const PACK_FIND = 40;
 const CART_KEY = 'edgefolio-cart-v1';
 const FAVS_KEY = 'edgefolio-favs-v1';
 const list = x => (Array.isArray(x) ? x.filter(v => typeof v === 'string') : []);
 
-// Takes one-off parameters (a sign-in token, a notice) out of the address bar, keeping the rest.
+// Quita de la barra de direcciones lo que sólo vale una vez (un enlace de confirmación, un aviso).
 function dropParams(...keys) {
   const qs = new URLSearchParams(location.search);
   keys.forEach(k => qs.delete(k));
@@ -27,12 +28,10 @@ function dropParams(...keys) {
   history.replaceState(history.state, '', location.pathname + (rest ? '?' + rest : '') + location.hash);
 }
 
-function startLang() {
-  const saved = read('tuisku-sf-lang');
-  if (LANGS.includes(saved)) return saved;
-  const asked = (navigator.languages || [navigator.language || '']).map(l => String(l).slice(0, 2).toLowerCase());
-  return asked.find(l => LANGS.includes(l)) || 'en';
-}
+// El idioma y la dirección de la carcasa del núcleo (los de <html>).
+const pageLang = () => (window.zt && zt.uiLang && zt.uiLang()) || document.documentElement.lang || 'es';
+const pageDir = () => document.documentElement.dir === 'rtl' ? 'rtl' : 'ltr';
+const toLogin = () => window.location.assign('/login?next=' + encodeURIComponent(location.pathname + location.search));
 
 export class App extends Component {
   constructor(props) {
@@ -46,11 +45,11 @@ export class App extends Component {
     this.timers = {};
     this.seq = {};
     this.state = {
-      dict: null, common: null, cfg: null, bundleDefs: null, fx: null,
-      lang: startLang(), mode: read('tuisku-sf-mode') === 'pro' ? 'pro' : 'lite',
+      dict: null, cfg: null, bundleDefs: null, fx: null,
+      lang: pageLang(), dir: pageDir(), mode: read('tuisku-sf-mode') === 'pro' ? 'pro' : 'lite',
       pview: ['table', 'rows', 'cards'].includes(pview) ? pview : 'rows',
       ...route, vw: window.innerWidth,
-      langOpen: false, addOpen: false, openPill: '', tv: read('edgefolio-tv') === '1', cur: 'local',
+      addOpen: false, openPill: '', tv: read('edgefolio-tv') === '1', cur: 'local',
       q: '', liteTab: 'hot', lite: null, liteTotal: 0, litePage: 0, counts: {}, tape: [],
       freeOnly: false, sort: 'np', sel: {}, rg: {}, draft: {}, openSel: '', selQ: '', moreOpen: '',
       pro: [], proTotal: 0, proFirst: 1, proPage: 0, proLoaded: false, hist: {}, options: {}, ranges: null,
@@ -60,10 +59,11 @@ export class App extends Component {
       favs: list(favs.favs), alerts: favs.alerts && typeof favs.alerts === 'object' ? favs.alerts : {},
       compare: [], cmpOpen: false, packOpen: false, packQ: '', packFound: [],
       freeFor: '', freeEmail: '', freeNews: false, freeSent: false,
-      me: null, mine: null, signEmail: '', signSent: false, signExpired: false, signToken: '', signAs: '',
+      me: props.signedIn ? null : { email: null }, mine: null, proofEmail: '', proofSent: false, proofExpired: false,
+      proofToken: '', proofAs: '',
       receipt: null, instStep: -1, instFor: '',
       tourStep: route.page === 'shop' && !read('edgefolio-tour-v1') ? 0 : -1,
-      error: '', notice: '', paying: false, rowsV: 0, Tree: null, pine: {}
+      error: '', errorVars: null, notice: '', paying: false, rowsV: 0, Tree: null, pine: {}
     };
   }
 
@@ -72,29 +72,30 @@ export class App extends Component {
   componentDidMount() {
     this.onResize = () => this.setState({ vw: window.innerWidth });
     this.onKeyDown = e => this.onKey(e);
-    this.onPop = () => this.setState({ ...parseLocation(location), tip: '', langOpen: false });
+    this.onPop = () => this.setState({ ...parseLocation(location), tip: '' });
+    // el menú de idioma de la carcasa: el diccionario ya está, sólo cambia el idioma
+    this.onLang = () => this.setState({ lang: pageLang(), dir: pageDir() });
     this.onShow = e => { if (e.persisted) { this.paying = false; this.setState({ paying: false }); } };
     window.addEventListener('resize', this.onResize);
     window.addEventListener('pageshow', this.onShow);
     window.addEventListener('keydown', this.onKeyDown);
     window.addEventListener('popstate', this.onPop);
+    document.addEventListener('zt:language', this.onLang);
 
-    Promise.all([api('/i18n/storefront.ui.json'), api('/i18n/common.json')])
-      .then(([dict, common]) => this.setState({ dict, common })).catch(e => this.fail(e));
+    const dictionary = window.zt && zt.i18nReady ? zt.i18nReady : Promise.resolve(null);
+    dictionary.then(dict => { if (dict) this.setState({ dict }); else this.fail({ network: true }); });
     api('/api/config').then(cfg => this.setState({ cfg })).catch(e => this.fail(e));
     api('/api/bundles').then(bundleDefs => this.setState(st => ({ bundleDefs, ...withoutOverlap(st, bundleDefs) }))).catch(e => this.fail(e));
     api('/api/fx').then(fx => this.setState({ fx })).catch(() => { /* prices then stay in USD */ });
     api('/api/strategies?paid=1&sort=hot&size=12').then(d => { this.keep(d.rows); this.setState({ tape: d.rows }); }).catch(e => this.fail(e));
-    api('/api/me').then(me => { this.setState({ me }); if (me.email) this.afterSignIn(); }).catch(() => this.setState({ me: { email: null } }));
+    if (this.props.signedIn) api('/api/me').then(me => { this.setState({ me }); if (me.email) this.afterSignIn(); }).catch(() => this.setState({ me: { email: null } }));
 
     const qs = new URLSearchParams(location.search);
     if (this.state.page === 'thanks') this.capture(qs.get('token'));
     if (qs.get('checkout') === 'cancel') history.replaceState(null, '', '/'); // back from PayPal: the cart is still here
-    const signin = this.state.page === 'mine' ? qs.get('signin') : null;
-    if (signin === 'expired') {
-      this.setState({ signExpired: true });
-      dropParams('signin');
-    } else if (signin) this.peekSignIn(signin);
+    // el enlace que confirma un correo: /mine?proof=<token> (sólo con la sesión abierta: /mine la pide)
+    const proof = this.state.page === 'mine' && this.props.signedIn ? qs.get('proof') : null;
+    if (proof) this.peekProof(proof);
     // back from the link that confirms the news opt-in
     const news = qs.get('news');
     if (news) {
@@ -108,6 +109,7 @@ export class App extends Component {
     window.removeEventListener('resize', this.onResize);
     window.removeEventListener('keydown', this.onKeyDown);
     window.removeEventListener('popstate', this.onPop);
+    document.removeEventListener('zt:language', this.onLang);
     window.removeEventListener('pageshow', this.onShow);
     Object.values(this.timers).forEach(clearTimeout);
   }
@@ -124,14 +126,8 @@ export class App extends Component {
       writeJSON(CART_KEY, { cart: s.cart, bundles: s.bundles, packIds: s.packIds, code: s.code, applied: s.applied });
     }
     if (!(s.me && s.me.email) && changed('favs', 'alerts')) writeJSON(FAVS_KEY, { favs: s.favs, alerts: s.alerts });
-    // from the first render, so screen readers, fonts and the browser's translate offer get the
-    // visitor's language and Arabic flips at once; again when the core's list of RTL languages is in
-    if (changed('lang', 'common')) {
-      const rtl = (s.common && s.common._rtl_languages) || ['ar'];
-      document.documentElement.lang = s.lang;
-      document.documentElement.dir = rtl.includes(s.lang) ? 'rtl' : 'ltr';
-    }
-    if (changed('lang', 'dict', 'common') && s.dict && s.common) document.title = 'Edgefolio · ' + translator(s.dict, s.common, s.lang)('toolName');
+    // el título, en el idioma de la carcasa (el servidor ya lo pone; al cambiar de idioma, aquí)
+    if (changed('lang', 'dict') && s.dict) document.title = 'Edgefolio · ' + translator(s.dict, {}, s.lang)('toolName');
 
     if (s.page === 'shop' && s.mode === 'pro') {
       const key = proQuery(s, s.ranges);
@@ -164,11 +160,6 @@ export class App extends Component {
     }
 
     if (s.me && s.me.email && s.page === 'mine' && !s.mine && !this.mineLoading && !this.uploading) this.loadMine();
-    // a sign-in link for the address already signed in: nothing to confirm
-    if (s.signAs && s.me && s.me.email === s.signAs) {
-      dropParams('signin');
-      this.setState({ signAs: '', signToken: '' });
-    }
     if (s.packOpen && s.packQ.trim() !== this.packKey) {
       const first = this.packKey == null;
       this.packKey = s.packQ.trim();
@@ -188,16 +179,17 @@ export class App extends Component {
     return () => this.seq[name] === n;
   }
 
-  // What went wrong, said in the visitor's language: the server's own messages are English and
-  // meant for the logs, so the page picks a text by what kind of failure it was.
-  // Only a request that got no answer is a network error; anything else without a status is a bug
-  // in the page: logged for whoever looks, and the visitor is asked to try later.
+  // Lo que falló, en el idioma de quien mira: la clave que contestó el servidor ({"error": "errAlgo"}),
+  // si el diccionario la tiene; si no, un texto según el tipo de fallo. Sólo una petición sin respuesta
+  // es un error de red; cualquier otra cosa sin código es un fallo de la página: a la consola, y a quien
+  // mira se le pide que lo intente más tarde.
   fail(e) {
     const st = e && e.status;
     if (!st && !(e && e.network)) console.error(e);
-    const key = e && e.network ? 'errNetwork' : !st ? 'errLater' : st === 402 ? 'errPayment' : st === 404 || st === 410 ? 'errNotFound'
-      : st === 429 ? 'errTooMany' : st >= 500 ? 'errLater' : 'errRequest';
-    this.setState({ error: key });
+    const own = e && e.key && this.state.dict && this.state.dict[e.key] ? e.key : '';
+    const key = own || (e && e.network ? 'errShopNetwork' : !st ? 'errLater' : st === 402 ? 'errPayment' : st === 404 || st === 410 ? 'errLinkNotFound'
+      : st === 429 ? 'errTooMany' : st >= 500 ? 'errLater' : 'errRequest');
+    this.setState({ error: key, errorVars: own && e.detail && e.detail.vars ? e.detail.vars : null });
   }
 
   // ---- rows ------------------------------------------------------------------------------------
@@ -253,8 +245,8 @@ export class App extends Component {
 
   loadTree() {
     this.treeAsked = true;
-    // a module that could not be fetched is a network failure
-    import('/js/tree.js').then(m => this.setState({ Tree: m.StrategyTree })).catch(e => this.fail({ network: true, cause: e }));
+    // un módulo que no llega es un fallo de red
+    import('./tree.js').then(m => this.setState({ Tree: m.StrategyTree })).catch(e => this.fail({ network: true, cause: e }));
   }
 
   // ---- lists -----------------------------------------------------------------------------------
@@ -310,9 +302,9 @@ export class App extends Component {
       this.setState(patch);
     }).catch(e => {
       if (this.quoteKey !== key) return;
-      // ids or bundles the server no longer sells (an old cart in this browser): take them out. Any
-      // other refusal (a strategy twice, a pack that is not valid) is shown, never retried.
-      const d = e.detail || {}, gone = /^unknown/.test(d.error || '') ? d.items || d.bundles || [] : [];
+      // ids o lotes que el servidor ya no vende (un carrito viejo de este navegador): fuera. Cualquier
+      // otro rechazo (una estrategia dos veces, un pack que no vale) se enseña, nunca se repite.
+      const d = e.detail || {}, gone = d.error === 'errUnknownItems' || d.error === 'errUnknownBundles' ? d.items || d.bundles || [] : [];
       if (e.status === 400 && gone.length) {
         this.setState(st => ({ cart: st.cart.filter(x => !gone.includes(x)), bundles: st.bundles.filter(x => !gone.includes(x)), packIds: st.packIds.filter(x => !gone.includes(x)) }));
       } else this.fail(e);
@@ -354,45 +346,50 @@ export class App extends Component {
     this.setState(st => ({ compare: st.compare.includes(id) ? st.compare.filter(x => x !== id) : st.compare.length >= 3 ? st.compare : [...st.compare, id] }));
   }
 
-  // ---- accounts, My strategies, favourites -----------------------------------------------------
+  // ---- la cuenta (la del núcleo), Mis estrategias, favoritas ------------------------------------
 
   signedIn() {
     return !!(this.state.me && this.state.me.email);
   }
 
-  signIn() {
-    const email = this.state.signEmail.trim();
-    if (!/.+@.+\..+/.test(email)) return;
-    post('/api/auth/login', { email, lang: this.state.lang }).then(() => this.setState({ signSent: true })).catch(e => this.fail(e));
-  }
-
-  // The emailed link opens /mine?signin=<token>. Opening it only shows who it signs in (mail
-  // scanners open links too); the visitor's own click spends it.
-  peekSignIn(token) {
-    post('/api/auth/peek', { token }).then(r => {
-      if (!r.email) { this.setState({ signExpired: true, signToken: '', signAs: '' }); dropParams('signin'); return; }
-      const me = this.state.me;
-      if (me && me.email && r.email === me.email) { dropParams('signin'); return; } // already in, as that address
-      this.setState({ signToken: token, signAs: r.email, signExpired: false });
-    }).catch(e => this.fail(e));
-  }
-
-  confirmSignIn() {
-    const token = this.state.signToken;
-    if (!token || this.signBusy) return;
-    this.signBusy = true;
-    post('/api/auth/verify', { token }).then(r => {
-      dropParams('signin');
-      this.setState({ me: { email: r.email }, mine: null, signToken: '', signAs: '', signSent: false, signExpired: false });
-      this.afterSignIn();
-    }).catch(e => {
-      if (e.status === 400) { this.setState({ signExpired: true, signToken: '', signAs: '' }); dropParams('signin'); } else this.fail(e);
-    }).then(() => { this.signBusy = false; });
+  // Mis estrategias pide la sesión: sin ella, a entrar (el núcleo vuelve aquí después).
+  goMine() {
+    if (!this.props.signedIn) { toLogin(); return; }
+    this.go({ page: 'mine' });
   }
 
   signOut() {
-    post('/api/auth/logout').then(() => this.setState({ me: { email: null }, mine: null, favs: [], alerts: {}, signSent: false, signEmail: '' }))
-      .catch(e => this.fail(e));
+    post('/logout').catch(() => null).then(() => window.location.assign('/'));
+  }
+
+  // Demostrar que un correo es de la cuenta: se manda un enlace a esa dirección.
+  askProof() {
+    const s = this.state, email = (s.proofEmail || (s.me && s.me.email) || '').trim();
+    if (!/.+@.+\..+/.test(email) || this.proofBusy) return;
+    this.proofBusy = true;
+    post('/api/mine/proofs', { email }).then(() => this.setState({ proofSent: true, proofExpired: false }))
+      .catch(e => this.fail(e)).then(() => { this.proofBusy = false; });
+  }
+
+  // El enlace del correo abre /mine?proof=<token>. Abrirlo sólo enseña de qué correo es (los lectores de
+  // correo también abren los enlaces); lo gasta el clic de la persona.
+  peekProof(token) {
+    post('/api/mine/proofs/peek', { token }).then(r => {
+      if (!r.email) { this.setState({ proofExpired: true, proofToken: '', proofAs: '' }); dropParams('proof'); return; }
+      this.setState({ proofToken: token, proofAs: r.email, proofExpired: false });
+    }).catch(e => { if (e.status === 401) toLogin(); else this.fail(e); });
+  }
+
+  confirmProof() {
+    const token = this.state.proofToken;
+    if (!token || this.proofBusy) return;
+    this.proofBusy = true;
+    post('/api/mine/proofs/confirm', { token }).then(() => {
+      dropParams('proof');
+      this.setState({ proofToken: '', proofAs: '', proofSent: false, proofExpired: false, mine: null });
+    }).catch(e => {
+      if (e.status === 400) { this.setState({ proofExpired: true, proofToken: '', proofAs: '' }); dropParams('proof'); } else this.fail(e);
+    }).then(() => { this.proofBusy = false; });
   }
 
   // Favourites kept in this browser while signed out move to the account once signed in.
@@ -401,7 +398,7 @@ export class App extends Component {
   afterSignIn() {
     const local = readJSON(FAVS_KEY, {}), favs = list(local.favs), alerts = local.alerts || {};
     this.uploading = true;
-    Promise.all(favs.map(id => api('/api/favourites/' + encodeURIComponent(id), { method: 'PUT', body: { alerts: alerts[id] || {}, lang: this.state.lang } })
+    Promise.all(favs.map(id => api('/api/favourites/' + encodeURIComponent(id), { method: 'PUT', body: { alerts: alerts[id] || {} } })
       .then(() => null, e => ({ id, e }))))
       .then(res => {
         const failed = res.filter(Boolean), left = failed.map(x => x.id);
@@ -425,7 +422,7 @@ export class App extends Component {
       m.favourites.forEach(x => { alerts[x.id] = x.alerts || {}; });
       this.setState({ mine: m, favs: m.favourites.map(x => x.id), alerts });
     }).catch(e => {
-      if (e.status === 401) this.setState({ me: { email: null }, mine: null });
+      if (e.status === 401) toLogin();
       else this.fail(e);
     }).then(() => { this.mineLoading = false; });
   }
@@ -439,7 +436,7 @@ export class App extends Component {
   saveFav(id, alerts) {
     if (!this.signedIn()) return;
     const url = '/api/favourites/' + encodeURIComponent(id);
-    (alerts ? api(url, { method: 'PUT', body: { alerts, lang: this.state.lang } }) : api(url, { method: 'DELETE' })).catch(e => this.fail(e));
+    (alerts ? api(url, { method: 'PUT', body: { alerts } }) : api(url, { method: 'DELETE' })).catch(e => this.fail(e));
   }
 
   toggleFav(id) {
@@ -467,7 +464,7 @@ export class App extends Component {
     const s = this.state, email = s.freeEmail.trim();
     if (!/.+@.+\..+/.test(email) || this.freeBusy) return;
     this.freeBusy = true;
-    post('/api/free', { id: s.freeFor, email, news: s.freeNews, lang: s.lang })
+    post('/api/free', { id: s.freeFor, email, news: s.freeNews })
       .then(() => this.setState({ freeSent: true, mine: null }))
       .catch(e => this.fail(e))
       .then(() => { this.freeBusy = false; });
@@ -478,7 +475,7 @@ export class App extends Component {
   go(patch, { replace = false, scroll = true } = {}) {
     const path = pathOf({ ...this.state, ...patch });
     if (path !== location.pathname || location.search || location.hash) history[replace ? 'replaceState' : 'pushState'](null, '', path);
-    this.setState({ ...patch, tip: '', langOpen: false });
+    this.setState({ ...patch, tip: '' });
     if (scroll) try { window.scrollTo(0, 0); } catch (e) { /* not scrollable */ }
   }
 
@@ -501,9 +498,9 @@ export class App extends Component {
 
   // ---- phone bar ---------------------------------------------------------------------------------
 
-  // Puts an element just under the sticky header (it covers the top of the page).
+  // Pone un elemento justo debajo de la barra fija (tapa lo de arriba de la página).
   scrollUnderHeader(el) {
-    const header = document.querySelector('header');
+    const header = document.querySelector('header.app-topbar');
     const top = el.getBoundingClientRect().top + window.scrollY - (header ? header.offsetHeight : 0) - 12;
     try { window.scrollTo(0, Math.max(0, top)); } catch (e) { /* not scrollable */ }
   }
@@ -552,11 +549,6 @@ export class App extends Component {
     });
   }
 
-  setLang(lang) {
-    write('tuisku-sf-lang', lang);
-    this.setState({ lang, langOpen: false });
-  }
-
   // There is no TradingView API to connect to: the chip opens TradingView and remembers the choice.
   toggleTv() {
     const on = !this.state.tv;
@@ -584,7 +576,7 @@ export class App extends Component {
     if (!p) return;
     const s = this.state, cur = s[which], max = which === 'instStep' ? 4 : 2;
     if (cur < 0) return;
-    const dx = e.clientX - p.x, dy = e.clientY - p.y, rtl = s.lang === 'ar';
+    const dx = e.clientX - p.x, dy = e.clientY - p.y, rtl = s.dir === 'rtl';
     let d = 0;
     if (Math.abs(dx) < 10 && Math.abs(dy) < 10) d = 1;
     else if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) d = ((dx < 0) !== rtl) ? 1 : -1;
@@ -597,15 +589,15 @@ export class App extends Component {
     if (!which) return;
     if (e.key === 'Escape') { if (which === 'instStep') this.closeInst(); else this.closeTour(); return; }
     if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
-    const max = which === 'instStep' ? 4 : 2, fwd = (e.key === 'ArrowRight') !== (s.lang === 'ar');
+    const max = which === 'instStep' ? 4 : 2, fwd = (e.key === 'ArrowRight') !== (s.dir === 'rtl');
     const n = Math.min(max, Math.max(0, s[which] + (fwd ? 1 : -1)));
     if (n !== s[which]) { e.preventDefault(); this.setState({ [which]: n }); }
   }
 
   render() {
     const s = this.state;
-    // no placeholder text: nothing shows until both dictionaries are in
-    if (!s.dict || !s.common) return null;
+    // sin textos de relleno: nada se pinta hasta que llega el diccionario
+    if (!s.dict) return null;
     return Storefront(renderVals(this));
   }
 }

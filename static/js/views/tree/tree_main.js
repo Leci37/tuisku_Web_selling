@@ -7,7 +7,7 @@ import { s, T } from '../../lib/tpl.js';
 
 export default function TreeMain(v) {
   return html`
-  <main style="max-width:1320px;margin:0 auto;padding:${s(v.mainPad)};display:flex;flex-direction:column;gap:20px">
+  <section style="max-width:1320px;margin:0 auto;padding:${s(v.mainPad)};display:flex;flex-direction:column;gap:20px">
     ${v.standalone ? html`
       <div style="max-width:820px;display:flex;flex-direction:column;gap:6px">
         <h1 style="margin:0;font-size:30px;font-weight:700;letter-spacing:-.5px">${v.L?.h1}</h1>
@@ -149,6 +149,6 @@ export default function TreeMain(v) {
         </div>
       ` : null}
     ${v.standalone ? html`<p style="margin:0;max-width:820px;font-size:12.5px;color:#8d9cae;text-wrap:pretty">${v.L?.source}</p>` : null}
-    </main>
+    </section>
 `;
 }

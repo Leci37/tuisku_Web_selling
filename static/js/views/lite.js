@@ -11,7 +11,7 @@ export default function Lite(v) {
         </div>
       </div>
     <section style="position:relative;overflow:hidden;background:#fff;border-bottom:1px solid #e2e9f0">${' '}
-      <img src="/img/hero_candle.png" alt="" decoding="async" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.2;mask-image:linear-gradient(${s(v.g90)},transparent 15%,#000 75%)" />${' '}
+      <img src="/static/img/hero_candle.png" alt="" decoding="async" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.2;mask-image:linear-gradient(${s(v.g90)},transparent 15%,#000 75%)" />${' '}
       <div style="position:relative;max-width:1320px;margin:0 auto;padding:44px 28px 28px;display:flex;flex-direction:column;gap:14px">
         <h1 style="margin:0;font-size:40px;font-weight:700;letter-spacing:-.6px;line-height:1.1;max-width:640px;text-wrap:balance">${v.tx?.liteTitle}</h1>
         <p style="margin:0;font-size:16px;color:#5a6b80;max-width:540px;text-wrap:pretty">${v.tx?.liteSub}</p>

@@ -5,30 +5,30 @@ import { s, T } from '../lib/tpl.js';
 export default function Mine(v) {
   return html`
   ${v.isMine ? html`
-    <main style="flex:1 0 auto;width:100%;max-width:1000px;margin:0 auto;padding:32px 28px 0;display:flex;flex-direction:column;gap:18px">
+    <section style="flex:1 0 auto;width:100%;max-width:1000px;margin:0 auto;padding:32px 28px 0;display:flex;flex-direction:column;gap:18px">
       <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap">
         <div><h1 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-.3px">${v.tx?.myStrategies}</h1><p style="margin:2px 0 0;color:#5a6b80">${v.tx?.mineSub}</p></div>
         ${v.signedIn ? html`<span style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:#5a6b80;flex-wrap:wrap"><span style="width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#0950e3,#0e7c98);color:#fff;display:grid;place-items:center;font-size:11px;font-weight:700">${v.avatar}</span>${T(v.signedAs)}<button type="button" class="sf-link" onClick=${v.signOut} style="font-family:inherit;border:none;background:none;padding:0;color:#0950e3;font-weight:600;font-size:12.5px;cursor:pointer">${v.tx?.signOut}</button></span>` : null}
         </div>
-      ${v.signConfirm ? html`
+      ${v.proofConfirm ? html`
         <div style="background:#fff;border:1px solid #e2e9f0;border-radius:18px;padding:20px 22px;display:flex;flex-direction:column;gap:14px;max-width:460px">
-          <h2 style="margin:0;font-size:20px;font-weight:700;letter-spacing:-.2px">${v.tx?.signInTitle}</h2>
-          <p style="margin:0;color:#5a6b80;font-size:14px">${v.tx?.signInConfirm}</p>
-          <button onClick=${v.confirmSignIn} style="font-family:inherit;background:linear-gradient(135deg,#0950e3,#0e7c98);border:none;color:#fff;font-weight:700;border-radius:12px;padding:12px 22px;font-size:14.5px;cursor:pointer;box-shadow:0 8px 20px rgba(9,80,227,.22);overflow-wrap:anywhere">${T(v.signAsBefore)}<bdi>${v.signAsEmail}</bdi>${T(v.signAsAfter)}</button>
+          <h2 style="margin:0;font-size:20px;font-weight:700;letter-spacing:-.2px">${v.tx?.proofConfirmTitle}</h2>
+          <p style="margin:0;color:#5a6b80;font-size:14px">${v.tx?.proofConfirm}</p>
+          <button onClick=${v.confirmProof} style="font-family:inherit;background:linear-gradient(135deg,#0950e3,#0e7c98);border:none;color:#fff;font-weight:700;border-radius:12px;padding:12px 22px;font-size:14.5px;cursor:pointer;box-shadow:0 8px 20px rgba(9,80,227,.22);overflow-wrap:anywhere">${T(v.proofAsBefore)}<bdi>${v.proofAsEmail}</bdi>${T(v.proofAsAfter)}</button>
           ${v.legalOn ? html`<a href=${v.legalPrivacyUrl} target="_blank" rel="noopener" style="font-size:12px;color:#5a6b80;cursor:pointer">${v.tx?.legalPrivacy}</a>` : null}
           </div>
         ` : null}
-      ${v.signedOut ? html`
+      ${v.proofOffer ? html`
         <div style="background:#fff;border:1px solid #e2e9f0;border-radius:18px;padding:20px 22px;display:flex;flex-direction:column;gap:14px;max-width:460px">
-          <h2 style="margin:0;font-size:20px;font-weight:700;letter-spacing:-.2px">${v.tx?.signInTitle}</h2>
-          ${v.signNotSent ? html`
-            ${v.signExpired ? html`<div role="note" style="display:flex;gap:10px;align-items:flex-start;border-radius:12px;padding:12px 14px;background:#fff7ec;border:1px solid #f6d9ae;font-size:13.5px"><i class="fa-solid fa-triangle-exclamation" style="color:#f79009;margin-top:2px"></i>${T(v.tx?.signInExpired)}</div>` : null}
-            <p style="margin:0;color:#5a6b80;font-size:14px">${v.tx?.signInText}</p>
-            <label style="display:flex;flex-direction:column;gap:5px"><span style="font-size:12px;font-weight:600;color:#5a6b80">${v.tx?.email}</span><input type="email" value=${v.signEmail ?? ''} onInput=${v.onSignEmail} onKeyDown=${v.signKey} placeholder="ana@example.com" style="font-family:inherit;font-size:14px;color:#16263a;border:1px solid #e2e9f0;border-radius:10px;padding:10px 12px" /></label>
-            <button onClick=${v.signIn} style="font-family:inherit;background:linear-gradient(135deg,#0950e3,#0e7c98);border:none;color:#fff;font-weight:700;border-radius:12px;padding:12px 22px;font-size:14.5px;cursor:pointer;box-shadow:0 8px 20px rgba(9,80,227,.22)">${v.tx?.sendLink}</button>
+          <h2 style="margin:0;font-size:20px;font-weight:700;letter-spacing:-.2px">${v.tx?.proofTitle}</h2>
+          ${v.proofNotSent ? html`
+            ${v.proofExpired ? html`<div role="note" style="display:flex;gap:10px;align-items:flex-start;border-radius:12px;padding:12px 14px;background:#fff7ec;border:1px solid #f6d9ae;font-size:13.5px"><i class="fa-solid fa-triangle-exclamation" style="color:#f79009;margin-top:2px"></i>${T(v.tx?.errProofExpired)}</div>` : null}
+            <p style="margin:0;color:#5a6b80;font-size:14px">${v.tx?.proofText}</p>
+            <label style="display:flex;flex-direction:column;gap:5px"><span style="font-size:12px;font-weight:600;color:#5a6b80">${v.tx?.email}</span><input type="email" value=${v.proofEmail ?? ''} onInput=${v.onProofEmail} onKeyDown=${v.proofKey} placeholder="ana@example.com" style="font-family:inherit;font-size:14px;color:#16263a;border:1px solid #e2e9f0;border-radius:10px;padding:10px 12px" /></label>
+            <button onClick=${v.askProof} style="font-family:inherit;background:linear-gradient(135deg,#0950e3,#0e7c98);border:none;color:#fff;font-weight:700;border-radius:12px;padding:12px 22px;font-size:14.5px;cursor:pointer;box-shadow:0 8px 20px rgba(9,80,227,.22)">${v.tx?.sendLink}</button>
             ${v.legalOn ? html`<a href=${v.legalPrivacyUrl} target="_blank" rel="noopener" style="font-size:12px;color:#5a6b80;cursor:pointer">${v.tx?.legalPrivacy}</a>` : null}
             ` : null}
-          ${v.signSent ? html`<div style="display:flex;gap:10px;align-items:flex-start;background:#e8f7ef;color:#15603c;border-radius:12px;padding:12px 14px;font-size:13.5px;font-weight:600"><i class="fa-solid fa-circle-check" style="margin-top:2px"></i>${T(v.tx?.signInSent)}</div>` : null}
+          ${v.proofSent ? html`<div style="display:flex;gap:10px;align-items:flex-start;background:#e8f7ef;color:#15603c;border-radius:12px;padding:12px 14px;font-size:13.5px;font-weight:600"><i class="fa-solid fa-circle-check" style="margin-top:2px"></i>${T(v.tx?.proofSent)}</div>` : null}
           </div>
         ` : null}
       ${v.mineHas ? html`<div style="background:#fff;border:1px solid #e2e9f0;border-radius:18px;overflow:hidden">${' '}
@@ -56,8 +56,8 @@ export default function Mine(v) {
             </div>
           `)}
         </div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center"><button onClick=${v.openInst0} style="font-family:inherit;background:#fff;border:1px solid #e2e9f0;color:#16263a;font-weight:600;border-radius:12px;padding:11px 18px;font-size:14px;cursor:pointer;display:inline-flex;gap:8px;align-items:center"><img src="/assets/icons/TW_ICO.svg" alt="" style="width:16px;height:16px" />${T(v.tx?.installTitle)}</button><button onClick=${v.goShop} style="font-family:inherit;background:none;border:none;color:#0950e3;font-weight:600;font-size:14px;cursor:pointer">${v.tx?.backShop}</button></div>
-      </main>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center"><button onClick=${v.openInst0} style="font-family:inherit;background:#fff;border:1px solid #e2e9f0;color:#16263a;font-weight:600;border-radius:12px;padding:11px 18px;font-size:14px;cursor:pointer;display:inline-flex;gap:8px;align-items:center"><img src="/static/assets/icons/TW_ICO.svg" alt="" style="width:16px;height:16px" />${T(v.tx?.installTitle)}</button><button onClick=${v.goShop} style="font-family:inherit;background:none;border:none;color:#0950e3;font-weight:600;font-size:14px;cursor:pointer">${v.tx?.backShop}</button></div>
+      </section>
     ` : null}
 `;
 }

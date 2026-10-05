@@ -143,7 +143,7 @@ function proVals(c, seg) {
         bg: on ? '#0950e3' : '#ffffff', color: on ? '#ffffff' : go ? '#16263a' : '#8d9cae', border: on ? '#0950e3' : '#e2e9f0' };
     }),
     proMore: s.proPage * PRO_SIZE < s.proTotal, loadMorePro: () => app.loadPro(s.proPage + 1, true),
-    viewTabs: seg([['rows', tx.viewRows, 'fa-solid fa-list'], ['cards', tx.viewCards, 'fa-solid fa-grip'], ['table', tx.viewTable, 'fa-solid fa-table']], s.pview, setPview),
+    viewTabs: seg([['rows', tx.viewRows, 'fa-solid fa-list'], ['cards', tx.viewCards, 'fa-solid fa-grip'], ['table', tx.pviewTable, 'fa-solid fa-table']], s.pview, setPview),
     isTable: s.pview === 'table', isRows: s.pview === 'rows', isCards: s.pview === 'cards', proListPager: s.pview !== 'table'
   };
 }

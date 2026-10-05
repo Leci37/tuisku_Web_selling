@@ -5,11 +5,11 @@ import { s, T } from '../lib/tpl.js';
 export default function Thanks(v) {
   return html`
   ${v.isThanks ? html`
-    <main style="flex:1 0 auto;width:100%;max-width:1000px;margin:0 auto;padding:32px 28px 0;display:flex;flex-direction:column;gap:18px">
+    <section style="flex:1 0 auto;width:100%;max-width:1000px;margin:0 auto;padding:32px 28px 0;display:flex;flex-direction:column;gap:18px">
       <div style="background:#fff;border:1px solid #e2e9f0;border-radius:18px;padding:24px 26px;display:flex;gap:18px;align-items:center;flex-wrap:wrap">
         <span style="width:52px;height:52px;border-radius:50%;background:#e8f7ef;color:#15803d;display:grid;place-items:center;font-size:22px;flex-shrink:0"><i class="fa-solid fa-check"></i></span>
         <div style="flex:1 1 320px"><h1 style="margin:0;font-size:24px;font-weight:700;letter-spacing:-.3px">${v.tx?.thanksTitle}</h1><p style="margin:2px 0 0;color:#5a6b80">${v.tx?.thanksSub}</p></div>
-        <div style="text-align:end;line-height:1.3"><div style="font-size:12px;color:#5a6b80">${v.tx?.totalPaid}</div><div style="font-size:26px;font-weight:700;letter-spacing:-.4px">${v.orderTotal}</div><div style="font-size:12px;color:#5a6b80;display:flex;flex-wrap:wrap;gap:2px 6px;align-items:center;justify-content:flex-end"><span style="display:inline-flex;gap:6px;align-items:center;white-space:nowrap"><img src="/assets/icons/a_logo_paypal.png" alt="PayPal" style="height:14px" />${T(v.tx?.paidWith)} ·</span><span style="white-space:nowrap">${v.orderLabel}</span></div></div>
+        <div style="text-align:end;line-height:1.3"><div style="font-size:12px;color:#5a6b80">${v.tx?.totalPaid}</div><div style="font-size:26px;font-weight:700;letter-spacing:-.4px">${v.orderTotal}</div><div style="font-size:12px;color:#5a6b80;display:flex;flex-wrap:wrap;gap:2px 6px;align-items:center;justify-content:flex-end"><span style="display:inline-flex;gap:6px;align-items:center;white-space:nowrap"><img src="/static/assets/icons/a_logo_paypal.png" alt="PayPal" style="height:14px" />${T(v.tx?.paidWith)} ·</span><span style="white-space:nowrap">${v.orderLabel}</span></div></div>
         </div>
       ${v.linksHidden ? html`
         <div role="note" style="display:flex;gap:12px;align-items:flex-start;border-radius:12px;padding:12px 14px;background:#eef3fd;border:1px solid #d6e2fb;flex-wrap:wrap">
@@ -35,7 +35,7 @@ export default function Thanks(v) {
         </div>` : null}
       <div style="background:#fff;border:1px solid #e2e9f0;border-radius:18px;padding:20px 22px;display:flex;flex-direction:column;gap:14px">
         <div style="display:flex;align-items:center;gap:10px 16px;flex-wrap:wrap">
-          <h2 style="margin:0;font-size:17px;font-weight:700;display:flex;align-items:center;gap:8px"><img src="/assets/icons/TW_ICO.svg" alt="" style="width:18px;height:18px" />${T(v.tx?.installTitle)}</h2>
+          <h2 style="margin:0;font-size:17px;font-weight:700;display:flex;align-items:center;gap:8px"><img src="/static/assets/icons/TW_ICO.svg" alt="" style="width:18px;height:18px" />${T(v.tx?.installTitle)}</h2>
           <button onClick=${v.openInst0} style="margin-inline-start:auto;font-family:inherit;background:linear-gradient(135deg,#0950e3,#0e7c98);border:none;color:#fff;font-weight:700;border-radius:12px;padding:9px 16px;font-size:13.5px;cursor:pointer;display:inline-flex;gap:8px;align-items:center;box-shadow:0 8px 20px rgba(9,80,227,.22)"><i class="fa-solid fa-circle-play"></i>${T(v.instWatch)}</button>
           </div>
         <ol style="margin:0;padding:0;list-style:none;display:grid;grid-template-columns:${s(v.instCols)};gap:10px">
@@ -44,7 +44,7 @@ export default function Thanks(v) {
         </div>
       <div style="display:flex;gap:10px;flex-wrap:wrap"><button onClick=${v.goMine} style="font-family:inherit;background:linear-gradient(135deg,#0950e3,#0e7c98);border:none;color:#fff;font-weight:700;border-radius:12px;padding:12px 22px;font-size:14.5px;cursor:pointer;box-shadow:0 8px 20px rgba(9,80,227,.22)">${v.tx?.goMine}</button><button onClick=${v.goShop} style="font-family:inherit;background:#fff;border:1px solid #e2e9f0;color:#16263a;font-weight:600;border-radius:12px;padding:11px 20px;font-size:14px;cursor:pointer">${v.tx?.backShop}</button></div>
       ${v.contactOn ? html`<p style="margin:0;font-size:12.5px;color:#5a6b80">${v.tx?.contactProblems}</p>` : null}
-      </main>
+      </section>
     ` : null}
 `;
 }

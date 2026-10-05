@@ -32,13 +32,13 @@ export default function Dialogs(v) {
           ${v.tourS1 ? html`<div style="display:grid;grid-template-columns:repeat(3,64px);gap:14px">
               ${(v.tourIcons || []).map((ti, $index) => html`<div style="width:64px;height:64px;border-radius:16px;background:#fff;border:1px solid #e2e9f0;display:grid;place-items:center;box-shadow:0 6px 16px rgba(22,38,58,.08)"><span role="img" aria-hidden="true" style="width:34px;height:34px;border-radius:8px;display:inline-block;flex-shrink:0;background-image:url('${s(ti?.src)}');background-size:cover;background-position:center"></span></div>`)}
               </div>` : null}
-          ${v.tourS2 ? html`<img src="/img/tour_profit.png" alt="" style="width:88%;border-radius:12px;border:1px solid #e2e9f0;box-shadow:0 10px 28px rgba(22,38,58,.12);display:block" />` : null}
+          ${v.tourS2 ? html`<img src="/static/img/tour_profit.png" alt="" style="width:88%;border-radius:12px;border:1px solid #e2e9f0;box-shadow:0 10px 28px rgba(22,38,58,.12);display:block" />` : null}
           ${v.tourS3 ? html`<div style="display:flex;align-items:center;gap:16px">
-              <div style="width:88px;height:64px;border-radius:16px;background:#fff;border:1px solid #e2e9f0;display:grid;place-items:center"><img src="/assets/icons/a_logo_paypal.png" alt="PayPal" style="max-width:64px;max-height:28px" /></div>
+              <div style="width:88px;height:64px;border-radius:16px;background:#fff;border:1px solid #e2e9f0;display:grid;place-items:center"><img src="/static/assets/icons/a_logo_paypal.png" alt="PayPal" style="max-width:64px;max-height:28px" /></div>
               <i class=${v.arrowFwd} style="color:#8d9cae"></i>
               <div style="width:64px;height:64px;border-radius:16px;background:#fff;border:1px solid #e2e9f0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:#0950e3;font-size:11px;font-weight:700"><i class="fa-solid fa-file-code" style="font-size:22px"></i><span dir="ltr">.pine</span></div>
               <i class=${v.arrowFwd} style="color:#8d9cae"></i>
-              <div style="width:64px;height:64px;border-radius:16px;background:#fff;border:1px solid #e2e9f0;display:grid;place-items:center"><img src="/assets/icons/TW_ICO.svg" alt="TradingView" style="width:32px;height:32px" /></div>
+              <div style="width:64px;height:64px;border-radius:16px;background:#fff;border:1px solid #e2e9f0;display:grid;place-items:center"><img src="/static/assets/icons/TW_ICO.svg" alt="TradingView" style="width:32px;height:32px" /></div>
               </div>` : null}
           </div>
         <div style="padding:20px 22px 18px;display:flex;flex-direction:column;gap:8px">
@@ -86,7 +86,7 @@ export default function Dialogs(v) {
                 </div>
               <div style="flex:1;display:grid;place-items:center">
                 <div style="width:52%;display:flex;flex-direction:column;align-items:center;gap:2.2cqw">
-                  <img src="/assets/icons/TW_ICO.svg" alt="" style="width:7cqw;height:7cqw;display:block" />
+                  <img src="/static/assets/icons/TW_ICO.svg" alt="" style="width:7cqw;height:7cqw;display:block" />
                   <span style="width:100%;height:4.8cqw;border-radius:1.4cqw;border:1px solid #e2e9f0;background:#f8fafc;display:flex;align-items:center;gap:1.4cqw;padding:0 1.8cqw;font-size:2.4cqw;color:#8d9cae"><i class="fa-regular fa-envelope"></i><span style="height:1.2cqw;width:45%;border-radius:1cqw;background:#e2e9f0"></span></span>
                   <span style="width:100%;height:4.8cqw;border-radius:1.4cqw;border:1px solid #e2e9f0;background:#f8fafc;display:flex;align-items:center;gap:1.4cqw;padding:0 1.8cqw;font-size:2.4cqw;color:#8d9cae;letter-spacing:0.4cqw"><i class="fa-solid fa-key" style="letter-spacing:0"></i>••••••</span>
                   <span style="position:relative;width:100%;display:flex;gap:2cqw;border-radius:1.6cqw;box-shadow:0 0 0 0.5cqw #0950e3,0 0 0 1.8cqw rgba(9,80,227,.2)">
@@ -130,10 +130,10 @@ export default function Dialogs(v) {
               </div>` : null}${' '}
           </div>
         <div style="padding:20px 22px 18px;display:flex;flex-direction:column;gap:8px">
-          <span style="font-size:12px;font-weight:700;color:#0950e3;display:flex;gap:6px;align-items:center;flex-wrap:wrap"><img src="/assets/icons/TW_ICO.svg" alt="" style="width:14px;height:14px" />${T(v.instTourTitle)} · ${T(v.instStepLabel)}</span>
+          <span style="font-size:12px;font-weight:700;color:#0950e3;display:flex;gap:6px;align-items:center;flex-wrap:wrap"><img src="/static/assets/icons/TW_ICO.svg" alt="" style="width:14px;height:14px" />${T(v.instTourTitle)} · ${T(v.instStepLabel)}</span>
           <h2 style="margin:0;font-size:20px;font-weight:700;letter-spacing:-.2px">${v.instTitle}</h2>
           <p style="margin:0;font-size:14px;color:#5a6b80;text-wrap:pretty">${v.instText}</p>
-          ${v.inst3 ? html`<a class="sf-hover13" href=${v.instChartUrl} target="_blank" rel="noopener" style="align-self:flex-start;display:inline-flex;gap:8px;align-items:center;font-weight:700;font-size:13.5px;border:1px solid #c5d6f8;background:#f5f8ff;border-radius:10px;padding:8px 12px;text-decoration:none"><img src="/assets/icons/TW_ICO.svg" alt="" style="width:16px;height:16px" />${T(v.instTvLabel)}<i class="fa-solid fa-arrow-up-right-from-square" style="font-size:11px"></i></a>` : null}
+          ${v.inst3 ? html`<a class="sf-hover13" href=${v.instChartUrl} target="_blank" rel="noopener" style="align-self:flex-start;display:inline-flex;gap:8px;align-items:center;font-weight:700;font-size:13.5px;border:1px solid #c5d6f8;background:#f5f8ff;border-radius:10px;padding:8px 12px;text-decoration:none"><img src="/static/assets/icons/TW_ICO.svg" alt="" style="width:16px;height:16px" />${T(v.instTvLabel)}<i class="fa-solid fa-arrow-up-right-from-square" style="font-size:11px"></i></a>` : null}
           <div style="display:flex;align-items:center;gap:10px;margin-top:10px">
             <div style="display:flex;gap:2px">${(v.instDots || []).map((dt, $index) => html`<button onClick=${dt?.go} aria-label=${dt?.label} title=${dt?.label} style="border:none;background:none;padding:10px 2px;cursor:pointer;display:block"><span style="display:block;height:8px;border-radius:999px;width:${s(dt?.w)};background:${s(dt?.bg)};transition:width .3s"></span></button>`)}</div>
             <div style="margin-inline-start:auto;display:flex;gap:8px">

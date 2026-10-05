@@ -7,18 +7,18 @@ import { shopVals } from './vals_shop.js';
 import { cartVals } from './vals_cart.js';
 import { pageVals } from './vals_pages.js';
 
-const TX_KEYS = ['toolName', 'tvConnect', 'tvConnected', 'tvDisconnect', 'language', 'cart', 'emptyCart', 'codePh', 'apply', 'checkout', 'shown', 'reset', 'onlyFree', 'strategies', 'sortNp', 'sortWin', 'sortPrice', 'sortTrades', 'npPct', 'avgProfit', 'monthsTrained', 'view', 'viewRows', 'viewCards', 'viewTable', 'addToCart', 'inCartBtn', 'download', 'riskTitle', 'riskText', 'riskShort', 'legalPrivacy', 'legalCookies', 'legalTerms', 'legalNotice', 'contactMenu', 'proView', 'liteTitle', 'liteSub', 'searchPh', 'loadMore', 'haveCode', 'noMatch', 'tradesWord', 'rowsPerPage', 'addFilter', 'colBacktest', 'strategyChart', 'candleChart', 'openTv', 'fSymbol', 'fTimeframe', 'fIndicators', 'any', 'tourOpen', 'tourBack', 'tourClose', 'email', 'bundles', 'freeTitle', 'freeText', 'newsOpt', 'sendLink', 'freeSent', 'myStrategies', 'mineSub', 'newLink', 'backShop', 'thanksTitle', 'thanksSub', 'downloadAll', 'totalPaid', 'paidWith', 'installTitle', 'goMine', 'selAll', 'selNone', 'searchSmall', 'clearAll', 'openPage', 'newTab', 'allResults', 'aboutInd', 'seeInd', 'scriptPreview', 'lockedNote', 'sinceRelease', 'liveVsBacktest', 'demoFigures', 'compare', 'compareTitle', 'compareMax', 'grade', 'packTitle', 'done', 'favourites', 'favEmpty', 'versions', 'v2note', 'v1note', 'updateAvail', 'getUpdate', 'trustPaypal', 'trustLinks', 'trustInvoice', 'currencyLabel', 'howItDecides', 'overviewTab', 'howTeaserTitle', 'howTeaserText', 'toSheet', 'scriptRest', 'buyScriptTitle', 'buyScriptText', 'formatsNote', 'fmtPineDesc', 'fmtMd', 'fmtMdDesc', 'fmtPyDesc', 'fmtJsDesc',
-  'liveUnknown', 'signInTitle', 'signInText', 'signInSent', 'signInExpired', 'signOut', 'errServer',
-  'signInConfirm', 'linksHiddenTitle', 'linksHiddenText', 'signInToDownload'];
+const TX_KEYS = ['toolName', 'tvConnect', 'tvConnected', 'tvDisconnect', 'language', 'cart', 'emptyCart', 'codePh', 'apply', 'checkout', 'shown', 'reset', 'onlyFree', 'strategies', 'sortNp', 'sortWin', 'sortPrice', 'sortTrades', 'npPct', 'avgProfit', 'monthsTrained', 'view', 'viewRows', 'viewCards', 'pviewTable', 'addToCart', 'inCartBtn', 'download', 'riskTitle', 'riskText', 'riskShort', 'legalPrivacy', 'legalCookies', 'legalTerms', 'legalNotice', 'contactMenu', 'proView', 'liteTitle', 'liteSub', 'searchPh', 'loadMore', 'haveCode', 'noMatch', 'tradesWord', 'rowsPerPage', 'addFilter', 'colBacktest', 'strategyChart', 'candleChart', 'openTv', 'fSymbol', 'fTimeframe', 'fIndicators', 'any', 'tourOpen', 'tourBack', 'tourClose', 'email', 'bundles', 'freeTitle', 'freeText', 'newsOpt', 'sendLink', 'freeSent', 'myStrategies', 'mineSub', 'newLink', 'backShop', 'thanksTitle', 'thanksSub', 'downloadAll', 'totalPaid', 'paidWith', 'installTitle', 'goMine', 'selAll', 'selNone', 'searchSmall', 'clearAll', 'openPage', 'newTab', 'allResults', 'aboutInd', 'seeInd', 'scriptPreview', 'lockedNote', 'sinceRelease', 'liveVsBacktest', 'demoFigures', 'compare', 'compareTitle', 'compareMax', 'grade', 'packTitle', 'done', 'favourites', 'favEmpty', 'versions', 'v2note', 'v1note', 'updateAvail', 'getUpdate', 'trustPaypal', 'trustLinks', 'trustInvoice', 'currencyLabel', 'howItDecides', 'overviewTab', 'howTeaserTitle', 'howTeaserText', 'toSheet', 'scriptRest', 'buyScriptTitle', 'buyScriptText', 'formatsNote', 'fmtPineDesc', 'fmtMd', 'fmtMdDesc', 'fmtPyDesc', 'fmtJsDesc',
+  'liveUnknown', 'signOut', 'errServer', 'linksHiddenTitle', 'linksHiddenText', 'signInToDownload',
+  'proofTitle', 'proofText', 'proofSent', 'proofConfirmTitle', 'proofConfirm', 'errProofExpired'];
 const GRADE_BG = { A: '#15803d', B: '#0e7c98', C: '#5a6b80', D: '#c0392b' };
 const stop = e => { if (e && e.stopPropagation) e.stopPropagation(); };
 
 export function renderVals(app) {
   const s = app.state;
-  const LANGS = s.common._languages || ['es', 'en', 'pt', 'fr', 'de', 'zh', 'ar', 'hi'];
-  const lang = LANGS.includes(s.lang) ? s.lang : 'en';
-  const rtl = (s.common._rtl_languages || ['ar']).includes(lang);
-  const t = translator(s.dict, s.common, lang);
+  // el idioma y la dirección, los de la carcasa del núcleo; los textos, su diccionario
+  const lang = s.lang;
+  const rtl = s.dir === 'rtl';
+  const t = translator(s.dict, {}, lang);
   const rates = (s.fx && s.fx.rates) || {};
   const f = formatters(lang, { local: s.cur === 'local', rate: rates[LOCAL_CURRENCY[lang]] || 0 });
   const tx = {};
@@ -31,30 +31,23 @@ export function renderVals(app) {
   const cart = cartVals(c); // also gives c.inCart and c.toggleCart, which every row uses
   const shop = shopVals(c);
   const pages = pageVals(c);
-  const labels = s.common._language_labels || {};
 
   return {
     lang, dir: rtl ? 'rtl' : 'ltr', g90: rtl ? '270deg' : '90deg', tickShift: rtl ? 'translateX(100%)' : 'translateX(-100%)',
-    tx,
-    languages: LANGS.map(code => ({ code, flag: (labels[code] || {}).flag || '🌐', name: (labels[code] || {}).endonym || code, go: () => app.setLang(code),
-      bg: code === lang ? '#eef3fd' : 'transparent', color: code === lang ? '#0950e3' : '#16263a', weight: code === lang ? '600' : '400' })),
-    langFlag: (labels[lang] || {}).flag || '🌐', langName: (labels[lang] || {}).endonym || lang,
-    langOpen: s.langOpen, toggleLangMenu: () => app.setState(st => ({ langOpen: !st.langOpen, addOpen: false, openPill: '' })),
+    tx, barStart: app.props.barStart, barEnd: app.props.barEnd,
     tv: s.tv, tvOff: !s.tv, toggleTv: () => app.toggleTv(), tvTitle: s.tv ? tx.tvDisconnect : tx.tvConnect,
     isLocal: f.isLocal, curLabel: f.curLabel, toggleCur: () => app.setState(st => ({ cur: st.cur === 'local' ? 'usd' : 'local' })),
     isPhone: s.vw < 640,
     goShop: () => app.go({ page: 'shop' }),
-    // the brand is a real link to the shop (a new tab, keyboard); a plain click stays in the page
-    goHome: e => { if (e.button || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return; e.preventDefault(); app.go({ page: 'shop' }); },
-    goMine: () => app.go({ page: 'mine' }),
+    goMine: () => app.goMine(),
     modeTabs: [['lite', 'Lite', 'fa-solid fa-bolt'], ['pro', 'Pro', 'fa-solid fa-chart-line']].map(([k, label, icon]) => {
       const on = (s.mode === 'pro' ? 'pro' : 'lite') === k;
       return { label, icon, on: String(on), bg: on ? '#0950e3' : 'transparent', color: on ? '#ffffff' : '#5a6b80', shadow: on ? '0 4px 12px rgba(9,80,227,.25)' : 'none',
         go: () => app.setMode(k) };
     }),
     ...shop, ...cart, ...pages,
-    anyMenu: s.langOpen || s.addOpen || !!s.openPill || !!s.openSel,
-    closeMenus: () => app.setState({ langOpen: false, addOpen: false, openPill: '', openSel: '' })
+    anyMenu: s.addOpen || !!s.openPill || !!s.openSel,
+    closeMenus: () => app.setState({ addOpen: false, openPill: '', openSel: '' })
   };
 }
 

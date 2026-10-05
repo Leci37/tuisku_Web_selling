@@ -1,18 +1,14 @@
-// Calls to the shop's own server. The server answers errors as {"detail": {"error": "..."}}; the
-// message travels on the ApiError so the page can show what the server said.
+// Las llamadas al servidor de la tienda. Un rechazo llega como {"error": "<clave>", ...} (la convención
+// de las herramientas): la clave viaja en el ApiError, con el resto de la respuesta (vars, items...), para
+// que la página la enseñe traducida. El token CSRF de cada POST, PUT y DELETE lo pone csrf.js del núcleo
+// (parchea fetch), igual que la cabecera que dice que esto es un script.
 export class ApiError extends Error {
-  constructor(status, message, detail) {
-    super(message);
+  constructor(status, key, detail) {
+    super(key);
     this.status = status;
+    this.key = key;
     this.detail = detail || {};
   }
-}
-
-function messageOf(detail, fallback) {
-  if (detail && typeof detail === 'object' && !Array.isArray(detail) && detail.error) return String(detail.error);
-  if (typeof detail === 'string') return detail;
-  if (Array.isArray(detail) && detail[0] && detail[0].msg) return String(detail[0].msg); // FastAPI validation
-  return fallback;
 }
 
 export async function api(path, { method = 'GET', body } = {}) {
@@ -24,16 +20,16 @@ export async function api(path, { method = 'GET', body } = {}) {
   let res;
   try {
     res = await fetch(path, init);
-  } catch (e) { // no answer at all (offline, DNS, connection cut): the one case that is a network error
-    const err = new ApiError(0, 'network', {});
+  } catch (e) { // ninguna respuesta (sin red, DNS, conexión cortada): el único caso que es un error de red
+    const err = new ApiError(0, 'errShopNetwork', {});
     err.network = true;
     throw err;
   }
   let data = null;
   try { data = await res.json(); } catch (e) { data = null; }
   if (!res.ok) {
-    const detail = data && data.detail;
-    throw new ApiError(res.status, messageOf(detail, res.statusText || 'HTTP ' + res.status), detail);
+    const detail = data && typeof data === 'object' && !Array.isArray(data) ? data : {};
+    throw new ApiError(res.status, typeof detail.error === 'string' ? detail.error : '', detail);
   }
   return data;
 }

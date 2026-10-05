@@ -81,8 +81,8 @@ const TEXT = {
 // Every tree shares these two files; one request each per visit, not per strategy.
 let shared = null;
 const sharedData = () => shared || (shared = Promise.all([
-  fetch('/trees/features.json').then(r => { if (!r.ok) throw new Error('/trees/features.json'); return r.json(); }),
-  fetch('/trees/ui.json').then(r => r.json()).catch(() => ({}))
+  fetch('/static/trees/features.json').then(r => { if (!r.ok) throw new Error('/static/trees/features.json'); return r.json(); }),
+  fetch('/static/trees/ui.json').then(r => r.json()).catch(() => ({}))
 ]).catch(e => { shared = null; throw e; }));
 
 const text = (url, init) => fetch(url, init).then(r => { if (!r.ok) throw new Error(url + ' (' + r.status + ')'); return r.text(); });
