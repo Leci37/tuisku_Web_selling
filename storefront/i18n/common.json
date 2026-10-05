@@ -1,0 +1,273 @@
+{
+ "_comment": "Shared texts from zlecitool-core (zlecitool_core/i18n/common.json, branch develop): only the keys the storefront uses. Refresh with: python tools/sync_core_i18n.py PATH/TO/common.json",
+ "_languages": [
+  "es",
+  "en",
+  "pt",
+  "fr",
+  "de",
+  "zh",
+  "ar",
+  "hi"
+ ],
+ "_rtl_languages": [
+  "ar",
+  "fa",
+  "he",
+  "ur"
+ ],
+ "_language_labels": {
+  "es": {
+   "flag": "🇪🇸",
+   "endonym": "Español"
+  },
+  "en": {
+   "flag": "🇺🇸",
+   "endonym": "English (US)"
+  },
+  "pt": {
+   "flag": "🇵🇹",
+   "endonym": "Português"
+  },
+  "fr": {
+   "flag": "🇫🇷",
+   "endonym": "Français"
+  },
+  "de": {
+   "flag": "🇩🇪",
+   "endonym": "Deutsch"
+  },
+  "zh": {
+   "flag": "🇨🇳",
+   "endonym": "中文"
+  },
+  "ar": {
+   "flag": "🇸🇦",
+   "endonym": "العربية"
+  },
+  "hi": {
+   "flag": "🇮🇳",
+   "endonym": "हिन्दी"
+  },
+  "eu": {
+   "flag": "",
+   "endonym": "Euskara"
+  },
+  "ca": {
+   "flag": "",
+   "endonym": "Català"
+  },
+  "gl": {
+   "flag": "",
+   "endonym": "Galego"
+  }
+ },
+ "buy": {
+  "es": "Comprar",
+  "en": "Buy",
+  "pt": "Comprar",
+  "fr": "Acheter",
+  "de": "Kaufen",
+  "zh": "购买",
+  "ar": "شراء",
+  "hi": "खरीदें",
+  "eu": "Erosi",
+  "ca": "Compra",
+  "gl": "Mercar"
+ },
+ "contactMenu": {
+  "es": "Contacto",
+  "en": "Contact",
+  "pt": "Contacto",
+  "fr": "Contact",
+  "de": "Kontakt",
+  "zh": "联系我们",
+  "ar": "اتصل بنا",
+  "hi": "संपर्क",
+  "eu": "Harremana",
+  "ca": "Contacte",
+  "gl": "Contacto"
+ },
+ "email": {
+  "es": "Correo",
+  "en": "Email",
+  "pt": "E-mail",
+  "fr": "E-mail",
+  "de": "E-Mail",
+  "zh": "邮箱",
+  "ar": "البريد الإلكتروني",
+  "hi": "ईमेल",
+  "eu": "Posta elektronikoa",
+  "ca": "Correu",
+  "gl": "Correo"
+ },
+ "free": {
+  "es": "gratis",
+  "en": "free",
+  "pt": "grátis",
+  "fr": "gratuit",
+  "de": "kostenlos",
+  "zh": "免费",
+  "ar": "مجاني",
+  "hi": "मुफ़्त",
+  "eu": "doan",
+  "ca": "gratis",
+  "gl": "de balde"
+ },
+ "landingFree": {
+  "es": "Gratis",
+  "en": "Free",
+  "pt": "Grátis",
+  "fr": "Gratuit",
+  "de": "Kostenlos",
+  "zh": "免费",
+  "ar": "مجانًا",
+  "hi": "मुफ़्त",
+  "eu": "Doan",
+  "ca": "Gratis",
+  "gl": "De balde"
+ },
+ "language": {
+  "es": "Idioma",
+  "en": "Language",
+  "pt": "Idioma",
+  "fr": "Langue",
+  "de": "Sprache",
+  "zh": "语言",
+  "ar": "اللغة",
+  "hi": "भाषा",
+  "eu": "Hizkuntza",
+  "ca": "Idioma",
+  "gl": "Idioma"
+ },
+ "legalCookies": {
+  "es": "Cookies",
+  "en": "Cookies",
+  "pt": "Cookies",
+  "fr": "Cookies",
+  "de": "Cookies",
+  "zh": "Cookie",
+  "ar": "ملفات تعريف الارتباط",
+  "hi": "कुकीज़",
+  "eu": "Cookieak",
+  "ca": "Galetes",
+  "gl": "Cookies"
+ },
+ "legalNotice": {
+  "es": "Aviso legal",
+  "en": "Legal notice",
+  "pt": "Aviso legal",
+  "fr": "Mentions légales",
+  "de": "Impressum",
+  "zh": "法律声明",
+  "ar": "إشعار قانوني",
+  "hi": "कानूनी सूचना",
+  "eu": "Lege-oharra",
+  "ca": "Avís legal",
+  "gl": "Aviso legal"
+ },
+ "legalPrivacy": {
+  "es": "Privacidad",
+  "en": "Privacy",
+  "pt": "Privacidade",
+  "fr": "Confidentialité",
+  "de": "Datenschutz",
+  "zh": "隐私",
+  "ar": "الخصوصية",
+  "hi": "गोपनीयता",
+  "eu": "Pribatutasuna",
+  "ca": "Privadesa",
+  "gl": "Privacidade"
+ },
+ "legalTerms": {
+  "es": "Condiciones de uso",
+  "en": "Terms of use",
+  "pt": "Condições de utilização",
+  "fr": "Conditions d’utilisation",
+  "de": "Nutzungsbedingungen",
+  "zh": "使用条款",
+  "ar": "شروط الاستخدام",
+  "hi": "उपयोग की शर्तें",
+  "eu": "Erabilera-baldintzak",
+  "ca": "Condicions d'ús",
+  "gl": "Condicións de uso"
+ },
+ "tourBack": {
+  "es": "Atrás",
+  "en": "Back",
+  "pt": "Voltar",
+  "fr": "Retour",
+  "de": "Zurück",
+  "zh": "返回",
+  "ar": "رجوع",
+  "hi": "पीछे",
+  "eu": "Atzera",
+  "ca": "Enrere",
+  "gl": "Atrás"
+ },
+ "tourClose": {
+  "es": "Cerrar el tutorial",
+  "en": "Close the tutorial",
+  "pt": "Fechar o tutorial",
+  "fr": "Fermer le tutoriel",
+  "de": "Tutorial schließen",
+  "zh": "关闭教程",
+  "ar": "إغلاق الشرح",
+  "hi": "ट्यूटोरियल बंद करें",
+  "eu": "Itxi tutoriala",
+  "ca": "Tanca el tutorial",
+  "gl": "Pechar o titorial"
+ },
+ "tourNext": {
+  "es": "Continuar",
+  "en": "Continue",
+  "pt": "Continuar",
+  "fr": "Continuer",
+  "de": "Weiter",
+  "zh": "继续",
+  "ar": "متابعة",
+  "hi": "आगे",
+  "eu": "Jarraitu",
+  "ca": "Continua",
+  "gl": "Continuar"
+ },
+ "tourOpen": {
+  "es": "Ver tutorial",
+  "en": "View tutorial",
+  "pt": "Ver tutorial",
+  "fr": "Voir le tutoriel",
+  "de": "Tutorial ansehen",
+  "zh": "查看教程",
+  "ar": "عرض الشرح",
+  "hi": "ट्यूटोरियल देखें",
+  "eu": "Ikusi tutoriala",
+  "ca": "Mostra el tutorial",
+  "gl": "Ver o titorial"
+ },
+ "tourStart": {
+  "es": "Empezar",
+  "en": "Get started",
+  "pt": "Começar",
+  "fr": "Commencer",
+  "de": "Loslegen",
+  "zh": "开始",
+  "ar": "ابدأ",
+  "hi": "शुरू करें",
+  "eu": "Hasi",
+  "ca": "Comença",
+  "gl": "Comezar"
+ },
+ "tourStepOf": {
+  "es": "Paso {n} de {total}",
+  "en": "Step {n} of {total}",
+  "pt": "Passo {n} de {total}",
+  "fr": "Étape {n} sur {total}",
+  "de": "Schritt {n} von {total}",
+  "zh": "第 {n} 步，共 {total} 步",
+  "ar": "الخطوة {n} من {total}",
+  "hi": "चरण {n} / {total}",
+  "eu": "{n}/{total} urratsa",
+  "ca": "Pas {n} de {total}",
+  "gl": "Paso {n} de {total}"
+ }
+}

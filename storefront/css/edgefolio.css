@@ -1,0 +1,32 @@
+/* Edgefolio storefront. Colours, type and spacing live inline in the views, as in the v7
+   reference design (docs/design); this file holds what inline styles cannot: the fonts, the page
+   base and the hover/focus states. */
+@font-face{font-family:"Ubuntu";font-weight:400;font-display:swap;src:url("../fonts/Ubuntu-400-latin.woff2") format("woff2")}
+@font-face{font-family:"Ubuntu";font-weight:500;font-display:swap;src:url("../fonts/Ubuntu-500-latin.woff2") format("woff2")}
+@font-face{font-family:"Ubuntu";font-weight:700;font-display:swap;src:url("../fonts/Ubuntu-700-latin.woff2") format("woff2")}
+*,*::before,*::after{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:#f4f8fb}
+#app,#app>.sc-host{height:100%}
+a{color:#0950e3;text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* hover and focus states (style-hover / style-focus in the design) */
+.sf-hover0:hover{border-color:#cfd6e6 !important}
+.sf-hover1:hover{background:#f4f6fb !important}
+.sf-hover2:hover{box-shadow:0 14px 36px rgba(22,38,58,.10) !important;border-color:#cfd6e6 !important}
+.sf-hover3:hover{background:#0950e3 !important;color:#ffffff !important;border-color:#0950e3 !important}
+.sf-hover4:hover{background:#0e7c98 !important;color:#ffffff !important;border-color:#0e7c98 !important}
+.sf-focus5:focus{border-color:#0950e3 !important;box-shadow:0 0 0 3px rgba(9,80,227,.15) !important}
+.sf-hover6:hover{background:#f7faff !important}
+.sf-hover7:hover{box-shadow:0 12px 32px rgba(22,38,58,.10) !important;border-color:#cfd6e6 !important}
+.sf-hover8:hover{background:#0950e3 !important;color:#ffffff !important;border-color:#0950e3 !important;text-decoration:none !important}
+.sf-hover9:hover{background:#0e7c98 !important;color:#ffffff !important;border-color:#0e7c98 !important;text-decoration:none !important}
+.sf-hover10:hover{border-color:#c5d6f8 !important;background:#f5f8ff !important}
+.sf-hover11:hover{border-color:#0e7c98 !important;box-shadow:0 8px 22px rgba(14,124,152,.14) !important}
+.sf-hover12:hover{background:#0950e3 !important;color:#ffffff !important}
+.sf-hover13:hover{background:#e9f0fd !important;text-decoration:none !important}
+.tr-hover0:hover{transform:translateY(-1px) !important;box-shadow:0 8px 20px rgba(22,38,58,.16) !important;opacity:1 !important}
+.tr-hover1:hover{opacity:1 !important;box-shadow:0 6px 16px rgba(22,38,58,.12) !important}
+.tr-hover2:hover{background:#e9f0fd !important}
+.tr-hover3:hover{border-color:#9fb8ef !important}
