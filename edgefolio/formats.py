@@ -1,12 +1,16 @@
-"""The other formats of a strategy, generated from its full Pine script: the rules in plain words (.md),
-Python and JavaScript versions of the trees (.py, .js, beta) and the zip that carries them with the .pine.
+# -*- coding: utf-8 -*-
+"""Los otros formatos de una estrategia, hechos de su script Pine completo: las reglas en palabras
+sencillas (.md), las versiones en Python y JavaScript de los árboles (.py, .js, beta) y el zip que los
+lleva con el .pine. Lo que escriben (el producto que se entrega) va en inglés, como el script.
 
-The factory writes every tree as a Pine function `decision_tree_N_...(...) =>` of nested
-`if( feat <= v )` / `if( feat > v )` blocks that end in `ret := score // buy|sell`, and the script
-reads `op_operation` from the trees, buys at `op_operation >= X` and closes at `op_operation <= Y`.
-At `op_operation <= 0` it arms its exit order: a stop loss and a take profit (inputs `sl`, `tp1`..`tp3`,
-in % of the entry price) that move through three stages (getCurrentStage) as the price rises.
+La fábrica escribe cada árbol como una función Pine `decision_tree_N_...(...) =>` de bloques
+`if( feat <= v )` / `if( feat > v )` anidados que acaban en `ret := score // buy|sell`, y el script lee
+`op_operation` de los árboles, compra con `op_operation >= X` y cierra con `op_operation <= Y`. Con
+`op_operation <= 0` arma su orden de salida: un stop loss y un take profit (las entradas `sl`,
+`tp1`..`tp3`, en % del precio de entrada) que pasan por tres etapas (getCurrentStage) según sube el precio.
 """
+from __future__ import annotations
+
 import functools
 import io
 import json
@@ -16,7 +20,7 @@ import zipfile
 from dataclasses import dataclass, field
 from typing import Optional, Union
 
-from api.settings import ROOT
+from .settings import STATIC
 
 NUM = r"(-?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?)"
 RE_TREE = re.compile(r"^decision_tree_(\d+)_\w*\s*\(([^)]*)\)\s*=>")
@@ -44,7 +48,7 @@ BETA = ("BETA: generated automatically from the Pine script. Check its signals a
 @dataclass
 class Leaf:
     raw: str
-    sig: str  # buy, sell or '' (the factory's comment on the leaf)
+    sig: str  # buy, sell o '' (el comentario de la fábrica en la hoja)
 
     @property
     def value(self) -> float:
@@ -59,7 +63,7 @@ class Split:
     gt: "Node"
 
 
-Node = Optional[Union[Leaf, Split]]  # None: a branch that is not in the source (a cut preview)
+Node = Optional[Union[Leaf, Split]]  # None: una rama que no está en el texto (una vista previa cortada)
 
 
 @dataclass
@@ -75,35 +79,35 @@ class Tree:
 @dataclass
 class Stage:
     n: int
-    reached_at: Optional[str]  # input whose % the bar's high must reach above the entry; None: from the entry
-    stop: str                  # calcStopLossPrice's argument: 'sl' (below the entry), '0' (at it), '-tp1' (above)
-    profit: str                # input of the take profit, above the entry
+    reached_at: Optional[str]  # la entrada cuyo % tiene que alcanzar el máximo de la vela; None: desde la entrada
+    stop: str                  # el argumento de calcStopLossPrice: 'sl' (debajo), '0' (en la entrada), '-tp1' (encima)
+    profit: str                # la entrada del take profit, encima de la entrada
 
 
 @dataclass
 class Exits:
-    pct: dict = field(default_factory=dict)       # input -> its default value in %, as written ('2.92')
-    titles: dict = field(default_factory=dict)    # input -> its title in TradingView ('stop loss')
-    stages: list = field(default_factory=list)    # [Stage], empty when the stage code is not the factory's
-    trailing: Optional[str] = None                # default of the 'activate trailing' input, if the script has it
-    trailing_used: bool = False                   # whether anything but its own declaration reads it
+    pct: dict = field(default_factory=dict)       # entrada -> su valor por defecto en %, como está escrito ('2.92')
+    titles: dict = field(default_factory=dict)    # entrada -> su título en TradingView ('stop loss')
+    stages: list = field(default_factory=list)    # [Stage]; vacía si el código de las etapas no es el de la fábrica
+    trailing: Optional[str] = None                # el valor por defecto de 'activate trailing', si el script lo tiene
+    trailing_used: bool = False                   # si algo, aparte de su declaración, lo lee
 
 
 @dataclass
 class Script:
     name: str
     trees: list = field(default_factory=list)
-    combine: str = "mean"          # how the script joins the trees' scores: mean or sum
-    buy: Optional[str] = None      # op_operation >= buy opens a long position
-    close: Optional[str] = None    # op_operation <= close closes it
-    arm: Optional[str] = None      # op_operation <= arm places or moves the exit order (stop loss, take profit)
+    combine: str = "mean"          # cómo junta el script las puntuaciones: mean o sum
+    buy: Optional[str] = None      # op_operation >= buy abre una posición larga
+    close: Optional[str] = None    # op_operation <= close la cierra
+    arm: Optional[str] = None      # op_operation <= arm pone o mueve la orden de salida (stop loss, take profit)
     exits: Optional[Exits] = None
     pyramiding: Optional[int] = None
-    entry_stop: Optional[str] = None  # the entry order's stop = close * this (a stop-entry price, not a stop loss)
+    entry_stop: Optional[str] = None  # el stop de la orden de entrada = close * esto (un precio de entrada, no un stop loss)
 
 
 def _lines(src: str) -> list:
-    """(indent width, text) of every non-blank line; tabs count as 4 so tabs and spaces both work."""
+    """(sangría, texto) de cada línea con algo; un tabulador cuenta 4, así valen tabuladores y espacios."""
     out = []
     for line in src.replace("\r", "").split("\n"):
         text = line.strip()
@@ -155,7 +159,7 @@ def _tree(lines: list, start: int) -> Tree:
 
 
 def _block(lines: list, n: int) -> list:
-    """The lines nested under line n."""
+    """Las líneas anidadas bajo la línea n."""
     out = []
     for ind, text in lines[n + 1:]:
         if ind <= lines[n][0]:
@@ -165,7 +169,7 @@ def _block(lines: list, n: int) -> list:
 
 
 def _stages(block: list, ups: dict) -> list:
-    """The exit order of each stage in the `op_operation <= arm` block; [] unless every stage is understood."""
+    """La orden de salida de cada etapa del bloque `op_operation <= arm`; [] si no se entiende cada etapa."""
     stages, n, stop = [], None, None
     for text in block:
         if m := RE_CUR_STAGE.match(text):
@@ -233,21 +237,21 @@ def parse(src: str) -> Script:
 
 @functools.lru_cache(maxsize=1)
 def feature_names() -> dict:
-    """English name and description of each indicator value the factory uses (storefront/trees/)."""
+    """El nombre y la descripción en inglés de cada valor de indicador que usa la fábrica (static/trees/)."""
     try:
-        data = json.loads((ROOT / "storefront" / "trees" / "features.json").read_text(encoding="utf-8"))
+        data = json.loads((STATIC / "trees" / "features.json").read_text(encoding="utf-8"))
     except (OSError, ValueError):
         return {}
     return {k: (v[0], v[1]) for k, v in data.get("features", {}).items() if len(v) >= 2}
 
 
 def is_flag(feat: str, raw: str) -> bool:
-    """The factory's 0/1 values end in Int; a split between 0 and 1 then just asks yes or no."""
+    """Los valores 0/1 de la fábrica acaban en Int: un corte entre 0 y 1 sólo pregunta sí o no."""
     return feat.endswith("Int") and 0 < float(raw) < 1
 
 
 def leaves(node: Node, path=()):
-    """(conditions, leaf) for every leaf, in the order the script lists them."""
+    """(condiciones, hoja) de cada hoja, en el orden en que las escribe el script."""
     if node is None:
         yield path, None
     elif isinstance(node, Leaf):
@@ -266,7 +270,7 @@ def features(script: Script) -> list:
 
 
 def plain(path) -> str:
-    """The conditions of one path, one per value: repeated splits on a value become one range."""
+    """Las condiciones de un camino, una por valor: los cortes repetidos de un valor se juntan en un rango."""
     bounds = {}
     for feat, raw, way in path:
         lo, hi = bounds.get(feat, (None, None))
@@ -291,9 +295,9 @@ ARM = "Arm the exits"
 
 
 def action(leaf: Leaf, script: Script) -> str:
-    """What the script does when this leaf decides. With one tree the leaf's score is the script's score,
-    so its thresholds tell; the factory's own buy/sell comments (at ±0.7) are not what the script acts on.
-    With several trees one leaf does not decide alone: the factory's label is the best hint."""
+    """Lo que hace el script cuando decide esta hoja. Con un árbol, la puntuación de la hoja es la del
+    script, y sus umbrales lo dicen; los comentarios buy/sell de la fábrica (a ±0,7) no son lo que hace el
+    script. Con varios árboles una hoja no decide sola: la etiqueta de la fábrica es la mejor pista."""
     if len(script.trees) == 1 and script.buy:
         v = leaf.value
         if v >= float(script.buy):
@@ -305,8 +309,8 @@ def action(leaf: Leaf, script: Script) -> str:
 
 
 def stop_pct(stage: Stage, exits: Exits) -> str:
-    """Where the stage's stop is, in % above (+) or below (-) the entry price: calcStopLossPrice(x) puts it
-    x points below the entry, so 'sl' is below, '0' at the entry and '-tp1' above."""
+    """Dónde está el stop de la etapa, en % por encima (+) o por debajo (-) del precio de entrada:
+    calcStopLossPrice(x) lo pone x puntos por debajo, así que 'sl' es debajo, '0' en la entrada y '-tp1' encima."""
     if stage.stop == "0":
         return "0"
     return exits.pct[stage.stop[1:]] if stage.stop.startswith("-") else "-" + exits.pct[stage.stop]
@@ -324,7 +328,7 @@ def _stage_line(stage: Stage, exits: Exits) -> str:
 
 
 def how_it_decides(script: Script) -> list:
-    """What the script does with its score, as its Pine code does it (one tree or several)."""
+    """Lo que hace el script con su puntuación, como lo hace su código Pine (uno o varios árboles)."""
     n = len(script.trees)
     out = [(f"On every bar, each of the {n} decision trees gives a score between -1 and 1, and the script "
             f"takes their {'sum' if script.combine == 'sum' else 'average'}." if n > 1 else
@@ -444,7 +448,7 @@ PCT_NAMES = {"sl": "STOP_LOSS_PCT", "tp1": "TAKE_PROFIT_1_PCT", "tp2": "TAKE_PRO
 
 
 def _constants(script: Script, lang: str) -> list:
-    """BUY_AT, ARM_EXITS_AT, CLOSE_AT and the exits as data, in Python or JavaScript."""
+    """BUY_AT, ARM_EXITS_AT, CLOSE_AT y las salidas como datos, en Python o en JavaScript."""
     none, start, end = ("None", "", "") if lang == "py" else ("null", "export const ", ";")
     exits = script.exits
 
@@ -529,7 +533,7 @@ def readme(stem: str, title: str, contact: str) -> str:
 
 
 def build_zip(src: str, stem: str, contact: str = "sales@tuisku.eu") -> bytes:
-    """The .zip a buyer downloads: the script and the formats generated from it."""
+    """El .zip que descarga quien compra: el script y los formatos hechos de él."""
     script = parse(src)
     title = script.name or stem
     buf = io.BytesIO()

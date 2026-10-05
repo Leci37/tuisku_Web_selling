@@ -1,41 +1,42 @@
-"""Configuration, all from the environment, so no secret or discount code lives in the code.
+# -*- coding: utf-8 -*-
+"""La configuración de la tienda, del entorno: ni un secreto ni un código de descuento en el código.
 
-PAYPAL_MODE           fake (default: no PayPal, for local runs and tests) | sandbox | live
-PAYPAL_CLIENT_ID      public id of the PayPal REST app
-PAYPAL_CLIENT_SECRET  server only
-PUBLIC_URL            the shop's address (https://...), for PayPal's return link, the emails' links and the
-                      cookies' Secure flag. Required with PAYPAL_MODE sandbox/live or MAIL_MODE=smtp; only a
-                      local run (fake PayPal, console mail) may leave it out and use the request's address
-STRATEGIES_DIR        private folder with the paid .pine files (default: private/strategies)
-DATABASE              SQLite file: orders, links, accounts, favourites, outbox (default: private/shop.db)
-DISCOUNT_CODES        code=rate pairs, e.g. "spring20=0.20,partner40=0.40"
-FLAT_PRICE_CODES      code=price pairs that set every loose item to one price, e.g. "launch=0.99"
-MAX_DISCOUNT          cap on tier + code discount together (default 0.70)
-DOWNLOAD_DAYS         how long a download link works (default 7)
-MAX_DOWNLOADS         downloads per link (default 10)
-PACK_SIZE, PACK_PRICE "Build your pack": how many strategies, for how much (default 5 for 249)
-NEW_DAYS              a strategy is "New" this many days after its release (default 30)
-MAIL_MODE             console (default: log it and keep it in the outbox table) | smtp
-SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASSWORD, SMTP_STARTTLS   for MAIL_MODE=smtp (port 587, STARTTLS on)
-MAIL_FROM             sender of the emails (default "Edgefolio <sales@tuisku.eu>")
-CONTACT_EMAIL         shown on the page for problems (default sales@tuisku.eu)
-LEGAL_BASE_URL        where the legal pages are (default https://tuisku.eu, paths as in zlecitool-core)
-SESSION_DAYS          how long a sign-in lasts (default 30)
-LOGIN_MINUTES         how long an emailed sign-in link works (default 15)
-THUMBS_DIR            cache of the WebP chart thumbnails (default cache/thumbs)
+Lo común (la sesión, la base de datos, el correo, la dirección pública, los idiomas) es del núcleo y
+se configura con sus variables (CONTRATO.md del núcleo, §3). Lo propio de la tienda:
+
+PAYPAL_MODE           fake (por defecto: sin PayPal, para trabajar en local y en las pruebas) | sandbox | live
+PAYPAL_CLIENT_ID      el id público de la app REST de PayPal
+PAYPAL_CLIENT_SECRET  sólo en el servidor
+STRATEGIES_DIR        la carpeta privada con los .pine de pago (por defecto <datos>/edgefolio/strategies)
+DISCOUNT_CODES        pares código=porcentaje: "spring20=0.20,partner40=0.40"
+FLAT_PRICE_CODES      pares código=precio que ponen un mismo precio a cada estrategia suelta: "launch=0.99"
+MAX_DISCOUNT          el tope del descuento por importe más el del código juntos (0.70)
+DOWNLOAD_DAYS         lo que vale un enlace de descarga, en días (7)
+MAX_DOWNLOADS         las descargas de cada enlace (10)
+PACK_SIZE, PACK_PRICE «Crea tu pack»: cuántas estrategias y por cuánto (5 por 249)
+NEW_DAYS              los días que una estrategia sale en «Nuevas» desde que se publicó (30)
+CONTACT_EMAIL         la dirección que la página da para los problemas (sales@tuisku.eu)
+
+Con PayPal de verdad (sandbox o live) hace falta ZLECITOOL_PUBLIC_URL: el enlace de vuelta de PayPal se
+hace con ella y nunca con la cabecera Host, que la escribe quien pide.
 """
+from __future__ import annotations
+
 import os
 from dataclasses import dataclass, field
 from decimal import Decimal
 from pathlib import Path
-from urllib.parse import urlsplit
+from typing import Mapping, Optional
 
 ROOT = Path(__file__).resolve().parent.parent
+STATIC = ROOT / "static"
+CATALOGUE = ROOT / "catalogue"
 
-# Order-size discount, as the old page applied it: over $2,500 -> 70%, ...
+# El descuento por importe del pedido, como lo aplicaba la página de antes: más de 2.500 $ → 70 %…
 DEFAULT_TIERS = ((Decimal("2500"), Decimal("0.70")), (Decimal("1000"), Decimal("0.40")),
                  (Decimal("500"), Decimal("0.25")), (Decimal("290"), Decimal("0.20")),
                  (Decimal("160"), Decimal("0.15")))
+PAYPAL_MODES = ("fake", "sandbox", "live")
 
 
 def _pairs(raw: str) -> dict:
@@ -53,17 +54,18 @@ class Settings:
     paypal_mode: str = "fake"
     paypal_client_id: str = ""
     paypal_client_secret: str = ""
-    public_url: str = ""
     currency: str = "USD"
-    strategies_dir: Path = ROOT / "private" / "strategies"
-    database: Path = ROOT / "private" / "shop.db"
-    catalogue: Path = ROOT / "catalogue" / "catalogue.csv"
-    indicators: Path = ROOT / "catalogue" / "indicators.csv"
-    bundles: Path = ROOT / "catalogue" / "bundles.json"
-    fx: Path = ROOT / "catalogue" / "fx.json"
-    since_release: Path = ROOT / "catalogue" / "since_release.csv"
-    storefront: Path = ROOT / "storefront"
-    thumbs_dir: Path = ROOT / "cache" / "thumbs"
+    # Lo privado y lo que se hace solo, dentro de la carpeta de datos de la herramienta.
+    strategies_dir: Path = Path("data") / "edgefolio" / "strategies"
+    thumbs_dir: Path = Path("data") / "edgefolio" / "thumbs"
+    fx_today: Path = Path("data") / "edgefolio" / "fx.json"  # lo escribe flask edgefolio fx-update
+    # Lo publicado, en el repo.
+    catalogue: Path = CATALOGUE / "catalogue.csv"
+    indicators: Path = CATALOGUE / "indicators.csv"
+    bundles: Path = CATALOGUE / "bundles.json"
+    fx: Path = CATALOGUE / "fx.json"           # cambios de ejemplo, hasta que haya los del día
+    since_release: Path = CATALOGUE / "since_release.csv"
+    static: Path = STATIC
     discount_codes: dict = field(default_factory=dict)
     flat_price_codes: dict = field(default_factory=dict)
     max_discount: Decimal = Decimal("0.70")
@@ -73,68 +75,45 @@ class Settings:
     pack_size: int = 5
     pack_price: Decimal = Decimal("249")
     new_days: int = 30
-    mail_mode: str = "console"
-    smtp_host: str = ""
-    smtp_port: int = 587
-    smtp_user: str = ""
-    smtp_password: str = ""
-    smtp_starttls: bool = True
-    mail_from: str = "Edgefolio <sales@tuisku.eu>"
     contact_email: str = "sales@tuisku.eu"
-    legal_base_url: str = "https://tuisku.eu"
-    session_days: int = 30
-    login_minutes: int = 15
 
     @classmethod
-    def from_env(cls) -> "Settings":
-        e = os.environ.get
-        s = cls(
-            paypal_mode=e("PAYPAL_MODE", "fake").lower(),
-            paypal_client_id=e("PAYPAL_CLIENT_ID", ""),
-            paypal_client_secret=e("PAYPAL_CLIENT_SECRET", ""),
-            public_url=e("PUBLIC_URL", "").rstrip("/"),
-            discount_codes=_pairs(e("DISCOUNT_CODES", "")),
-            flat_price_codes=_pairs(e("FLAT_PRICE_CODES", "")),
-            max_discount=Decimal(e("MAX_DISCOUNT", "0.70")),
-            download_days=int(e("DOWNLOAD_DAYS", "7")),
-            max_downloads=int(e("MAX_DOWNLOADS", "10")),
-            pack_size=int(e("PACK_SIZE", "5")),
-            pack_price=Decimal(e("PACK_PRICE", "249")),
-            new_days=int(e("NEW_DAYS", "30")),
-            mail_mode=e("MAIL_MODE", "console").lower(),
-            smtp_host=e("SMTP_HOST", ""),
-            smtp_port=int(e("SMTP_PORT", "587")),
-            smtp_user=e("SMTP_USER", ""),
-            smtp_password=e("SMTP_PASSWORD", ""),
-            smtp_starttls=e("SMTP_STARTTLS", "1") not in ("0", "false", "no"),
-            mail_from=e("MAIL_FROM", "Edgefolio <sales@tuisku.eu>"),
-            contact_email=e("CONTACT_EMAIL", "sales@tuisku.eu"),
-            legal_base_url=e("LEGAL_BASE_URL", "https://tuisku.eu").rstrip("/"),
-            session_days=int(e("SESSION_DAYS", "30")),
-            login_minutes=int(e("LOGIN_MINUTES", "15")),
+    def for_data_dir(cls, data_dir: Path, **values) -> "Settings":
+        """Los de por defecto con las carpetas privadas dentro de ``data_dir``."""
+        data_dir = Path(data_dir)
+        values.setdefault("strategies_dir", data_dir / "strategies")
+        values.setdefault("thumbs_dir", data_dir / "thumbs")
+        values.setdefault("fx_today", data_dir / "fx.json")
+        return cls(**values)
+
+    @classmethod
+    def from_env(cls, data_dir: Path, environ: Optional[Mapping[str, str]] = None,
+                 public_url: Optional[str] = None) -> "Settings":
+        """La de esta instalación. ``public_url`` es ``ZLECITOOL_PUBLIC_URL`` (la lee el núcleo)."""
+        e = (environ if environ is not None else os.environ).get
+        s = cls.for_data_dir(
+            data_dir,
+            paypal_mode=(e("PAYPAL_MODE") or "fake").strip().lower(),
+            paypal_client_id=e("PAYPAL_CLIENT_ID") or "",
+            paypal_client_secret=e("PAYPAL_CLIENT_SECRET") or "",
+            discount_codes=_pairs(e("DISCOUNT_CODES") or ""),
+            flat_price_codes=_pairs(e("FLAT_PRICE_CODES") or ""),
+            max_discount=Decimal(e("MAX_DISCOUNT") or "0.70"),
+            download_days=int(e("DOWNLOAD_DAYS") or "7"),
+            max_downloads=int(e("MAX_DOWNLOADS") or "10"),
+            pack_size=int(e("PACK_SIZE") or "5"),
+            pack_price=Decimal(e("PACK_PRICE") or "249"),
+            new_days=int(e("NEW_DAYS") or "30"),
+            contact_email=(e("CONTACT_EMAIL") or "sales@tuisku.eu").strip(),
         )
         if e("STRATEGIES_DIR"):
             s.strategies_dir = Path(e("STRATEGIES_DIR"))
-        if e("DATABASE"):
-            s.database = Path(e("DATABASE"))
-        if e("THUMBS_DIR"):
-            s.thumbs_dir = Path(e("THUMBS_DIR"))
-        if s.paypal_mode not in ("fake", "sandbox", "live"):
-            raise ValueError(f"PAYPAL_MODE must be fake, sandbox or live, not {s.paypal_mode!r}")
+        if s.paypal_mode not in PAYPAL_MODES:
+            raise ValueError(f"PAYPAL_MODE es fake, sandbox o live, no {s.paypal_mode!r}")
         if s.paypal_mode != "fake" and not (s.paypal_client_id and s.paypal_client_secret):
-            raise ValueError("PAYPAL_CLIENT_ID and PAYPAL_CLIENT_SECRET are required outside fake mode")
-        if s.mail_mode not in ("console", "smtp"):
-            raise ValueError(f"MAIL_MODE must be console or smtp, not {s.mail_mode!r}")
-        if s.mail_mode == "smtp" and not s.smtp_host:
-            raise ValueError("SMTP_HOST is required with MAIL_MODE=smtp")
-        if (s.paypal_mode != "fake" or s.mail_mode == "smtp") and not s.public_url:
-            # Without it the links in emails and PayPal's return address would be built from the Host
-            # header, which the visitor chooses: a sign-in link could then point at someone else's server.
-            raise ValueError("PUBLIC_URL is required with PAYPAL_MODE=sandbox/live or MAIL_MODE=smtp: the shop's "
-                             "address, e.g. PUBLIC_URL=https://shop.example.com")
-        if s.public_url:
-            u = urlsplit(s.public_url)
-            if u.scheme not in ("http", "https") or not u.hostname or u.query or u.fragment:
-                raise ValueError(f"PUBLIC_URL must be the shop's address, like https://shop.example.com, "
-                                 f"not {s.public_url!r}")
+            raise ValueError("fuera de PAYPAL_MODE=fake hacen falta PAYPAL_CLIENT_ID y PAYPAL_CLIENT_SECRET")
+        if s.paypal_mode != "fake" and not public_url:
+            # Sin ella, el enlace de vuelta de PayPal se haría con la cabecera Host, que elige quien pide.
+            raise ValueError("con PAYPAL_MODE=sandbox o live hace falta ZLECITOOL_PUBLIC_URL, la dirección de la "
+                             "tienda: ZLECITOOL_PUBLIC_URL=https://edgefolio.tuisku.eu")
         return s

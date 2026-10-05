@@ -1,15 +1,25 @@
-"""The favourites' alerts: one email per person when a strategy they follow gets a new version, a
-lower price, or goes into a bundle. Run daily by tools/send_alerts.py (cron), not by a request.
+# -*- coding: utf-8 -*-
+"""Los avisos de las favoritas: un correo por persona cuando una estrategia que sigue tiene una versión
+nueva, baja de precio o entra en un lote. Lo lanza el trabajo diario (``flask --app app edgefolio
+send-alerts``, desde cron), no una petición.
 
-Each run compares the catalogue with what it looked like at the previous run (table alert_state)
-and then stores the new picture, so a change is announced once. The first run only takes the
-picture: there is nothing to compare with yet.
+Cada vuelta compara el catálogo con cómo era en la anterior (edgefolio_alert_state) y guarda cómo es
+ahora: un cambio se avisa una vez. La primera vuelta sólo toma la foto: aún no hay con qué comparar.
+
+Los avisos van al correo de la cuenta sólo si la cuenta ha demostrado que es suyo (``proofs``): el
+núcleo no lo comprueba al darse de alta, y nadie tiene que recibir correos porque otro se registrara
+con su dirección y marcara unas casillas.
 """
+from __future__ import annotations
+
 from decimal import Decimal
 
-from api.settings import Settings
+from zlecitool_core.db import db, utcnow
 
-# alert switch (as the page stores it) -> what changed
+from . import proofs
+from .models import AlertState, Favourite
+
+# el interruptor (como lo guarda la página) -> lo que cambió
 ALERTS = {"nv": "version", "pd": "price", "bd": "bundle"}
 
 
@@ -18,7 +28,7 @@ def money(value) -> str:
 
 
 def picture(catalogue) -> dict:
-    """{key: {version, price, bundles}} of every strategy now."""
+    """{clave: {version, price, bundles}} de cada estrategia ahora."""
     bundles_of = {}
     for b in catalogue.bundles.values():
         for s in b.items:
@@ -28,12 +38,12 @@ def picture(catalogue) -> dict:
 
 
 def changes(before: dict, now: dict) -> dict:
-    """{key: {'version': v, 'price': (old, new), 'bundle': [keys]}} for what is new since `before`."""
+    """{clave: {'version': v, 'price': (antes, ahora), 'bundle': [claves]}} de lo nuevo desde ``before``."""
     out = {}
     for key, cur in now.items():
         old = before.get(key)
         if not old:
-            continue  # new in the catalogue: nobody can follow it yet
+            continue  # nueva en el catálogo: nadie la puede seguir todavía
         found = {}
         if cur["version"] > old["version"]:
             found["version"] = cur["version"]
@@ -47,27 +57,51 @@ def changes(before: dict, now: dict) -> dict:
     return out
 
 
-def run(catalogue, store, mailer, texts, settings: Settings) -> dict:
-    """Send what is due and store the new picture; returns counts for the log."""
+def state() -> dict:
+    return {r.item_key: {"version": r.version, "price": r.price, "bundles": list(r.bundles)}
+            for r in AlertState.query.all()}
+
+
+def save_state(picture_now: dict):
+    AlertState.query.delete()
+    now = utcnow()
+    db.session.add_all(AlertState(item_key=k, version=v["version"], price=v["price"], bundles=v["bundles"],
+                                  updated_at=now) for k, v in picture_now.items())
+    db.session.commit()
+
+
+def subscriptions() -> list:
+    """Cada favorita con algún aviso encendido."""
+    rows = Favourite.query.order_by(Favourite.user_id, Favourite.created_at).all()
+    return [r for r in rows if any((r.alerts or {}).values())]
+
+
+def run(shop, base_url: str, mail) -> dict:
+    """Manda lo que toca y guarda la foto nueva; devuelve las cuentas para el log. ``base_url`` es la
+    dirección pública de la tienda (los enlaces de los correos); ``mail``, el ``mail.send`` del núcleo."""
+    catalogue, texts = shop.catalogue, shop.texts
     now = picture(catalogue)
-    before = store.alert_state()
+    before = state()
     if not before:
-        store.save_alert_state(now)
-        return {"first_run": True, "emails": 0, "failed": 0, "changes": 0}
+        save_state(now)
+        return {"first_run": True, "emails": 0, "unconfirmed": 0, "changes": 0}
     found = changes(before, now)
-    base = settings.public_url or "http://localhost:8000"
-    per_person = {}  # email -> (lang, [lines])
-    for sub in store.alert_subscriptions():
-        news = found.get(sub["item_key"])
-        s = catalogue.items.get(sub["item_key"])
+    per_person = {}  # user_id -> (correo, idioma, [líneas])
+    unconfirmed = set()
+    for sub in subscriptions():
+        news = found.get(sub.item_key)
+        s = catalogue.items.get(sub.item_key)
         if not news or not s:
             continue
-        lang = sub["lang"]
+        if not proofs.is_proven(sub.user_id, sub.email):
+            unconfirmed.add(sub.user_id)
+            continue
+        lang = sub.lang or "en"
         common = {"name": s.row.get("Name", s.ticker), "ticker": s.ticker, "code": s.key_techs,
-                  "url": f"{base}/s/{s.id}"}
-        lines = per_person.setdefault(sub["email"], (lang, []))[1]
+                  "url": f"{base_url}/s/{s.id}"}
+        lines = per_person.setdefault(sub.user_id, (sub.email, lang, []))[2]
         for switch, what in ALERTS.items():
-            if not sub["alerts"].get(switch) or what not in news:
+            if not sub.alerts.get(switch) or what not in news:
                 continue
             if what == "version":
                 lines.append(texts.get("mailAlertNew", lang, version=news["version"], **common))
@@ -79,15 +113,14 @@ def run(catalogue, store, mailer, texts, settings: Settings) -> dict:
                     b = catalogue.bundles[key]
                     lines.append(texts.get("mailAlertBundle", lang, bundle=texts.get(b.name_key, lang),
                                            price=money(b.price), n=len(b.items), **common))
-    sent = failed = 0
-    for email, (lang, lines) in per_person.items():
+    sent = 0
+    for email, lang, lines in per_person.values():
         if not lines:
             continue
-        body = texts.get("mailAlertBody", lang, lines="\n".join("- " + line for line in lines), mine=f"{base}/mine")
-        if mailer.send(email, texts.get("mailAlertSubject", lang), body):
-            sent += 1
-        else:
-            failed += 1
-    # A failed email is not retried tomorrow: the change is in the picture now, as for everyone else.
-    store.save_alert_state(now)
-    return {"first_run": False, "emails": sent, "failed": failed, "changes": len(found)}
+        body = texts.get("mailAlertBody", lang, lines="\n".join("- " + line for line in lines),
+                         mine=f"{base_url}/mine")
+        mail(email, texts.get("mailAlertSubject", lang), body, kind="edgefolio-alert")
+        sent += 1
+    # Un cambio no se repite mañana: ya está en la foto, como para todos.
+    save_state(now)
+    return {"first_run": False, "emails": sent, "unconfirmed": len(unconfirmed), "changes": len(found)}

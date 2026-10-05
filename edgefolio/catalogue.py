@@ -1,8 +1,11 @@
-"""The strategies for sale, read from catalogue/catalogue.csv: the only source of prices.
+# -*- coding: utf-8 -*-
+"""Las estrategias a la venta, leídas de catalogue/catalogue.csv: el único sitio de donde salen los precios.
 
-Next to it: indicators.csv (what each indicator is, for the strategy page), bundles.json (the
-bundles and their prices) and the optional since_release.csv that the daily job writes.
+A su lado: indicators.csv (qué es cada indicador, para la página de la estrategia), bundles.json (los
+lotes y sus precios) y, si existe, since_release.csv, que escribe el trabajo diario.
 """
+from __future__ import annotations
+
 import base64
 import binascii
 import csv
@@ -15,13 +18,13 @@ from decimal import Decimal
 from functools import cached_property
 from pathlib import Path
 
-from api.settings import Settings
+from .settings import Settings
 
 log = logging.getLogger(__name__)
 
 TV_SCRIPTS = "https://www.tradingview.com/scripts/"
 
-# CSV column -> (row field, type). Every one may be missing or empty: the row then says null.
+# Columna del CSV -> (campo de la fila, tipo). Cualquiera puede faltar o estar vacía: la fila dice null.
 NUMBERS = {
     "Net Profit_usd": ("np", float), "Net Profit_per": ("npp", float), "Total Closed Trades": ("tr", int),
     "Percent Profitable_per": ("w", float), "Profit Factor": ("pf", float), "Max Drawdown_usd": ("mdd", float),
@@ -50,12 +53,12 @@ def number(raw, kind=float):
 
 
 def asset(path: str) -> str:
-    """The catalogue stores 'assets/...' relative to storefront/; the page runs at /s/<id> too."""
-    return "/" + path.lstrip("/") if path else ""
+    """El catálogo guarda 'assets/...' relativo a static/; la página también corre en /s/<id>."""
+    return "/static/" + path.lstrip("/") if path else ""
 
 
 def grade(trades) -> str:
-    """How much evidence the backtest has: the cut-offs of the design (still to be agreed)."""
+    """Cuánta prueba tiene el backtest: los cortes del diseño (aún por acordar)."""
     t = trades or 0
     return "A" if t >= 300 else "B" if t >= 100 else "C" if t >= 30 else "D"
 
@@ -67,34 +70,34 @@ class Strategy:
     key_techs: str
     id_model: str
     price: Decimal
-    row: dict = field(repr=False, compare=False)  # the whole catalogue row
-    live: float = None        # % since release, from the daily job; None until it has run
+    row: dict = field(repr=False, compare=False)  # la fila entera del catálogo
+    live: float = None        # % desde la publicación, del trabajo diario; None hasta que corra
     live_as_of: str = None
     new_days: int = 30
 
     @property
     def id(self) -> str:
-        """The URL id (/s/<id>) and the stem of the chart files."""
+        """El id de la URL (/s/<id>) y la raíz del nombre de sus gráficos."""
         return f"{self.ticker}_{self.interval}_{self.key_techs}_{self.id_model}"
 
     @property
     def key(self) -> str:
-        """The id orders and download links store (and the old cart's id before base64)."""
+        """El id que guardan los pedidos y los enlaces (y el del carrito de antes, sin base64)."""
         return f"{self.ticker} - {self.interval} - {self.key_techs} - {self.id_model}"
 
     @property
     def private_file(self) -> str:
-        """Name of the paid script in STRATEGIES_DIR, as the factory names it (pine_TW_b/)."""
+        """El nombre del script de pago en STRATEGIES_DIR, el que le da la fábrica (pine_TW_b/)."""
         return b64url(f"{self.ticker}_{self.interval}_{self.key_techs}tuisku{self.id_model}") + ".pine"
 
     @property
     def download_name(self) -> str:
-        """The .pine a buyer saves: named as the script inside TradingView, the tutorial and the zip."""
+        """El .pine que se lleva quien compra: con el nombre del script en TradingView, el tutorial y el zip."""
         return f"{self.file}.pine"
 
     @property
     def file(self) -> str:
-        """The script's name inside TradingView, and the base name of every format sold."""
+        """El nombre del script dentro de TradingView, y la base del nombre de cada formato."""
         return f"Tuisku_{self.id}"
 
     @property
@@ -139,7 +142,7 @@ class Strategy:
 
     @cached_property
     def summary(self) -> dict:
-        """The row fields that never change while the server runs (is_new does, at midnight)."""
+        """Los campos de la fila que no cambian mientras corre el servidor (is_new sí, a medianoche)."""
         r = self.row
         stems = {k: Path(r.get(col) or "").stem for k, col in (("profit", "path_stra"), ("candle", "path_candle"))}
         return {
@@ -161,7 +164,7 @@ class Strategy:
 @dataclass(frozen=True)
 class Bundle:
     key: str
-    name_key: str          # i18n key of its name
+    name_key: str          # la clave de su nombre en el diccionario
     items: tuple           # Strategy, ...
     price: Decimal
 
@@ -175,7 +178,7 @@ class Bundle:
 
 
 def read_table(path: Path) -> list:
-    """A small CSV that may be comma- or tab-separated (indicators.csv is the first, tests write the second)."""
+    """Un CSV pequeño, separado por comas o por tabuladores (indicators.csv, lo primero; las pruebas, lo segundo)."""
     if not path or not path.is_file():
         return []
     with open(path, newline="", encoding="utf-8") as f:
@@ -191,13 +194,13 @@ def clean(value) -> str:
 
 class Catalogue:
     def __init__(self, source):
-        """source: the Settings, or the path of catalogue.csv with its companions next to it."""
+        """source: los Settings, o la ruta de catalogue.csv con sus compañeros al lado."""
         if not isinstance(source, Settings):
             path = Path(source)
             source = Settings(catalogue=path, indicators=path.parent / "indicators.csv",
                               bundles=path.parent / "bundles.json", since_release=path.parent / "since_release.csv")
         live = {r.get("id"): r for r in read_table(source.since_release)}
-        self.items = {}   # by key: what orders and links store
+        self.items = {}   # por clave: lo que guardan los pedidos y los enlaces
         self.by_id = {}
         with open(source.catalogue, newline="", encoding="utf-8") as f:
             for row in csv.DictReader(f, delimiter="\t"):
@@ -220,9 +223,9 @@ class Catalogue:
         self.bundles = self._bundles(source.bundles)
 
     def _bundles(self, path: Path) -> dict:
-        """The bundles of bundles.json that are still what they promise. One that lost a strategy, or no longer
-        costs less than its strategies one by one, is left out whole (and logged): selling what is left of it
-        at the old price would be a different bundle from the one advertised."""
+        """Los lotes de bundles.json que siguen siendo lo que prometen. Uno que perdió una estrategia, o que ya
+        no cuesta menos que sus estrategias sueltas, se deja fuera entero (y va al log): vender lo que queda de
+        él al precio de antes sería otro lote distinto del anunciado."""
         if not path or not path.is_file():
             return {}
         out = {}
@@ -231,13 +234,13 @@ class Catalogue:
             items = [self.resolve(i) for i in ids]
             gone = [i for i, s in zip(ids, items) if not s]
             if gone or not items:
-                log.error("bundle %s left out: %s", b.get("key"),
-                          f"not in the catalogue: {', '.join(gone)}" if gone else "it has no strategies")
+                log.error("lote %s fuera: %s", b.get("key"),
+                          f"no están en el catálogo: {', '.join(gone)}" if gone else "no tiene estrategias")
                 continue
             bundle = Bundle(b["key"], b.get("name_key", b["key"]), tuple(items),
                             Decimal(str(b["price"])).quantize(Decimal("0.01")))
             if bundle.price >= bundle.was:
-                log.error("bundle %s left out: its price %s is not below its strategies' %s", bundle.key,
+                log.error("lote %s fuera: su precio, %s, no es menor que el de sus estrategias, %s", bundle.key,
                           bundle.price, bundle.was)
                 continue
             out[bundle.key] = bundle
@@ -258,7 +261,7 @@ class Catalogue:
         return iter(self.items.values())
 
     def resolve(self, item_id: str):
-        """Accept the id (AAPL_1Day_1C00_ac87f0dc), the plain 'T - I - K - H' or the old cart's base64 of it."""
+        """Vale el id (AAPL_1Day_1C00_ac87f0dc), la clave 'T - I - K - H' o su base64 del carrito de antes."""
         if item_id in self.by_id:
             return self.by_id[item_id]
         if item_id in self.items:

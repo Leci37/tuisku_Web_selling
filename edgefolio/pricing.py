@@ -1,15 +1,18 @@
-"""Prices and discounts, computed on the server only. The browser sends ids, bundle keys and a code.
+# -*- coding: utf-8 -*-
+"""Los precios y los descuentos, sólo en el servidor. El navegador manda ids, claves de lotes y un código.
 
-A cart is loose strategies, bundles (catalogue/bundles.json) and at most one "Build your pack"
-(PACK_SIZE paid strategies for PACK_PRICE, or for the sum of their prices when that is less: a pack of
-cheap strategies never costs more than buying them one by one). A strategy inside a chosen bundle or the pack is not
-charged again as a loose item, and a cart whose bundles (or a bundle and the pack) share a strategy
-is refused (see overlap): each of them would charge for it.
+Un carrito son estrategias sueltas, lotes (catalogue/bundles.json) y como mucho un «Crea tu pack»
+(PACK_SIZE estrategias de pago por PACK_PRICE, o por la suma de sus precios si es menor: un pack de
+estrategias baratas nunca cuesta más que comprarlas sueltas). Una estrategia que va en un lote elegido o en
+el pack no se cobra otra vez suelta, y un carrito cuyos lotes (o un lote y el pack) comparten una estrategia
+se rechaza (overlap): cada uno la cobraría.
 """
+from __future__ import annotations
+
 from dataclasses import dataclass, field
 from decimal import ROUND_HALF_UP, Decimal
 
-from api.settings import Settings
+from .settings import Settings
 
 CENT = Decimal("0.01")
 ZERO = Decimal("0")
@@ -21,22 +24,22 @@ def cents(value: Decimal) -> Decimal:
 
 @dataclass
 class Quote:
-    items: list            # [(Strategy, price charged)]: the loose ones
-    subtotal: Decimal      # catalogue prices: loose items + bundle prices + pack price
+    items: list            # [(Strategy, lo que se cobra)]: las sueltas
+    subtotal: Decimal      # precios del catálogo: sueltas + lotes + pack
     discount_rate: Decimal
     total: Decimal
-    code: str              # as typed, lower-cased ('' if none)
+    code: str              # como se tecleó, en minúsculas ('' si no hay)
     code_status: str       # '' | 'applied' | 'invalid'
-    bundles: list = field(default_factory=list)   # [(Bundle, price charged)]
-    pack: tuple = None                             # ([Strategy], price charged) or None
+    bundles: list = field(default_factory=list)   # [(Bundle, lo que se cobra)]
+    pack: tuple = None                             # ([Strategy], lo que se cobra) o None
     tier_rate: Decimal = ZERO
     code_rate: Decimal = ZERO
-    tier_index: int = 0       # how many order-size tiers the subtotal has passed
-    next_tier: dict = None    # {over, rate, missing} of the next one, None when none is left (or none applies)
+    tier_index: int = 0       # cuántos escalones por importe ha pasado el subtotal
+    next_tier: dict = None    # {over, rate, missing} del siguiente; None si no queda (o no se aplica)
 
     @property
     def strategies(self) -> list:
-        """Every strategy the buyer gets, once: what the order stores and the links are issued for."""
+        """Cada estrategia que se lleva quien compra, una vez: lo que guarda el pedido y para lo que hay enlace."""
         out = {s.key: s for s, _ in self.items}
         for b, _ in self.bundles:
             out.update((s.key, s) for s in b.items)
@@ -67,9 +70,9 @@ class Quote:
 
 
 def pack_line(strategies: list, price: Decimal, list_price: Decimal) -> dict:
-    """The pack as the cart shows it: `price` is what this cart charges for it (after the tier or code
-    discount), `was` its strategies' prices one by one, and `save` what the pack itself saves against
-    them, 1 - list_price/was ("0" when nothing): the tier and the code are shown on their own."""
+    """El pack como lo enseña el carrito: `price`, lo que cobra este carrito por él (después del escalón o
+    del código); `was`, sus estrategias sueltas; y `save`, lo que ahorra el pack por sí mismo frente a ellas,
+    1 - list_price/was ("0" si nada): el escalón y el código se enseñan aparte."""
     was = sum((s.price for s in strategies), ZERO).quantize(CENT)
     save = (1 - list_price / was).quantize(CENT, ROUND_HALF_UP) if was > 0 and list_price < was else ZERO
     return {"ids": [s.id for s in strategies], "price": str(price), "was": str(was),
@@ -77,9 +80,9 @@ def pack_line(strategies: list, price: Decimal, list_price: Decimal) -> dict:
 
 
 def ladder(subtotal: Decimal, settings: Settings) -> tuple:
-    """(how many tiers the subtotal has passed, the next tier) with tier_rate's rule: a tier applies only
-    above its threshold, so at exactly $160 the 15% tier is still $0.01 away."""
-    tiers = sorted(settings.tiers)  # lowest threshold first
+    """(cuántos escalones ha pasado el subtotal, el siguiente), con la regla de tier_rate: un escalón vale
+    sólo por encima de su umbral, así que con 160 $ justos al del 15 % aún le falta 0,01 $."""
+    tiers = sorted(settings.tiers)  # el umbral más bajo, primero
     passed = sum(1 for over, _ in tiers if subtotal > over)
     if passed == len(tiers):
         return passed, None
@@ -88,14 +91,14 @@ def ladder(subtotal: Decimal, settings: Settings) -> tuple:
 
 
 def tier_rate(subtotal: Decimal, settings: Settings) -> Decimal:
-    for over, rate in settings.tiers:  # highest threshold first
+    for over, rate in settings.tiers:  # el umbral más alto, primero
         if subtotal > over:
             return rate
     return ZERO
 
 
 def overlap(bundles: list, pack: list = ()) -> list:
-    """The strategies that two of the chosen bundles, or a bundle and the pack, both contain."""
+    """Las estrategias que están a la vez en dos de los lotes elegidos, o en un lote y en el pack."""
     groups = [{s.key for s in b.items} for b in {b.key: b for b in bundles}.values()]
     groups.append({s.key for s in pack})
     seen, twice = set(), set()
@@ -107,8 +110,8 @@ def overlap(bundles: list, pack: list = ()) -> list:
 
 
 def quote(strategies: list, code: str, settings: Settings, bundles: list = (), pack: list = ()) -> Quote:
-    """One of each strategy and bundle; a flat-price code replaces every loose price, otherwise the
-    order-size tier and the code add up, capped at MAX_DISCOUNT so a total can never reach zero."""
+    """Una de cada estrategia y de cada lote; un código de precio único cambia el de cada suelta y, si no,
+    el escalón por importe y el código se suman, con el tope de MAX_DISCOUNT: un total nunca llega a cero."""
     chosen = list({b.key: b for b in bundles}.values())
     pack = list({s.key: s for s in pack}.values())
     covered = {s.key for b in chosen for s in b.items} | {s.key for s in pack}
@@ -118,7 +121,7 @@ def quote(strategies: list, code: str, settings: Settings, bundles: list = (), p
     subtotal = (sum((s.price for s in loose), ZERO) + fixed).quantize(CENT)
     code = (code or "").strip().lower()
     if code and code in settings.flat_price_codes:
-        # a launch price for single strategies: bundles and the pack are already a deal, no tier on top
+        # un precio de lanzamiento para las sueltas: los lotes y el pack ya son una oferta, sin escalón encima
         flat = settings.flat_price_codes[code].quantize(CENT)
         charged = [(s, min(flat, s.price)) for s in loose]
         total = (sum((p for _, p in charged), ZERO) + fixed).quantize(CENT)
