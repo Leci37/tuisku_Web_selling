@@ -1979,5 +1979,85 @@
   "zh": "点击“Add to chart”。你会在图表上看到它的买卖信号，并在“Strategy Tester”中看到结果。在手机上，它位于“Indicators” › “My scripts”。",
   "ar": "انقر «Add to chart». سترى عمليات الشراء والبيع على الرسم ونتائجها في «Strategy Tester». على الهاتف تجدها في «Indicators» ‹ «My scripts».",
   "hi": "“Add to chart” दबाएँ। चार्ट पर इसकी खरीद-बिक्री और “Strategy Tester” में इसके नतीजे दिखेंगे। फ़ोन पर यह “Indicators” › “My scripts” में है।"
+ },
+ "liveUnknown": {
+  "es": "Aún sin medir: el cálculo diario del resultado desde la publicación todavía no se ha ejecutado.",
+  "en": "Not measured yet: the daily job that tracks each strategy since its release has not run.",
+  "pt": "Ainda não medido: o cálculo diário do resultado desde o lançamento ainda não foi executado.",
+  "fr": "Pas encore mesuré : le calcul quotidien du résultat depuis la sortie n’a pas encore tourné.",
+  "de": "Noch nicht gemessen: Die tägliche Auswertung seit der Veröffentlichung ist noch nicht gelaufen.",
+  "zh": "尚未测量：每日跟踪发布以来表现的任务还没有运行。",
+  "ar": "لم يُقَس بعد: لم تعمل بعد المهمة اليومية التي تتابع كل استراتيجية منذ إصدارها.",
+  "hi": "अभी मापा नहीं गया: रिलीज़ के बाद से हर रणनीति को ट्रैक करने वाला दैनिक काम अभी चला नहीं है।"
+ },
+ "liveAsOf": {
+  "es": "Medido hasta el {date}.",
+  "en": "Measured up to {date}.",
+  "pt": "Medido até {date}.",
+  "fr": "Mesuré jusqu’au {date}.",
+  "de": "Gemessen bis {date}.",
+  "zh": "统计截至 {date}。",
+  "ar": "مُقاس حتى {date}.",
+  "hi": "{date} तक मापा गया।"
+ },
+ "signInTitle": {
+  "es": "Entra para ver tus estrategias",
+  "en": "Sign in to see your strategies",
+  "pt": "Entra para veres as tuas estratégias",
+  "fr": "Connectez-vous pour voir vos stratégies",
+  "de": "Melde dich an, um deine Strategien zu sehen",
+  "zh": "登录查看你的策略",
+  "ar": "سجّل الدخول لرؤية استراتيجياتك",
+  "hi": "अपनी रणनीतियाँ देखने के लिए साइन इन करें"
+ },
+ "signInText": {
+  "es": "Escribe el correo con el que compraste o descargaste y te enviamos un enlace para entrar. Sin contraseña.",
+  "en": "Enter the email you bought or downloaded with and we'll send you a sign-in link. No password.",
+  "pt": "Escreve o e-mail com que compraste ou descarregaste e enviamos-te uma ligação para entrar. Sem palavra-passe.",
+  "fr": "Saisissez l’e-mail utilisé pour acheter ou télécharger et nous vous enverrons un lien de connexion. Sans mot de passe.",
+  "de": "Gib die E-Mail ein, mit der du gekauft oder heruntergeladen hast, und wir schicken dir einen Anmeldelink. Ohne Passwort.",
+  "zh": "输入你购买或下载时使用的邮箱，我们会发送登录链接。无需密码。",
+  "ar": "أدخل البريد الإلكتروني الذي اشتريت أو نزّلت به وسنرسل لك رابط تسجيل الدخول. بلا كلمة مرور.",
+  "hi": "वह ईमेल लिखें जिससे आपने ख़रीदा या डाउनलोड किया था, हम साइन-इन लिंक भेज देंगे। कोई पासवर्ड नहीं।"
+ },
+ "signInSent": {
+  "es": "Hecho. Revisa tu correo: el enlace para entrar vale 15 minutos.",
+  "en": "Done. Check your inbox: the sign-in link is valid for 15 minutes.",
+  "pt": "Feito. Vê o teu e-mail: a ligação para entrar é válida durante 15 minutos.",
+  "fr": "C’est fait. Consultez votre boîte : le lien de connexion est valable 15 minutes.",
+  "de": "Erledigt. Schau in dein Postfach: Der Anmeldelink gilt 15 Minuten.",
+  "zh": "已发送。请查收邮件：登录链接 15 分钟内有效。",
+  "ar": "تم. تحقّق من بريدك: رابط تسجيل الدخول صالح لمدة 15 دقيقة.",
+  "hi": "हो गया। अपना इनबॉक्स देखें: साइन-इन लिंक 15 मिनट तक मान्य है।"
+ },
+ "signInExpired": {
+  "es": "Ese enlace para entrar ha caducado o ya se usó. Pide otro.",
+  "en": "That sign-in link has expired or was already used. Ask for a new one.",
+  "pt": "Essa ligação para entrar expirou ou já foi usada. Pede outra.",
+  "fr": "Ce lien de connexion a expiré ou a déjà servi. Demandez-en un nouveau.",
+  "de": "Dieser Anmeldelink ist abgelaufen oder wurde schon benutzt. Fordere einen neuen an.",
+  "zh": "该登录链接已过期或已被使用。请重新获取。",
+  "ar": "انتهت صلاحية رابط تسجيل الدخول أو استُخدم من قبل. اطلب رابطًا جديدًا.",
+  "hi": "वह साइन-इन लिंक समाप्त हो गया है या पहले ही इस्तेमाल हो चुका है। नया लिंक माँगें।"
+ },
+ "signOut": {
+  "es": "Salir",
+  "en": "Sign out",
+  "pt": "Sair",
+  "fr": "Se déconnecter",
+  "de": "Abmelden",
+  "zh": "退出登录",
+  "ar": "تسجيل الخروج",
+  "hi": "साइन आउट"
+ },
+ "errServer": {
+  "es": "No se pudo hacer",
+  "en": "That didn't work",
+  "pt": "Não foi possível",
+  "fr": "Cela n’a pas fonctionné",
+  "de": "Das hat nicht geklappt",
+  "zh": "操作未成功",
+  "ar": "تعذّر ذلك",
+  "hi": "यह नहीं हो सका"
  }
 }

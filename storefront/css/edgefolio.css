@@ -30,3 +30,7 @@ a:hover{text-decoration:underline}
 .tr-hover1:hover{opacity:1 !important;box-shadow:0 6px 16px rgba(22,38,58,.12) !important}
 .tr-hover2:hover{background:#e9f0fd !important}
 .tr-hover3:hover{border-color:#9fb8ef !important}
+
+/* On a phone the code, totals and Checkout of the Pro cart strip need a line of their own; with
+   flex:0 0 auto (as designed) they could not wrap and pushed the page sideways. */
+@media (max-width:560px){.sf-cartend{flex:1 1 100% !important}}

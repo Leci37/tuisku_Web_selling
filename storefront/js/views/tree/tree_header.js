@@ -9,7 +9,7 @@ export default function TreeHeader(v) {
         <span style="font-weight:700;font-size:21px;letter-spacing:-.5px">Edge<span style="color:#0950e3">folio</span></span>
         <span style="width:1px;height:20px;background:#e2e9f0"></span>
         <span style="font-weight:500;font-size:13px;color:#5a6b80">${v.L?.pageName}</span>
-        <span style="margin-inline-start:auto;display:flex;gap:16px;font-size:12.5px;font-weight:600"><a href="Improvements Lab.dc.html">${v.L?.lab}</a><a href="Storefront v7.dc.html">${v.L?.store}</a></span>
+        <span style="margin-inline-start:auto;display:flex;gap:16px;font-size:12.5px;font-weight:600"><a href="/">${v.L?.store}</a></span>
         </div>
       <div style="position:absolute;inset-inline:0;bottom:-1px;height:3px;background:linear-gradient(90deg,#47f9e5,#0950e3)"></div>
       </header>` : null}

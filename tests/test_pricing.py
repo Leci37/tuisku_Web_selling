@@ -20,6 +20,7 @@ def test_code_adds_to_the_tier(client, ids):
     r = client.post("/api/quote", json={"items": ids[:2], "code": " Spring20 "})
     assert r.json()["code_status"] == "applied"
     assert Decimal(r.json()["discount_rate"]) == Decimal("0.35")  # 15% tier + 20% code
+    assert (r.json()["tier_rate"], r.json()["code_rate"]) == ("0.15", "0.20")
 
 
 def test_stacked_discounts_are_capped(settings):
@@ -49,6 +50,11 @@ def test_unknown_item_and_empty_cart(client):
 def test_plain_key_is_accepted_too(client):
     r = client.post("/api/quote", json={"items": ["AAPL - 1Day - 1ADX - aaaa1111"]})
     assert r.json()["total"] == "79.00"
+
+
+def test_new_id_and_old_cart_id_are_the_same_item(client, ids):
+    r = client.post("/api/quote", json={"items": ["AAPL_1Day_1ADX_aaaa1111", ids[0]]})
+    assert r.json()["total"] == "79.00" and r.json()["items"] == [{"id": "AAPL_1Day_1ADX_aaaa1111", "price": "79.00"}]
 
 
 def test_config_exposes_no_codes_or_secrets(client, settings):

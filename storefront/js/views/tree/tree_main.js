@@ -1,4 +1,7 @@
 // Markup and styles ported one to one from docs/design/Strategy Tree.dc.html (the v7 reference design).
+// Changed for real data: the forest badge becomes one button per tree for an owner, and the Owner
+// switch explains how to sign in or buy when this browser has no purchase to show. Sliders stay
+// left-to-right in Arabic, as the coloured zones above them are drawn from the left.
 import { html } from '../../lib/html.js';
 import { s, T } from '../../lib/tpl.js';
 
@@ -62,7 +65,7 @@ export default function TreeMain(v) {
                     ${(f?.zones || []).map((z, $index) => html`<span style="position:absolute;left:${s(z?.l)};width:${s(z?.w)};top:3px;height:8px;border-radius:2px;background:${s(z?.c)};opacity:${s(z?.op)};box-shadow:${s(z?.ring)}"></span>`)}${' '}
                     ${(f?.ticks || []).map((tk, $index) => html`<span onMouseEnter=${tk?.onEnter} onMouseLeave=${tk?.onLeave} style="position:absolute;left:${s(tk?.left)};top:-3px;width:12px;height:20px;margin-left:-6px;display:flex;justify-content:center;align-items:center;cursor:help"><span style="width:2px;height:${s(tk?.h)};border-radius:1px;background:${s(tk?.bg)}"></span></span>`)}${' '}
                     </div>
-                  <input type="range" min=${f?.min} max=${f?.max} step="any" value=${f?.value ?? ''} onInput=${f?.onChange} aria-label=${f?.full} style="width:100%;margin:0;accent-color:#0950e3;cursor:pointer" />
+                  <input type="range" dir="ltr" min=${f?.min} max=${f?.max} step="any" value=${f?.value ?? ''} onInput=${f?.onChange} aria-label=${f?.full} style="width:100%;margin:0;accent-color:#0950e3;cursor:pointer" />
                   ` : null}
                 ${f?.isBool ? html`
                   <div style="display:flex;background:#e9eef4;border-radius:10px;padding:3px;align-self:flex-start">
@@ -78,7 +81,7 @@ export default function TreeMain(v) {
         <section data-tree-sec="1" style="flex:999 1 480px;min-width:0;background:#fff;border:1px solid #e2e9f0;border-radius:18px;overflow:hidden;display:flex;flex-direction:column">
           <div style="padding:16px 18px 10px;display:flex;flex-wrap:wrap;gap:10px 16px;align-items:flex-start">
             <div style="flex:1 1 280px;min-width:0;display:flex;flex-direction:column;gap:2px">
-              <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><strong style="font-size:18px">${v.title}</strong><span style="font-size:11.5px;font-weight:700;color:#0950e3;background:#e9f0fd;border-radius:999px;padding:2px 9px">${v.L?.tree1}</span></div>
+              <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><strong style="font-size:18px">${v.title}</strong>${v.hasForest ? (v.forestPicks || []).map(fp => html`<button onClick=${fp?.pick} style="font-family:inherit;border:none;cursor:pointer;font-size:11.5px;font-weight:700;color:${s(fp?.color)};background:${s(fp?.bg)};border-radius:999px;padding:2px 9px">${fp?.text}</button>`) : html`<span style="font-size:11.5px;font-weight:700;color:#0950e3;background:#e9f0fd;border-radius:999px;padding:2px 9px">${v.treeBadge}</span>`}</div>
               <span style="font-size:12.5px;color:#5a6b80">${v.summary}</span>
               <span style="font-size:13px;color:#16263a;text-wrap:pretty;margin-top:4px;max-width:640px">${v.about}</span>
               <span style="font-size:11px;color:#8d9cae;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;overflow-wrap:anywhere">${v.params}</span>
@@ -97,7 +100,8 @@ export default function TreeMain(v) {
             <span style="display:inline-flex;align-items:center;gap:6px"><span style="width:16px;height:3px;border-radius:2px;background:#0950e3"></span>${T(v.L?.path)}</span>
             </div>
           ${v.showCta ? html`<div style="margin:0 18px 12px;border:1px solid #c5d6f8;background:#f5f8ff;border-radius:12px;padding:10px 12px;display:flex;flex-wrap:wrap;align-items:center;gap:10px"><i class="fa-solid fa-lock" style="color:#0950e3"></i><span style="flex:1 1 240px;font-size:13px;text-wrap:pretty">${v.ctaText}</span><button onClick=${v.unlock} style="font-family:inherit;border:none;border-radius:10px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;background:#0950e3;color:#ffffff;white-space:nowrap">${v.unlockLabel}</button></div>` : null}
-          ${v.isOwner ? html`<div style="margin:0 18px 12px;border:1px solid #b7e4c7;background:#e8f7ef;border-radius:12px;padding:10px 12px;display:flex;flex-wrap:wrap;align-items:center;gap:10px"><i class="fa-solid fa-circle-check" style="color:#15803d"></i><span style="flex:1 1 240px;font-size:13px;text-wrap:pretty">${v.ownerText}</span><button onClick=${v.download} style="font-family:inherit;border:none;border-radius:10px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;background:#15803d;color:#ffffff;white-space:nowrap"><i class="fa-solid fa-download"></i> ${T(v.L?.download)}</button></div>` : null}
+          ${v.isOwner && !v.ownerHas ? html`<div style="margin:0 18px 12px;border:1px solid #c5d6f8;background:#f5f8ff;border-radius:12px;padding:10px 12px;display:flex;flex-wrap:wrap;align-items:center;gap:10px"><i class="fa-solid fa-lock" style="color:#0950e3"></i><span style="flex:1 1 240px;font-size:13px;text-wrap:pretty">${v.ownerText}</span><a href="/mine" style="font-family:inherit;border:1.5px solid #0950e3;border-radius:10px;padding:6.5px 14px;font-size:13px;font-weight:700;background:#ffffff;color:#0950e3;white-space:nowrap;text-decoration:none">${v.L?.signIn}</a><button onClick=${v.unlock} style="font-family:inherit;border:none;border-radius:10px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;background:#0950e3;color:#ffffff;white-space:nowrap">${v.unlockLabel}</button></div>` : null}
+          ${v.isOwner && v.ownerHas ? html`<div style="margin:0 18px 12px;border:1px solid #b7e4c7;background:#e8f7ef;border-radius:12px;padding:10px 12px;display:flex;flex-wrap:wrap;align-items:center;gap:10px"><i class="fa-solid fa-circle-check" style="color:#15803d"></i><span style="flex:1 1 240px;font-size:13px;text-wrap:pretty">${v.ownerText}</span><button onClick=${v.download} style="font-family:inherit;border:none;border-radius:10px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;background:#15803d;color:#ffffff;white-space:nowrap"><i class="fa-solid fa-download"></i> ${T(v.L?.download)}</button></div>` : null}
           ${v.isTree ? html`
             <div ref=${v.treeRef} data-tree-scroll="1" onPointerDown=${v.panDown} onPointerMove=${v.panMove} onPointerUp=${v.panUp} onPointerLeave=${v.panUp} style="cursor:grab;user-select:none;overflow:auto;max-height:72vh;border-top:1px solid #e2e9f0;background:#fbfcfe">
               <div style="position:relative;width:${s(v.cwPx)};height:${s(v.chPx)}">${' '}

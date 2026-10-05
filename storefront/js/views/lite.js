@@ -11,7 +11,7 @@ export default function Lite(v) {
         </div>
       </div>
     <section style="position:relative;overflow:hidden;background:#fff;border-bottom:1px solid #e2e9f0">${' '}
-      <img src="storefront/assets/charts/AMZN_1Day_1BOL_9d10c25f_candel.png" alt="" decoding="async" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.2;mask-image:linear-gradient(${s(v.g90)},transparent 15%,#000 75%)" />${' '}
+      <img src="/assets/charts/AMZN_1Day_1BOL_9d10c25f_candel.png" alt="" decoding="async" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.2;mask-image:linear-gradient(${s(v.g90)},transparent 15%,#000 75%)" />${' '}
       <div style="position:relative;max-width:1320px;margin:0 auto;padding:44px 28px 28px;display:flex;flex-direction:column;gap:14px">
         <h1 style="margin:0;font-size:40px;font-weight:700;letter-spacing:-.6px;line-height:1.1;max-width:640px;text-wrap:balance">${v.tx?.liteTitle}</h1>
         <p style="margin:0;font-size:16px;color:#5a6b80;max-width:540px;text-wrap:pretty">${v.tx?.liteSub}</p>
@@ -72,7 +72,7 @@ export default function Lite(v) {
           `)}
         </div>
       ${v.liteEmpty ? html`<p style="margin:0;padding:32px 0;text-align:center;color:#8d9cae">${v.tx?.noMatch}</p>` : null}
-      <div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:6px 0"><span style="font-size:12.5px;color:#5a6b80">${v.liteShowing}</span><button style="font-family:inherit;background:#fff;border:1px solid #e2e9f0;color:#16263a;font-weight:600;border-radius:12px;padding:10px 20px;font-size:13.5px;cursor:pointer">${v.tx?.loadMore}</button></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:6px 0"><span style="font-size:12.5px;color:#5a6b80">${v.liteShowing}</span>${v.liteMore ? html`<button onClick=${v.loadMoreLite} style="font-family:inherit;background:#fff;border:1px solid #e2e9f0;color:#16263a;font-weight:600;border-radius:12px;padding:10px 20px;font-size:13.5px;cursor:pointer">${v.tx?.loadMore}</button>` : null}</div>
       </section>
     ${v.cartHas ? html`
       <div style="position:sticky;bottom:16px;z-index:10;width:calc(100% - 32px);max-width:780px;margin:24px auto 0">

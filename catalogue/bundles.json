@@ -1,0 +1,32 @@
+[
+  {
+    "key": "top5",
+    "name_key": "bundleTop",
+    "ids": [
+      "NVST_1Hour_1ULT_8cb89452",
+      "NVST_1Hour_1MAD_831fdffc",
+      "NVST_1Hour_1WAV_d4c90466",
+      "NVST_1Hour_2MV0_97e45690",
+      "NVST_1Hour_1KON_d8387418"
+    ],
+    "price": 249
+  },
+  {
+    "key": "crypto",
+    "name_key": "bundleCrypto",
+    "ids": [
+      "ETHUSDT_1Day_1ULT_0563b718",
+      "DOGEUSDT_1Day_1MAD_f1161200"
+    ],
+    "price": 119
+  },
+  {
+    "key": "amzn",
+    "name_key": "bundleAmzn",
+    "ids": [
+      "AMZN_1Day_1T00_912096cc",
+      "AMZN_1Day_2BB0_b8356da2"
+    ],
+    "price": 119
+  }
+]

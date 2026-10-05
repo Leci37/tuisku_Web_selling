@@ -1,7 +1,6 @@
 // Markup and styles ported one to one from docs/design/Storefront v7.dc.html (the v7 reference design).
 import { html } from '../lib/html.js';
 import { s, T } from '../lib/tpl.js';
-import { StrategyTree } from '../tree.js';
 
 export default function Detail(v) {
   return html`
@@ -15,7 +14,7 @@ export default function Detail(v) {
           <div style="flex:1 1 320px;min-width:0;display:flex;flex-direction:column;gap:6px">
             <h1 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-.4px;line-height:1.15">${T(v.det?.name)} · ${T(v.det?.ticker)}</h1>
             <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12.5px">
-              <a href=${v.det?.tvUrl} target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;font-weight:600"><img src="storefront/assets/icons/TW_ICO.svg" alt="" style="width:14px;height:14px" />${T(v.tx?.openTv)}</a>
+              <a href=${v.det?.tvUrl} target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;font-weight:600"><img src="/assets/icons/TW_ICO.svg" alt="" style="width:14px;height:14px" />${T(v.tx?.openTv)}</a>
               <span style="border:1px solid #e2e9f0;border-radius:999px;padding:2px 9px;font-weight:600;color:#5a6b80;background:#fff">${v.det?.interval}</span>
               <span style="border:1px solid #e2e9f0;border-radius:999px;padding:2px 9px;font-weight:600;color:#5a6b80;background:#fff">${v.det?.index}</span>
               <span style="border:1px solid #e2e9f0;border-radius:999px;padding:2px 9px;font-weight:600;color:#5a6b80;background:#fff">${v.det?.key}</span>
@@ -45,12 +44,11 @@ export default function Detail(v) {
             <div style="height:8px;border-radius:999px;background:#e2e9f0;overflow:hidden"><div style="width:${s(v.det?.barBt)};height:100%;background:linear-gradient(${s(v.g90)},#47f9e5,#0950e3)"></div></div>
             <div style="display:flex;justify-content:space-between;font-size:13px"><span>${v.tx?.sinceRelease}</span><strong style="color:${s(v.det?.liveColor)}">${v.det?.live}</strong></div>
             <div style="height:8px;border-radius:999px;background:#e2e9f0;overflow:hidden"><div style="width:${s(v.det?.barLive)};height:100%;background:${s(v.det?.liveColor)}"></div></div>
-            <span style="font-size:11.5px;color:#8d9cae">${v.tx?.demoFigures}</span>
+            ${v.liveNote ? html`<span style="font-size:11.5px;color:#8d9cae">${v.liveNote}</span>` : null}
             </div>
           <div style="flex:1 1 300px;background:#fff;border:1px solid #e2e9f0;border-radius:16px;padding:16px 18px;display:flex;flex-direction:column;gap:10px">
             <span style="font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#5a6b80">${v.tx?.versions}</span>
-            <div style="display:flex;gap:10px;align-items:flex-start"><span style="width:10px;height:10px;border-radius:50%;background:#0950e3;margin-top:5px;flex-shrink:0"></span><div style="flex:1;font-size:13px"><strong>v2</strong><div style="color:#5a6b80">${v.tx?.v2note}</div></div><span style="font-size:11px;font-weight:700;color:#0950e3;background:#e9f0fd;border-radius:999px;padding:2px 8px;white-space:nowrap">${v.tx?.updateAvail}</span></div>
-            <div style="display:flex;gap:10px;align-items:flex-start"><span style="width:10px;height:10px;border-radius:50%;background:#cfd8e3;margin-top:5px;flex-shrink:0"></span><div style="flex:1;font-size:13px"><strong>v1 · ${T(v.det?.releaseLabel)}</strong><div style="color:#5a6b80">${v.tx?.v1note}</div></div></div>
+            ${(v.versions || []).map((vr, $index) => html`<div style="display:flex;gap:10px;align-items:flex-start"><span style="width:10px;height:10px;border-radius:50%;background:${s(vr?.dot)};margin-top:5px;flex-shrink:0"></span><div style="flex:1;font-size:13px"><strong>${vr?.title}</strong>${vr?.note ? html`<div style="color:#5a6b80">${vr?.note}</div>` : null}</div>${vr?.update ? html`<span style="font-size:11px;font-weight:700;color:#0950e3;background:#e9f0fd;border-radius:999px;padding:2px 8px;white-space:nowrap">${v.tx?.updateAvail}</span>` : null}</div>`)}
             </div>
           </div>
         <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start">
@@ -67,7 +65,7 @@ export default function Detail(v) {
           <span style="font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#5a6b80">${v.tx?.aboutInd}</span>
           <strong style="font-size:15px">${T(v.det?.key)} · ${T(v.det?.ind)}</strong>
           <p style="margin:0;color:#5a6b80;font-size:13.5px;text-wrap:pretty">${v.det?.ex}</p>
-          <a href=${v.det?.indUrl} target="_blank" rel="noopener" style="font-size:13px;font-weight:600;display:inline-flex;gap:6px;align-items:center"><img src="storefront/assets/icons/TW_ICO.svg" alt="" style="width:14px;height:14px" />${T(v.tx?.seeInd)}</a>
+          <a href=${v.det?.indUrl} target="_blank" rel="noopener" style="font-size:13px;font-weight:600;display:inline-flex;gap:6px;align-items:center"><img src="/assets/icons/TW_ICO.svg" alt="" style="width:14px;height:14px" />${T(v.tx?.seeInd)}</a>
           </div>
         <div style="border-radius:18px;overflow:hidden;border:1px solid #16263a;box-shadow:0 14px 36px rgba(15,27,45,.18)">
           <div style="padding:11px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:#16263a">
@@ -93,7 +91,7 @@ export default function Detail(v) {
           </div>
         ` : null}
       ${v.detTreeTab ? html`
-        <div class="sc-host"><${StrategyTree} embedded=${true} strategy=${v.det?.treeKey} lang=${v.treeLang} onBuy=${v.det?.onCart} /></div>
+        ${v.Tree ? html`<div class="sc-host"><${v.Tree} embedded=${true} strategy=${v.treeRow} lang=${v.treeLang} onBuy=${v.treeBuy} owned=${v.treeOwned} ownerDownload=${v.treeDownload} /></div>` : null}
         <button class="sf-hover12" onClick=${v.backToSheet} style="align-self:flex-start;font-family:inherit;border-radius:999px;padding:9px 18px;font-size:14px;font-weight:700;cursor:pointer;display:inline-flex;gap:8px;align-items:center;border:1.5px solid #0950e3;background:#e9f0fd;color:#0950e3"><i class="fa-regular fa-file-lines"></i>${T(v.tx?.toSheet)}</button>
         ` : null}
       </main>

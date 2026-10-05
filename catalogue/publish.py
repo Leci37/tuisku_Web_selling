@@ -7,6 +7,8 @@ EXPORT.csv is the tab-separated file the factory writes (pine_TW_img_info_*_WEB.
   - rewrites every image and preview path to a relative storefront/assets/... path, whether the
     export gave a local path or an absolute raw.githubusercontent.com URL;
   - drops pine_path, the location of the full paid script, which must never be public;
+  - keeps the shop's own optional columns (version) from the current catalogue.csv when the
+    export does not bring them, so a re-publish does not reset every strategy to v1;
   - writes catalogue/catalogue.csv, the one file both the storefront and the API read
     (the API takes prices from it, never from the browser).
 
@@ -26,6 +28,8 @@ ROOT = Path(__file__).resolve().parent.parent
 ASSETS = ROOT / "storefront" / "assets"
 OUT = ROOT / "catalogue" / "catalogue.csv"
 KEY = ["ticker", "interval", "key_techs", "id_model"]
+# Columns the shop adds that the factory does not write (the API defaults them when missing).
+OPTIONAL = ["version"]
 
 # column -> (assets subfolder, the factory's folder name)
 PATH_COLUMNS = {
@@ -42,10 +46,22 @@ def file_name(value: str) -> str:
     return posixpath.basename(str(value).replace("\\", "/"))
 
 
+def keep_optional(df: pd.DataFrame, previous: Path) -> pd.DataFrame:
+    if not previous.is_file():
+        return df
+    old = pd.read_csv(previous, sep="\t", dtype=str)
+    carry = [c for c in OPTIONAL if c in old.columns and c not in df.columns]
+    if not carry:
+        return df
+    old = old[KEY + carry].drop_duplicates(subset=KEY)
+    return df.astype({k: str for k in KEY}).merge(old, on=KEY, how="left")
+
+
 def publish(export: Path, assets_src: Path = None) -> pd.DataFrame:
-    df = pd.read_csv(export, sep="\t")
+    df = pd.read_csv(export, sep="\t", dtype={k: str for k in KEY})
     before = len(df)
     df = df.drop_duplicates(subset=KEY, keep="first").drop(columns=["pine_path"], errors="ignore")
+    df = keep_optional(df, OUT)
     for col, (sub, src_folder) in PATH_COLUMNS.items():
         names = df[col].map(file_name)
         df[col] = "assets/" + sub + "/" + names
