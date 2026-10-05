@@ -16,6 +16,10 @@ EXPORT.csv is the tab-separated file the factory writes (pine_TW_img_info_*_WEB.
               d_result/ folder) into storefront/assets/.
 --prune       deletes files in storefront/assets/{charts,previews} that no catalogue row uses.
 The paid scripts are not handled here: they go to the API's private storage (STRATEGIES_DIR).
+
+Every preview is cut as the factory cuts the paid ones (the script up to 50 lines into its first
+tree, then a note): the factory's previews of the free strategies were the whole script, which
+made the free download's email step pointless.
 """
 import argparse
 import posixpath
@@ -31,6 +35,10 @@ KEY = ["ticker", "interval", "key_techs", "id_model"]
 # Columns the shop adds that the factory does not write (the API defaults them when missing).
 OPTIONAL = ["version"]
 
+# How the factory cuts a preview (checked against all 2,755 paid ones): 50 lines of the first tree.
+PREVIEW_TREE_LINES = 50
+PREVIEW_TAIL = "\n\t...\nThe rest of this Pine script is part of the paid version. Visit the website for more info.\n"
+
 # column -> (assets subfolder, the factory's folder name)
 PATH_COLUMNS = {
     "path_stra": ("charts", "pine_TW_img"),
@@ -44,6 +52,31 @@ PATH_COLUMNS = {
 def file_name(value: str) -> str:
     """Last path component of a local path, a Windows path or a URL."""
     return posixpath.basename(str(value).replace("\\", "/"))
+
+
+def cut_preview(script: str) -> str:
+    """The public part of a script; a preview that is already cut comes back unchanged."""
+    if script.endswith(PREVIEW_TAIL):
+        return script
+    lines = script.replace("\r\n", "\n").split("\n")
+    start = next((i for i, line in enumerate(lines) if line.startswith("decision_tree_")), None)
+    if start is None:
+        raise ValueError("no decision_tree_ function: not a strategy script")
+    return "\n".join(lines[:start + PREVIEW_TREE_LINES]) + "\n" + PREVIEW_TAIL
+
+
+def cut_previews(names) -> int:
+    """Cut every preview of the catalogue in place; returns how many needed it."""
+    done = 0
+    for n in names:
+        f = ASSETS / "previews" / n
+        if f.is_file():
+            text = f.read_text(encoding="utf-8")
+            cut = cut_preview(text)
+            if cut != text:
+                f.write_text(cut, encoding="utf-8")
+                done += 1
+    return done
 
 
 def keep_optional(df: pd.DataFrame, previous: Path) -> pd.DataFrame:
@@ -71,8 +104,10 @@ def publish(export: Path, assets_src: Path = None) -> pd.DataFrame:
                 src = assets_src / src_folder / n
                 if src.exists() and not (ASSETS / sub / n).exists():
                     shutil.copy2(src, ASSETS / sub / n)
+    cut = cut_previews(df["pine_path_shadow"].map(file_name).unique())
     df.to_csv(OUT, sep="\t", index=False)
-    print(f"{OUT.relative_to(ROOT)}: {len(df)} strategies ({before - len(df)} repeated rows dropped)")
+    print(f"{OUT.relative_to(ROOT)}: {len(df)} strategies ({before - len(df)} repeated rows dropped, "
+          f"{cut} previews cut to their public part)")
     return df
 
 

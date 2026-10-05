@@ -25,8 +25,11 @@ def test_bundles_and_pack_are_listed(client):
 def test_shipped_bundles_come_from_the_real_catalogue(real_client):
     cat = Catalogue(ROOT / "catalogue" / "catalogue.csv")
     paid = sorted((s for s in cat if s.price > 0), key=lambda s: -s.numbers["npp"])
+    best_per_ticker = list({s.ticker: s for s in reversed(paid)}.values())[::-1]  # each ticker's best, by npp
+    best_per_ticker.sort(key=lambda s: -s.numbers["npp"])
     bundles = {b["key"]: b for b in real_client.get("/api/bundles").json()["bundles"]}
-    assert bundles["top5"]["ids"] == [s.id for s in paid[:5]] and bundles["top5"]["price"] == 249
+    assert bundles["top5"]["ids"] == [s.id for s in best_per_ticker[:5]] and bundles["top5"]["price"] == 249
+    assert len({cat.resolve(i).ticker for i in bundles["top5"]["ids"]}) == 5, "five different tickers"
     assert bundles["crypto"]["ids"] == [s.id for s in paid if s.market == "crypto"][:2]
     assert bundles["amzn"]["ids"] == [s.id for s in paid if s.ticker == "AMZN"][:2]
     for b in bundles.values():

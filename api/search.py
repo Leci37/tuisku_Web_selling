@@ -24,6 +24,9 @@ RANGES = {
 }
 SELECTS = {"sym": "ticker", "tf": "interval", "ind": "key", "idx": "index", "rel": "release"}
 SORTS = {"np": "np", "npp": "npp", "win": "w", "price": "price", "trades": "tr", "avg": "avg", "months": "m"}
+# "hot" is net profit % with the tickers taken in turns: one ticker's dozen variants would otherwise
+# fill the whole first page, the ticker strip and the top bundle.
+ORDERS = (*SORTS, "hot")
 TABS = ("hot", "win", "stocks", "crypto", "new", "free")
 INTERVALS = ("1Min", "3Min", "5Min", "15Min", "30Min", "1Hour", "2Hour", "4Hour", "1Day", "1Week")
 EPS = 1e-6  # a handle typed as "$200" must keep the row worth $199.9999 (the mock's tolerance)
@@ -74,6 +77,10 @@ class Index:
         self.crypto = to_mask(r["market"] == "crypto" for r in rows)
         self.order = {k: sorted(range(self.n), key=lambda i, f=field: (rows[i][f] is None, -(rows[i][f] or 0)))
                       for k, field in SORTS.items()}
+        turn, seen = [0] * self.n, {}
+        for i in self.order["npp"]:
+            turn[i] = seen[rows[i]["ticker"]] = seen.get(rows[i]["ticker"], -1) + 1
+        self.order["hot"] = sorted(self.order["npp"], key=lambda i: turn[i])
         self.releases = [s.release_date for s in self.strategies]
         self._new = (None, 0)
 
@@ -164,7 +171,7 @@ def strategies(request: Request, q: str = Query("", max_length=100), tab: str = 
     ix = index_of(request.app.state.catalogue)
     if tab and tab not in TABS:
         bad("unknown tab")
-    if sort and sort not in SORTS:
+    if sort and sort not in ORDERS:
         bad("unknown sort")
 
     filters = []  # (name, mask): the facets leave out their own name
@@ -200,7 +207,7 @@ def strategies(request: Request, q: str = Query("", max_length=100), tab: str = 
     suffix.reverse()
     passing = prefix[-1]
 
-    order = sort or ("win" if tab == "win" else "npp" if tab else "np")
+    order = sort or ("win" if tab == "win" else "hot" if tab else "np")
     bits = format(passing, f"0{ix.n}b")[::-1] if ix.n else ""
     hits = [i for i in ix.order[order] if bits[i] == "1"]
     start = (page - 1) * size

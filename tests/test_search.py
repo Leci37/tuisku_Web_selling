@@ -88,7 +88,12 @@ def test_free_paid_and_tabs(real_client, rows):
     assert get(real_client, "paid=1")["total"] == len(rows) - free
     assert get(real_client, "tab=stocks")["total"] == sum(r["market"] == "stocks" for r in rows)
     hot = get(real_client, "tab=hot")["rows"]
-    assert [r["npp"] for r in hot] == sorted((r["npp"] for r in rows), reverse=True)[:25]
+    assert len({r["ticker"] for r in hot}) == 25, "Hot takes the tickers in turns"
+    best = {}
+    for r in sorted(rows, key=lambda r: -r["npp"]):
+        best.setdefault(r["ticker"], r["npp"])
+    assert [r["npp"] for r in hot] == sorted(best.values(), reverse=True)[:25], "each ticker's best, by net profit %"
+    assert [r["npp"] for r in get(real_client, "sort=npp")["rows"]] == sorted((r["npp"] for r in rows), reverse=True)[:25]
     win = get(real_client, "tab=win")["rows"]
     assert [r["w"] for r in win] == sorted((r["w"] for r in rows), reverse=True)[:25]
     by_price = get(real_client, "tab=hot&sort=price")["rows"]

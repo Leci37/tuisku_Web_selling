@@ -56,3 +56,23 @@ def test_only_cut_previews_are_public():
     pine = list(STOREFRONT.rglob("*.pine"))
     assert pine and all(p.parent == STOREFRONT / "assets" / "previews" for p in pine)
     assert not paid & {p.name for p in STOREFRONT.rglob("*")}, "a paid script is in storefront/"
+
+
+def test_every_public_preview_is_cut():
+    # The factory's previews of the 79 free strategies were the whole script, so anyone could skip
+    # the free download's email step; every preview must stop 50 lines into its first tree.
+    import sys
+    sys.path.insert(0, str(ROOT / "catalogue"))
+    from publish import PREVIEW_TAIL, PREVIEW_TREE_LINES, cut_preview
+
+    previews = sorted((STOREFRONT / "assets" / "previews").glob("*.pine"))
+    assert len(previews) > 2000
+    for f in previews:
+        text = f.read_text(encoding="utf-8")
+        assert text.endswith(PREVIEW_TAIL), f.name
+        lines = text.split("\n")
+        start = next(i for i, line in enumerate(lines) if line.startswith("decision_tree_"))
+        assert len(lines) <= start + PREVIEW_TREE_LINES + PREVIEW_TAIL.count("\n") + 1, f.name
+    full = "//@version=5\ndecision_tree_0_X(a)=>\n" + "".join(f"\tif( a <= {i} )\n\t\tret := 1\n" for i in range(80))
+    cut = cut_preview(full)
+    assert cut.endswith(PREVIEW_TAIL) and cut.count("if( a <=") < 30 and cut_preview(cut) == cut
