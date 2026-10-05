@@ -1,0 +1,7 @@
+# The paid scripts and the orders database never go to git (see README: private storage)
+private/
+*.db
+__pycache__/
+.pytest_cache/
+.venv/
+venv/
