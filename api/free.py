@@ -1,7 +1,7 @@
 """POST /api/free: a free strategy for an email address. The link goes by email, never in the answer,
 so the address is real. News is a separate opt-in, recorded only when ticked and only counted once the
 person confirms it from the email (GDPR double opt-in): GET /api/news/confirm."""
-import time
+import secrets
 
 from fastapi import APIRouter, HTTPException, Query, Request
 from fastapi.responses import RedirectResponse
@@ -34,13 +34,15 @@ def claim(body: FreeClaim, request: Request):
         raise HTTPException(400, {"error": "only free strategies can be downloaded for an email"})
     email = valid_email(body.email)
     limited(request, "free")
-    if state.store.claims_since(email, time.time() - 86400) >= DAILY_CLAIMS:
-        raise HTTPException(429, {"error": "too many free downloads for this email today; try again tomorrow"})
     if not (state.settings.strategies_dir / strategy.private_file).is_file():
         raise HTTPException(404, {"error": "file missing from private storage", "item": strategy.key})
     days, lang, texts = state.settings.download_days, language(body.lang), state.texts
-    token = state.store.add_free_claim(email, strategy.key, body.news, lang, days, strategy.version)
-    news = state.store.request_news(email, "free", lang) if body.news else None
+    store = state.store
+    token = store.add_free_claim(email, strategy.key, body.news, lang, days, strategy.version, daily_limit=DAILY_CLAIMS)
+    if token is None:
+        raise HTTPException(429, {"error": "too many free downloads for this email today; try again tomorrow"})
+    # the pending subscription is written only once the email with its link has gone out
+    news = secrets.token_urlsafe(24) if body.news and not store.news_confirmed(email) else None
     base = base_url(request)
     what = {"name": strategy.row.get("Name") or strategy.ticker, "ticker": strategy.ticker,
             "interval": strategy.interval}
@@ -50,7 +52,10 @@ def claim(body: FreeClaim, request: Request):
     if news:
         text += "\n" + texts.get("mailNewsConfirm", lang, link=f"{base}/api/news/confirm?token={news}")
     if not state.mailer.send(email, texts.get("mailFreeSubject", lang, **what), text):
+        store.delete_free_claim(token)  # nothing was received: no claim to count, no link that works
         raise HTTPException(502, {"error": "the email could not be sent; try again later"})
+    if news:
+        store.request_news(email, "free", lang, token=news)
     return {"sent": True}
 
 

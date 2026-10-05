@@ -1,7 +1,8 @@
 """Prices and discounts, computed on the server only. The browser sends ids, bundle keys and a code.
 
 A cart is loose strategies, bundles (catalogue/bundles.json) and at most one "Build your pack"
-(PACK_SIZE paid strategies for PACK_PRICE). A strategy inside a chosen bundle or the pack is not
+(PACK_SIZE paid strategies for PACK_PRICE, or for the sum of their prices when that is less: a pack of
+cheap strategies never costs more than buying them one by one). A strategy inside a chosen bundle or the pack is not
 charged again as a loose item, and a cart whose bundles (or a bundle and the pack) share a strategy
 is refused (see overlap): each of them would charge for it.
 """
@@ -30,6 +31,8 @@ class Quote:
     pack: tuple = None                             # ([Strategy], price charged) or None
     tier_rate: Decimal = ZERO
     code_rate: Decimal = ZERO
+    tier_index: int = 0       # how many order-size tiers the subtotal has passed
+    next_tier: dict = None    # {over, rate, missing} of the next one, None when none is left (or none applies)
 
     @property
     def strategies(self) -> list:
@@ -45,7 +48,7 @@ class Quote:
         return {
             "items": [{"id": s.id, "price": str(p)} for s, p in self.items],
             "bundles": [{"key": b.key, "price": str(p)} for b, p in self.bundles],
-            "pack": {"ids": [s.id for s in self.pack[0]], "price": str(self.pack[1])} if self.pack else None,
+            "pack": pack_line(*self.pack) if self.pack else None,
         }
 
     def as_dict(self) -> dict:
@@ -58,7 +61,30 @@ class Quote:
             "discount": str((self.subtotal - self.total).quantize(CENT)),
             "total": str(self.total),
             "code_status": self.code_status,
+            "tier_index": self.tier_index,
+            "next_tier": self.next_tier,
         }
+
+
+def pack_line(strategies: list, price: Decimal, list_price: Decimal) -> dict:
+    """The pack as the cart shows it: `price` is what this cart charges for it (after the tier or code
+    discount), `was` its strategies' prices one by one, and `save` what the pack itself saves against
+    them, 1 - list_price/was ("0" when nothing): the tier and the code are shown on their own."""
+    was = sum((s.price for s in strategies), ZERO).quantize(CENT)
+    save = (1 - list_price / was).quantize(CENT, ROUND_HALF_UP) if was > 0 and list_price < was else ZERO
+    return {"ids": [s.id for s in strategies], "price": str(price), "was": str(was),
+            "save": str(save) if save > 0 else "0"}
+
+
+def ladder(subtotal: Decimal, settings: Settings) -> tuple:
+    """(how many tiers the subtotal has passed, the next tier) with tier_rate's rule: a tier applies only
+    above its threshold, so at exactly $160 the 15% tier is still $0.01 away."""
+    tiers = sorted(settings.tiers)  # lowest threshold first
+    passed = sum(1 for over, _ in tiers if subtotal > over)
+    if passed == len(tiers):
+        return passed, None
+    over, rate = tiers[passed]
+    return passed, {"over": str(over), "rate": str(rate), "missing": str((over - subtotal + CENT).quantize(CENT))}
 
 
 def tier_rate(subtotal: Decimal, settings: Settings) -> Decimal:
@@ -87,7 +113,7 @@ def quote(strategies: list, code: str, settings: Settings, bundles: list = (), p
     pack = list({s.key: s for s in pack}.values())
     covered = {s.key for b in chosen for s in b.items} | {s.key for s in pack}
     loose = [s for s in {s.key: s for s in strategies}.values() if s.key not in covered]
-    pack_price = settings.pack_price.quantize(CENT) if pack else ZERO
+    pack_price = min(settings.pack_price, sum((s.price for s in pack), ZERO)).quantize(CENT) if pack else ZERO
     fixed = sum((b.price for b in chosen), ZERO) + pack_price
     subtotal = (sum((s.price for s in loose), ZERO) + fixed).quantize(CENT)
     code = (code or "").strip().lower()
@@ -97,12 +123,13 @@ def quote(strategies: list, code: str, settings: Settings, bundles: list = (), p
         charged = [(s, min(flat, s.price)) for s in loose]
         total = (sum((p for _, p in charged), ZERO) + fixed).quantize(CENT)
         return Quote(charged, subtotal, ZERO, total, code, "applied", [(b, b.price) for b in chosen],
-                     (pack, pack_price) if pack else None)
+                     (pack, pack_price, pack_price) if pack else None)
     code_rate = settings.discount_codes.get(code, ZERO) if code else ZERO
     status = "" if not code else ("applied" if code in settings.discount_codes else "invalid")
     tier = tier_rate(subtotal, settings)
     rate = min(tier + code_rate, settings.max_discount)
     off = 1 - rate
+    passed, upcoming = ladder(subtotal, settings)
     return Quote([(s, cents(s.price * off)) for s in loose], subtotal, rate, cents(subtotal * off), code, status,
-                 [(b, cents(b.price * off)) for b in chosen], (pack, cents(pack_price * off)) if pack else None,
-                 tier, code_rate)
+                 [(b, cents(b.price * off)) for b in chosen], (pack, cents(pack_price * off), pack_price) if pack else None,
+                 tier, code_rate, passed, upcoming)

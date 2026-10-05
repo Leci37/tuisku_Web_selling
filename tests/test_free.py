@@ -195,3 +195,51 @@ def test_parallel_free_downloads_never_pass_the_limit(client, free_file, setting
         codes = sorted(pool.map(lambda _: client.get(link).status_code, range(10)))
     assert codes == [200] * 2 + [429] * 8
     assert read(link.rsplit("/", 1)[1])["count"] == 2
+
+
+class SlowCount:
+    """Stands in for the store's connection, pausing right after counting an address's claims: if counting
+    and inserting were not one transaction, parallel requests would all read the same count here."""
+
+    def __init__(self, db):
+        self.db = db
+
+    def execute(self, sql, *args):
+        cursor = self.db.execute(sql, *args)
+        if "COUNT(*) FROM free_claims" in sql:
+            time.sleep(0.05)
+        return cursor
+
+    def __getattr__(self, name):
+        return getattr(self.db, name)
+
+    def __enter__(self):
+        return self.db.__enter__()
+
+    def __exit__(self, *exc):
+        return self.db.__exit__(*exc)
+
+
+def test_parallel_claims_never_pass_the_daily_limit(client, free_file, monkeypatch):
+    store = client.app.state.store
+    monkeypatch.setattr(store, "db", SlowCount(store.db))
+    with ThreadPoolExecutor(15) as pool:
+        codes = sorted(pool.map(lambda _: claim(client).status_code, range(15)))
+    assert codes == [200] * 10 + [429] * 5
+    assert store.claims_since("ana@example.com", time.time() - DAY) == 10
+    assert len(store.outbox("ana@example.com")) == 10
+
+
+def test_a_failed_email_leaves_no_claim_and_no_subscription(client, free_file, monkeypatch):
+    store, mailer = client.app.state.store, client.app.state.mailer
+    send = mailer.send
+    monkeypatch.setattr(mailer, "send", lambda to, subject, body: False)
+    for _ in range(12):
+        r = claim(client, "keen@example.com", news=True)
+        assert r.status_code == 502 and r.json()["detail"]["error"]
+    assert store.db.execute("SELECT COUNT(*) FROM free_claims").fetchone()[0] == 0
+    assert store.db.execute("SELECT COUNT(*) FROM subscribers").fetchone()[0] == 0
+    monkeypatch.setattr(mailer, "send", send)
+    assert claim(client, "keen@example.com", news=True).status_code == 200, "failures do not count toward 10 a day"
+    assert opened(client, confirm_link(client, "keen@example.com")) == "/?news=confirmed"
+    assert client.get(emailed_link(client, "keen@example.com")).status_code == 200

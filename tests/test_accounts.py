@@ -10,6 +10,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from api.app import create_app
+from api.auth import MAX_PENDING_LOGINS
 from api.mail import Mailer
 from api.settings import ROOT
 from api.store import Store
@@ -92,13 +93,14 @@ def test_opening_the_link_signs_nobody_in(client):
 
 
 def test_another_site_cannot_post_a_token(client):
-    """Login CSRF: a form elsewhere can only send form-encoded or text/plain bodies, never JSON."""
+    """Login CSRF: a form elsewhere can only send form-encoded or text/plain bodies, never JSON (refused)."""
     client.post("/api/auth/login", json={"email": "attacker@example.com"})
     token = emailed_token(client, "attacker@example.com")
     for headers, content in (({"content-type": "text/plain"}, json.dumps({"token": token})),
                              ({"content-type": "application/x-www-form-urlencoded"}, f"token={token}")):
         r = client.post("/api/auth/verify", content=content, headers=headers)
-        assert r.status_code == 422 and "set-cookie" not in r.headers
+        assert r.status_code == 400 and r.json() == {"detail": {"error": "body is invalid"}}
+        assert "set-cookie" not in r.headers
     assert client.get("/api/me").json() == {"email": None}
     assert client.post("/api/auth/peek", json={"token": token}).status_code == 200, "still unused"
 
@@ -133,7 +135,20 @@ def test_same_answer_for_anyone_and_no_flooding(client):
     assert len(client.app.state.store.outbox("nobody@example.com")) == 5, "at most 5 unused links at once"
     for bad in ("", "no-at-sign", "a@b", "two@@example.com", "sp ace@example.com"):
         assert client.post("/api/auth/login", json={"email": bad}).status_code == 400
-    assert client.post("/api/auth/login", json={"email": "x" * 250 + "@example.com"}).status_code == 422
+    r = client.post("/api/auth/login", json={"email": "x" * 250 + "@example.com"})  # over 254 characters
+    assert r.status_code == 400 and r.json() == {"detail": {"error": "email is invalid"}}
+
+
+def test_a_failed_email_leaves_no_sign_in_link(client, monkeypatch):
+    store, mailer = client.app.state.store, client.app.state.mailer
+    send = mailer.send
+    monkeypatch.setattr(mailer, "send", lambda to, subject, body: False)
+    for _ in range(MAX_PENDING_LOGINS + 1):  # unsent links never fill the cap of pending ones
+        assert client.post("/api/auth/login", json={"email": "ana@example.com"}).status_code == 502
+    assert store.db.execute("SELECT COUNT(*) FROM login_tokens").fetchone()[0] == 0
+    monkeypatch.setattr(mailer, "send", send)
+    sign_in(client)
+    assert store.db.execute("SELECT COUNT(*) FROM login_tokens").fetchone()[0] == 1
 
 
 def test_old_database_files_gain_the_new_columns(tmp_path):

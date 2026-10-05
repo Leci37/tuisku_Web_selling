@@ -19,29 +19,49 @@ def quote(client, **cart):
 def test_bundles_and_pack_are_listed(client):
     body = client.get("/api/bundles").json()
     assert body == {"bundles": [{"key": "duo", "name_key": "bundleTop", "ids": [AAPL, MSFT], "price": 150,
-                                 "was": 172}], "pack": {"size": 5, "price": 249}}
+                                 "was": 172}], "pack": {"size": 5, "price": 249, "was": 395}}  # 5 x median $79
 
 
 def test_shipped_bundles_come_from_the_real_catalogue(real_client):
+    """catalogue/bundles.json, by its rules: top5 = each ticker's best paid strategy by npp, the first five (the
+    'hot' order of /api/strategies); crypto = the 2 best paid crypto by npp; amzn = the 2 best paid AMZN by npp
+    that are not in top5. No two of them share a strategy (a cart with both would be refused)."""
     cat = Catalogue(ROOT / "catalogue" / "catalogue.csv")
     paid = sorted((s for s in cat if s.price > 0), key=lambda s: -s.numbers["npp"])
-    best_per_ticker = list({s.ticker: s for s in reversed(paid)}.values())[::-1]  # each ticker's best, by npp
-    best_per_ticker.sort(key=lambda s: -s.numbers["npp"])
+    best = {}
+    for s in paid:
+        best.setdefault(s.ticker, s)
+    top5 = [s.id for s in sorted(best.values(), key=lambda s: -s.numbers["npp"])[:5]]
+    hot = real_client.get("/api/strategies?paid=1&sort=hot&size=5").json()["rows"]
+    assert [r["id"] for r in hot] == top5, "the same five as the shop's own 'hot' order"
     bundles = {b["key"]: b for b in real_client.get("/api/bundles").json()["bundles"]}
-    assert bundles["top5"]["ids"] == [s.id for s in best_per_ticker[:5]] and bundles["top5"]["price"] == 249
-    assert len({cat.resolve(i).ticker for i in bundles["top5"]["ids"]}) == 5, "five different tickers"
+    assert list(bundles) == ["top5", "crypto", "amzn"]
+    assert bundles["top5"]["ids"] == top5 and bundles["top5"]["price"] == 249
+    assert len({cat.resolve(i).ticker for i in top5}) == 5, "five different tickers"
     assert bundles["crypto"]["ids"] == [s.id for s in paid if s.market == "crypto"][:2]
-    assert bundles["amzn"]["ids"] == [s.id for s in paid if s.ticker == "AMZN"][:2]
+    assert bundles["amzn"]["ids"] == [s.id for s in paid if s.ticker == "AMZN" and s.id not in top5][:2]
+    every = [i for b in bundles.values() for i in b["ids"]]
+    assert len(every) == len(set(every)) == 9, "no two shipped bundles share a strategy"
     for b in bundles.values():
         assert b["price"] < b["was"] == sum(float(cat.resolve(i).price) for i in b["ids"])
 
 
-def test_unknown_ids_in_the_file_are_dropped(settings, caplog):
+def test_a_bundle_that_lost_a_strategy_or_its_saving_is_left_out(settings, caplog):
+    # (a bundle with an unknown id used to be sold with what was left of it, at its old price)
     settings.bundles.write_text(json.dumps([{"key": "duo", "ids": [AAPL, "GONE_1Day_X_0"], "price": 70},
-                                            {"key": "ghost", "ids": ["GONE_1Day_X_0"], "price": 9}]))
-    body = TestClient(create_app(settings)).get("/api/bundles").json()
-    assert [(b["key"], b["ids"]) for b in body["bundles"]] == [("duo", [AAPL])]
-    assert "GONE_1Day_X_0" in caplog.text
+                                            {"key": "ghost", "ids": ["GONE_1Day_X_0"], "price": 9},
+                                            {"key": "empty", "ids": [], "price": 9},
+                                            {"key": "dear", "ids": [AAPL, TSLA], "price": 129},   # was 129
+                                            {"key": "fair", "ids": [AAPL, TSLA], "price": 128.99}]))
+    with caplog.at_level("ERROR"):
+        client = TestClient(create_app(settings))
+    body = client.get("/api/bundles").json()
+    assert [(b["key"], b["ids"], b["price"], b["was"]) for b in body["bundles"]] == [
+        ("fair", [AAPL, TSLA], 128.99, 129)]
+    errors = [r.getMessage() for r in caplog.records if r.levelname == "ERROR"]
+    assert any("duo" in e and "GONE_1Day_X_0" in e for e in errors) and any("ghost" in e for e in errors)
+    assert any("dear" in e and "129" in e for e in errors) and any("empty" in e for e in errors)
+    assert client.post("/api/quote", json={"bundles": ["duo"]}).status_code == 400
 
 
 def test_items_in_a_bundle_are_not_charged_twice(client):
@@ -66,7 +86,9 @@ def test_flat_price_code_is_for_loose_items_only(client):
 def test_pack(client, settings):
     settings.pack_size, settings.pack_price = 2, Decimal("120")
     r = quote(client, items=[AAPL, MSFT, TSLA], pack=[AAPL, TSLA]).json()
-    assert r["pack"] == {"ids": [AAPL, TSLA], "price": "102.00"} and [i["id"] for i in r["items"]] == [MSFT]
+    # price is what the cart charges (120 less the 15% tier); save is the pack's own: 1 - 120/129
+    assert r["pack"] == {"ids": [AAPL, TSLA], "price": "102.00", "was": "129.00", "save": "0.07"}
+    assert [i["id"] for i in r["items"]] == [MSFT]
     assert r["subtotal"] == "213.00" and r["total"] == "181.05"  # 93 + 120, 15% tier
 
 
@@ -84,11 +106,11 @@ def test_unknown_bundle_and_empty_cart(client):
 
 def test_buying_a_bundle_and_a_pack(client, settings):
     # (this cart was duo + a pack of TSLA and AAPL: AAPL is in duo, so that cart is now refused, see below)
-    settings.pack_size, settings.pack_price = 1, Decimal("80")
+    settings.pack_size, settings.pack_price = 1, Decimal("40")
     order = client.post("/api/orders", json={"bundles": ["duo"], "pack": [TSLA]})
     assert order.status_code == 200, order.text
     o = order.json()
-    assert o["total"] == "195.50"  # 150 + 80 = 230, 15% tier
+    assert o["total"] == "161.50"  # 150 + 40 = 190, 15% tier
     stored = client.app.state.store.order(o["id"])
     assert sorted(stored["items"]) == sorted(" - ".join(r[k] for k in ("ticker", "interval", "key_techs", "id_model"))
                                              for r in (ROWS[0], ROWS[1], ROWS[3]))
@@ -119,13 +141,60 @@ def test_two_bundles_never_charge_a_strategy_twice(settings):
     assert quote(client, bundles=["apple"], items=[AAPL, MSFT]).json()["total"] == "172.55"  # 110 + 93, 15%
 
 
-def test_the_shipped_top5_and_amzn_bundles_cannot_be_combined(real_client):
-    bundles = {b["key"]: b for b in real_client.get("/api/bundles").json()["bundles"]}
-    shared = set(bundles["top5"]["ids"]) & set(bundles["amzn"]["ids"])
-    assert shared == {"AMZN_1Day_1T00_912096cc"}
-    r = real_client.post("/api/quote", json={"bundles": ["top5", "amzn"]})
+def test_the_shipped_bundles_can_all_be_bought_together(real_client):
+    # (top5 and amzn used to share AMZN_1Day_1T00_912096cc, and such a cart is refused)
+    r = real_client.post("/api/quote", json={"bundles": ["top5", "crypto", "amzn"]})
+    assert r.status_code == 200 and r.json()["subtotal"] == "487.00"  # 249 + 119 + 119
+    top5 = real_client.get("/api/bundles").json()["bundles"][0]["ids"]
+    others = [r["id"] for r in real_client.get("/api/strategies?paid=1&sort=npp&size=40").json()["rows"]
+              if r["id"] not in top5][:4]
+    r = real_client.post("/api/quote", json={"bundles": ["top5"], "pack": [top5[0], *others]})
     assert r.status_code == 400 and r.json()["detail"] == {"error": "a strategy is in two of the chosen bundles",
-                                                           "items": ["AMZN_1Day_1T00_912096cc"]}
-    assert real_client.post("/api/orders", json={"bundles": ["amzn", "top5"]}).status_code == 400
-    for alone in (["top5"], ["amzn"], ["top5", "crypto"]):
-        assert real_client.post("/api/quote", json={"bundles": alone}).status_code == 200, alone
+                                                           "items": [top5[0]]}
+
+
+def test_a_pack_never_costs_more_than_its_strategies(client, settings):
+    settings.pack_size, settings.pack_price = 2, Decimal("249")
+    r = quote(client, pack=[AAPL, TSLA]).json()  # $79 + $50 = $129 < $249
+    assert r["pack"] == {"ids": [AAPL, TSLA], "price": "129.00", "was": "129.00", "save": "0"}
+    assert r["subtotal"] == "129.00" and r["total"] == "129.00"
+    settings.pack_price = Decimal("120")
+    r = quote(client, pack=[AAPL, TSLA]).json()
+    assert r["pack"] == {"ids": [AAPL, TSLA], "price": "120.00", "was": "129.00", "save": "0.07"}
+    order = client.post("/api/orders", json={"pack": [AAPL, TSLA]}).json()
+    assert order["total"] == "120.00" and client.app.state.store.order(order["id"])["lines"]["pack"]["was"] == "129.00"
+
+
+def test_a_pack_of_the_cheapest_real_strategies(real_client):
+    cat = Catalogue(ROOT / "catalogue" / "catalogue.csv")
+    cheap = sorted((s for s in cat if s.price > 0), key=lambda s: s.price)[:5]
+    assert sum(s.price for s in cheap) < 249, "five $39 and $49 strategies"
+    r = real_client.post("/api/quote", json={"pack": [s.id for s in cheap]}).json()
+    assert r["pack"]["was"] == r["subtotal"] == str(sum(s.price for s in cheap)) == "205.00", "not $249"
+    # price is what the cart charges (here after the 15% tier); the pack itself saves nothing on them
+    assert (r["tier_rate"], r["pack"]["price"], r["pack"]["save"], r["total"]) == ("0.15", "174.25", "0", "174.25")
+    pack = real_client.get("/api/bundles").json()["pack"]
+    assert pack["was"] == 5 * float(cat.median_paid_price) and pack["was"] > pack["price"]
+
+
+def test_the_ladder_comes_from_the_server(client, settings):
+    settings.pack_size, settings.pack_price = 2, Decimal("160")
+    r = quote(client, pack=[AAPL, MSFT]).json()            # subtotal exactly $160: not above it
+    assert (r["subtotal"], r["tier_rate"], r["tier_index"]) == ("160.00", "0", 0)
+    assert r["next_tier"] == {"over": "160", "rate": "0.15", "missing": "0.01"}
+    r = quote(client, items=[TSLA]).json()                  # $50
+    assert r["tier_index"] == 0 and r["next_tier"] == {"over": "160", "rate": "0.15", "missing": "110.01"}
+    r = quote(client, items=[AAPL, MSFT]).json()            # $172: the 15% tier, the 20% one next
+    assert (r["tier_rate"], r["tier_index"]) == ("0.15", 1)
+    assert r["next_tier"] == {"over": "290", "rate": "0.20", "missing": "118.01"}
+    r = quote(client, items=[AAPL, MSFT], code="launch").json()
+    assert (r["tier_index"], r["next_tier"]) == (0, None), "a flat-price code: no tier applies at all"
+
+
+def test_past_the_last_tier(settings):
+    from api.catalogue import Strategy
+    from api.pricing import quote as price
+    big = [Strategy("T", "1Day", f"K{i}", f"id{i}", Decimal("99"), {}) for i in range(30)]  # $2,970
+    q = price(big, "", settings).as_dict()
+    assert (q["tier_rate"], q["tier_index"], q["next_tier"]) == ("0.70", 5, None)
+    assert price(big[:5], "", settings).as_dict()["next_tier"] == {"over": "500", "rate": "0.25", "missing": "5.01"}

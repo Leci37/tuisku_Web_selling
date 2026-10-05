@@ -112,7 +112,8 @@ def test_paging(real_client):
     assert len(two["rows"]) == 10 and not {r["id"] for r in one["rows"]} & {r["id"] for r in two["rows"]}
     assert one["rows"][-1]["tr"] >= two["rows"][0]["tr"]
     assert get(real_client, "page=999")["rows"] == []
-    assert real_client.get("/api/strategies?size=101").status_code == 422
+    r = real_client.get("/api/strategies?size=101")
+    assert r.status_code == 400 and r.json() == {"detail": {"error": "size is invalid"}}
 
 
 def test_bad_parameters(real_client):

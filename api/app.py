@@ -3,7 +3,8 @@
     uvicorn --factory api.app:create_app --port 8000      # then open http://localhost:8000
 """
 from fastapi import FastAPI, Request
-from fastapi.responses import FileResponse
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from api import auth, capture, download, free, media, mine, orders, search
@@ -22,6 +23,15 @@ CSP = ("default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline';
 PAGES = ("/", "/mine", "/thanks", "/s/{strategy_id}", "/s/{strategy_id}/tree")
 
 
+def invalid_field(exc: RequestValidationError) -> str:
+    """The parameter a request got wrong, as the browser sent it: 'email', 'size', 'alerts.nv'; 'body' when the
+    body itself is not the JSON object expected (list positions are left out: 'items', not 'items.3')."""
+    for error in exc.errors():
+        loc = [str(p) for p in error.get("loc", ()) if not isinstance(p, int)]
+        return ".".join(loc[1:]) or (loc[0] if loc else "request")
+    return "request"
+
+
 def create_app(settings: Settings = None, paypal=None) -> FastAPI:
     settings = settings or Settings.from_env()
     docs = settings.paypal_mode == "fake"  # the map of the API is for local runs, not for the public shop
@@ -38,6 +48,11 @@ def create_app(settings: Settings = None, paypal=None) -> FastAPI:
     app.state.paypal = paypal or (FakePayPal() if settings.paypal_mode == "fake" else
                                   PayPalREST(settings.paypal_mode, settings.paypal_client_id,
                                              settings.paypal_client_secret))
+
+    @app.exception_handler(RequestValidationError)
+    async def invalid_request(request: Request, exc: RequestValidationError):
+        # the shape of every other refusal of the API, instead of FastAPI's 422 list
+        return JSONResponse({"detail": {"error": f"{invalid_field(exc)} is invalid"}}, status_code=400)
 
     @app.middleware("http")
     async def security_headers(request: Request, call_next):

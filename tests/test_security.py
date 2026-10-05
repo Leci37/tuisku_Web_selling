@@ -147,3 +147,19 @@ def test_language_codes():
     assert [language(x) for x in ("es", "PT-br", "zh_Hans", "ar-SA", "hi", "de", "fr", "en", "xx", "", None,
                                   "english", "<b>")] == [
         "es", "pt", "zh", "ar", "hi", "de", "fr", "en", "en", "en", "en", "en", "en"]
+
+
+def test_invalid_requests_answer_like_the_rest_of_the_api(client, ids):
+    cases = (("post", "/api/free", {"json": {}}, "id"),
+             ("post", "/api/free", {"json": {"id": "x", "email": "a@example.com", "news": "maybe"}}, "news"),
+             ("post", "/api/quote", {"json": {"items": "not a list"}}, "items"),
+             ("post", "/api/quote", {"json": {"items": [ids[0], 7]}}, "items"),
+             ("post", "/api/quote", {"content": "{broken", "headers": {"content-type": "application/json"}}, "body"),
+             ("post", "/api/quote", {"json": ["a list"]}, "body"),
+             ("get", "/api/strategies?page=0", {}, "page"),
+             ("put", "/api/favourites/X", {"json": {"alerts": {"nv": "loud"}}}, "alerts.nv"),
+             ("get", "/api/auth/verify?token=" + "x" * 201, {}, "token"))
+    for method, path, kw, field in cases:
+        r = getattr(client, method)(path, **kw)
+        assert r.status_code == 400 and r.json() == {"detail": {"error": f"{field} is invalid"}}, (path, r.text)
+        assert r.headers["x-content-type-options"] == "nosniff", "the security headers too"

@@ -239,6 +239,10 @@ def strategy(strategy_id: str, request: Request):
 
 @router.get("/api/bundles")
 def bundles(request: Request):
-    settings = request.app.state.settings
-    return {"bundles": [b.as_dict() for b in request.app.state.catalogue.bundles.values()],
-            "pack": {"size": settings.pack_size, "price": float(settings.pack_price)}}
+    settings, catalogue = request.app.state.settings, request.app.state.catalogue
+    # The pack card's "was" before anything is picked: PACK_SIZE strategies at the median paid price, a typical
+    # pack (the mean would lean on the few dear ones; the dearest five would overstate it). Once picked, the
+    # quote gives the pack's own was and save.
+    return {"bundles": [b.as_dict() for b in catalogue.bundles.values()],
+            "pack": {"size": settings.pack_size, "price": float(settings.pack_price),
+                     "was": float(settings.pack_size * catalogue.median_paid_price)}}

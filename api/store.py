@@ -190,11 +190,24 @@ class Store:
     # Free strategies for an email.
 
     def add_free_claim(self, email: str, key: str, news: bool, lang: str, days: int, version: int = 1,
-                       consent_at: float = None) -> str:
+                       consent_at: float = None, daily_limit: int = None):
+        """The new claim's token; None when `daily_limit` is given and the address already made that many
+        claims in the last day. Counting and inserting happen in one locked transaction, so parallel
+        requests cannot all pass the count before any of them inserts."""
         token, now = secrets.token_urlsafe(24), time.time()
-        self._write("INSERT INTO free_claims VALUES (?,?,?,?,?,?,0,?,?)",
-                    (token, norm(email), key, int(bool(news)), consent_at or now, now + days * DAY, version, lang))
+        with self.lock, self.db:
+            if daily_limit is not None and self.db.execute(
+                    "SELECT COUNT(*) FROM free_claims WHERE email=? AND consent_at>=?",
+                    (norm(email), now - DAY)).fetchone()[0] >= daily_limit:
+                return None
+            self.db.execute("INSERT INTO free_claims VALUES (?,?,?,?,?,?,0,?,?)",
+                            (token, norm(email), key, int(bool(news)), consent_at or now, now + days * DAY,
+                             version, lang))
         return token
+
+    def delete_free_claim(self, token: str):
+        """A claim whose email could not be sent: it gave nothing, so it must not count or stay usable."""
+        self._write("DELETE FROM free_claims WHERE token=?", (token,))
 
     def free_claim(self, token: str):
         row = self.db.execute("SELECT * FROM free_claims WHERE token=?", (token,)).fetchone()
@@ -204,12 +217,17 @@ class Store:
         return self.db.execute("SELECT COUNT(*) FROM free_claims WHERE email=? AND consent_at>=?",
                                (norm(email), since)).fetchone()[0]
 
-    def request_news(self, email: str, source: str, lang: str):
-        """Only called when the person ticked the news box. The row stays pending (confirmed_at NULL) until
-        the emailed link is opened, so nobody is subscribed by someone typing their address (double opt-in).
-        Returns the token of that link, or None if the address is already a confirmed subscriber.
-        A newer request replaces the token: the latest email's link is the one that works."""
-        e, now, token = norm(email), time.time(), secrets.token_urlsafe(24)
+    def news_confirmed(self, email: str) -> bool:
+        return bool(self.db.execute("SELECT 1 FROM subscribers WHERE email=? AND news=1 AND confirmed_at IS NOT "
+                                    "NULL", (norm(email),)).fetchone())
+
+    def request_news(self, email: str, source: str, lang: str, token: str = None):
+        """Only called when the person ticked the news box, once the email with the link has gone out. The row
+        stays pending (confirmed_at NULL) until the link is opened, so nobody is subscribed by someone typing
+        their address (double opt-in). Returns the token of that link (`token`, or a new one), or None if the
+        address is already a confirmed subscriber. A newer request replaces the token: the latest email's
+        link is the one that works."""
+        e, now, token = norm(email), time.time(), token or secrets.token_urlsafe(24)
         with self.lock, self.db:
             row = self.db.execute("SELECT confirmed_at FROM subscribers WHERE email=? AND news=1", (e,)).fetchone()
             if row and row[0] is not None:
@@ -240,10 +258,21 @@ class Store:
 
     # Passwordless accounts.
 
-    def add_login_token(self, email: str, minutes: int) -> str:
-        token = secrets.token_urlsafe(32)
-        self._write("INSERT INTO login_tokens VALUES (?,?,?,0)", (digest(token), norm(email), time.time() + minutes * 60))
+    def add_login_token(self, email: str, minutes: int, max_pending: int = None):
+        """A new sign-in token; None when `max_pending` is given and the address already has that many unused
+        ones (counted and inserted in one locked transaction)."""
+        token, now = secrets.token_urlsafe(32), time.time()
+        with self.lock, self.db:
+            if max_pending is not None and self.db.execute(
+                    "SELECT COUNT(*) FROM login_tokens WHERE email=? AND used=0 AND expires>?",
+                    (norm(email), now)).fetchone()[0] >= max_pending:
+                return None
+            self.db.execute("INSERT INTO login_tokens VALUES (?,?,?,0)", (digest(token), norm(email), now + minutes * 60))
         return token
+
+    def delete_login_token(self, token: str):
+        """A sign-in link whose email could not be sent: it must not count toward the pending ones."""
+        self._write("DELETE FROM login_tokens WHERE token_hash=?", (digest(token),))
 
     def pending_logins(self, email: str) -> int:
         return self.db.execute("SELECT COUNT(*) FROM login_tokens WHERE email=? AND used=0 AND expires>?",

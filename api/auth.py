@@ -74,14 +74,15 @@ def login(body: Login, request: Request):
     state = request.app.state
     email = valid_email(body.email)
     limited(request, "login")
-    if state.store.pending_logins(email) >= MAX_PENDING_LOGINS:
+    token = state.store.add_login_token(email, state.settings.login_minutes, max_pending=MAX_PENDING_LOGINS)
+    if token is None:
         return {"sent": True}
-    token = state.store.add_login_token(email, state.settings.login_minutes)
     lang, texts = language(body.lang), state.texts
     sent = state.mailer.send(email, texts.get("mailSignInSubject", lang),
                              texts.get("mailSignInBody", lang, link=f"{base_url(request)}/mine?signin={token}",
                                        minutes=state.settings.login_minutes))
-    if not sent:
+    if not sent:  # a link nobody received: gone, so it neither works nor counts toward MAX_PENDING_LOGINS
+        state.store.delete_login_token(token)
         raise HTTPException(502, {"error": "the email could not be sent; try again later"})
     return {"sent": True}
 

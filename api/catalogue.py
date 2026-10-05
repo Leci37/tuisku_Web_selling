@@ -220,23 +220,36 @@ class Catalogue:
         self.bundles = self._bundles(source.bundles)
 
     def _bundles(self, path: Path) -> dict:
+        """The bundles of bundles.json that are still what they promise. One that lost a strategy, or no longer
+        costs less than its strategies one by one, is left out whole (and logged): selling what is left of it
+        at the old price would be a different bundle from the one advertised."""
         if not path or not path.is_file():
             return {}
         out = {}
         for b in json.loads(path.read_text(encoding="utf-8")):
-            items = []
-            for i in b.get("ids", []):
-                s = self.resolve(i)
-                if s:
-                    items.append(s)
-                else:
-                    log.warning("bundle %s: %s is not in the catalogue, dropped", b.get("key"), i)
-            if items:
-                out[b["key"]] = Bundle(b["key"], b.get("name_key", b["key"]), tuple(items),
-                                       Decimal(str(b["price"])).quantize(Decimal("0.01")))
-            else:
-                log.warning("bundle %s: no strategy left, dropped", b.get("key"))
+            ids = b.get("ids", [])
+            items = [self.resolve(i) for i in ids]
+            gone = [i for i, s in zip(ids, items) if not s]
+            if gone or not items:
+                log.error("bundle %s left out: %s", b.get("key"),
+                          f"not in the catalogue: {', '.join(gone)}" if gone else "it has no strategies")
+                continue
+            bundle = Bundle(b["key"], b.get("name_key", b["key"]), tuple(items),
+                            Decimal(str(b["price"])).quantize(Decimal("0.01")))
+            if bundle.price >= bundle.was:
+                log.error("bundle %s left out: its price %s is not below its strategies' %s", bundle.key,
+                          bundle.price, bundle.was)
+                continue
+            out[bundle.key] = bundle
         return out
+
+    @cached_property
+    def median_paid_price(self) -> Decimal:
+        prices = sorted(s.price for s in self.items.values() if s.price > 0)
+        if not prices:
+            return Decimal("0")
+        mid = len(prices) // 2
+        return prices[mid] if len(prices) % 2 else ((prices[mid - 1] + prices[mid]) / 2).quantize(Decimal("0.01"))
 
     def __len__(self):
         return len(self.items)
