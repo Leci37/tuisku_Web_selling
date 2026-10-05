@@ -81,7 +81,7 @@ export function cartVals(c) {
     bundles: defs.bundles.map(b => {
       const on = s.bundles.includes(b.key), rowsB = b.ids.map(row).filter(Boolean);
       const tick = [...new Set(rowsB.map(r => r.ticker))];
-      return { name: t(b.name_key), count: t('nStrategies', { n: f.int(b.ids.length) }), tickers: tick.join(' · '),
+      return { name: t(b.name_key), count: t('nStrategies', { n: f.int(b.ids.length) }, b.ids.length), tickers: tick.join(' · '),
         icons: tick.map(tk => ({ src: iconOf(rowsB.find(r => r.ticker === tk)) })),
         was: f.pmoney(b.was), price: f.pmoney(b.price), save: saveOf(b.price, b.was),
         label: on ? tx.inCartBtn : t('addBundle'), btnIcon: on ? 'fa-solid fa-check' : 'fa-solid fa-cart-plus',

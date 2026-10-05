@@ -21,7 +21,14 @@ export async function api(path, { method = 'GET', body } = {}) {
     init.headers['Content-Type'] = 'application/json';
     init.body = JSON.stringify(body);
   }
-  const res = await fetch(path, init);
+  let res;
+  try {
+    res = await fetch(path, init);
+  } catch (e) { // no answer at all (offline, DNS, connection cut): the one case that is a network error
+    const err = new ApiError(0, 'network', {});
+    err.network = true;
+    throw err;
+  }
   let data = null;
   try { data = await res.json(); } catch (e) { data = null; }
   if (!res.ok) {

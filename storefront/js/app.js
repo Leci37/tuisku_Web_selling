@@ -7,6 +7,7 @@ import { api, post } from './lib/api.js';
 import { read, write, readJSON, writeJSON } from './lib/saved.js';
 import { parseLocation, pathOf } from './lib/route.js';
 import { proQuery } from './lib/filters.js';
+import { translator } from './lib/fmt.js';
 import { renderVals } from './lib/vals.js';
 import { PRO_SIZE } from './lib/vals_shop.js';
 import { withoutOverlap } from './lib/vals_cart.js';
@@ -127,6 +128,7 @@ export class App extends Component {
       document.documentElement.lang = s.lang;
       document.documentElement.dir = rtl.includes(s.lang) ? 'rtl' : 'ltr';
     }
+    if (changed('lang', 'dict', 'common') && s.dict && s.common) document.title = 'Edgefolio · ' + translator(s.dict, s.common, s.lang)('toolName');
 
     if (s.page === 'shop' && s.mode === 'pro') {
       const key = proQuery(s, s.ranges);
@@ -185,9 +187,12 @@ export class App extends Component {
 
   // What went wrong, said in the visitor's language: the server's own messages are English and
   // meant for the logs, so the page picks a text by what kind of failure it was.
+  // Only a request that got no answer is a network error; anything else without a status is a bug
+  // in the page: logged for whoever looks, and the visitor is asked to try later.
   fail(e) {
     const st = e && e.status;
-    const key = !st ? 'errNetwork' : st === 402 ? 'errPayment' : st === 404 || st === 410 ? 'errNotFound'
+    if (!st && !(e && e.network)) console.error(e);
+    const key = e && e.network ? 'errNetwork' : !st ? 'errLater' : st === 402 ? 'errPayment' : st === 404 || st === 410 ? 'errNotFound'
       : st === 429 ? 'errTooMany' : st >= 500 ? 'errLater' : 'errRequest';
     this.setState({ error: key });
   }
@@ -479,11 +484,16 @@ export class App extends Component {
     try { window.scrollTo(0, Math.max(0, top)); } catch (e) { /* not scrollable */ }
   }
 
-  // Runs fn once the shop is on screen (the bar's buttons work from every page).
+  // Runs fn once the shop and its list are on screen (the bar's buttons work from every page, and
+  // the list's height moves what comes after it); after 3 s it runs anyway.
   onShop(fn) {
     if (this.state.page !== 'shop') this.go({ page: 'shop' });
     let tries = 0;
-    const run = () => { if (!fn() && ++tries < 20) setTimeout(run, 50); };
+    const run = () => {
+      const s = this.state, ready = s.page === 'shop' && (s.mode === 'pro' ? s.proLoaded : !!s.lite);
+      if ((ready || tries >= 59) && fn()) return;
+      if (++tries < 60) setTimeout(run, 50);
+    };
     setTimeout(run, 0);
   }
 

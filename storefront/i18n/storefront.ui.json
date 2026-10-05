@@ -961,14 +961,41 @@
   "hi": "Amazon जोड़ी"
  },
  "nStrategies": {
-  "es": "{n} estrategias",
-  "en": "{n} strategies",
-  "pt": "{n} estratégias",
-  "fr": "{n} stratégies",
-  "de": "{n} Strategien",
-  "zh": "{n} 个策略",
-  "ar": "{n} استراتيجيات",
-  "hi": "{n} रणनीतियाँ"
+  "es": {
+   "one": "{n} estrategia",
+   "other": "{n} estrategias"
+  },
+  "en": {
+   "one": "{n} strategy",
+   "other": "{n} strategies"
+  },
+  "pt": {
+   "one": "{n} estratégia",
+   "other": "{n} estratégias"
+  },
+  "fr": {
+   "one": "{n} stratégie",
+   "other": "{n} stratégies"
+  },
+  "de": {
+   "one": "{n} Strategie",
+   "other": "{n} Strategien"
+  },
+  "zh": {
+   "other": "{n} 个策略"
+  },
+  "ar": {
+   "zero": "لا توجد استراتيجيات",
+   "one": "استراتيجية واحدة",
+   "two": "استراتيجيتان",
+   "few": "{n} استراتيجيات",
+   "many": "{n} استراتيجية",
+   "other": "{n} استراتيجية"
+  },
+  "hi": {
+   "one": "{n} रणनीति",
+   "other": "{n} रणनीतियाँ"
+  }
  },
  "saveP": {
   "es": "Ahorra un {p}",
@@ -1081,14 +1108,41 @@
   "hi": "{date} को मुफ़्त डाउनलोड"
  },
  "linkValid": {
-  "es": "Enlace válido {n} días más",
-  "en": "Link valid {n} more days",
-  "pt": "Ligação válida mais {n} dias",
-  "fr": "Lien valable encore {n} jours",
-  "de": "Link noch {n} Tage gültig",
-  "zh": "链接还剩 {n} 天有效",
-  "ar": "الرابط صالح {n} أيام أخرى",
-  "hi": "लिंक {n} दिन और चलेगा"
+  "es": {
+   "one": "Enlace válido {n} día más",
+   "other": "Enlace válido {n} días más"
+  },
+  "en": {
+   "one": "Link valid {n} more day",
+   "other": "Link valid {n} more days"
+  },
+  "pt": {
+   "one": "Ligação válida mais {n} dia",
+   "other": "Ligação válida mais {n} dias"
+  },
+  "fr": {
+   "one": "Lien valable encore {n} jour",
+   "other": "Lien valable encore {n} jours"
+  },
+  "de": {
+   "one": "Link noch {n} Tag gültig",
+   "other": "Link noch {n} Tage gültig"
+  },
+  "zh": {
+   "other": "链接还剩 {n} 天有效"
+  },
+  "ar": {
+   "zero": "الرابط صالح لأقل من يوم",
+   "one": "الرابط صالح ليوم واحد آخر",
+   "two": "الرابط صالح ليومين آخرين",
+   "few": "الرابط صالح {n} أيام أخرى",
+   "many": "الرابط صالح {n} يومًا آخر",
+   "other": "الرابط صالح {n} يوم آخر"
+  },
+  "hi": {
+   "one": "लिंक {n} दिन और चलेगा",
+   "other": "लिंक {n} दिन और चलेगा"
+  }
  },
  "linkExpired": {
   "es": "El enlace caducó",

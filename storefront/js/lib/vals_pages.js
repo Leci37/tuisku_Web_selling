@@ -6,23 +6,24 @@ const LEGAL = { legalPrivacyUrl: '/legal/privacidad', legalCookiesUrl: '/legal/c
 
 export function pageVals(c) {
   const { app, s, t, tx, f } = c;
-  const base = ((s.cfg && s.cfg.legal_base_url) || 'https://tuisku.eu').replace(/\/+$/, '');
+  // the legal pages and the contact address are the server's settings: no link until /api/config is in
+  const base = ((s.cfg && s.cfg.legal_base_url) || '').replace(/\/+$/, '');
   const legal = {};
-  Object.keys(LEGAL).forEach(k => { legal[k] = base + LEGAL[k]; });
+  if (base) Object.keys(LEGAL).forEach(k => { legal[k] = base + LEGAL[k]; });
   const TS = s.tourStep;
   const closeTour = () => app.closeTour();
   // above the Lite cart bar when it shows, so the toast never hides the total or Checkout
   const errBottom = (s.vw < 640 ? 76 : 16) + (s.page === 'shop' && s.mode !== 'pro' && (s.cart.length + s.bundles.length > 0) ? 84 : 0);
   return {
     ...detailVals(c), ...compareVals(c), ...mineVals(c), ...thanksVals(c), ...installVals(c), ...freeVals(c),
-    ...legal, contactUrl: c.contact ? 'mailto:' + c.contact : '',
+    ...legal, legalOn: !!base, contactOn: !!c.contact, contactUrl: c.contact ? 'mailto:' + c.contact : '',
     errOpen: !!s.error, errTitle: tx.errServer, closeErr: () => app.setState({ error: '' }),
-    errText: t(s.error) + (s.error === 'errPayment' || s.error === 'errLater' ? ' ' + t('contactProblems', { e: s.cfg?.contact_email || 'sales@tuisku.eu' }) : ''),
+    errText: t(s.error) + ((s.error === 'errPayment' || s.error === 'errLater') && c.contact ? ' ' + t('contactProblems', { e: c.contact }) : ''),
     errBottom: errBottom + 'px',
     cmpBottom: (s.vw < 640 ? 76 : 16) + 'px',
     // a short notice (the news opt-in confirmed or its link expired): the toast's look, not an error;
-    // over the error toast when both show
-    ...noticeVals(c, errBottom + (s.error ? 76 : 0)),
+    // it waits while an error toast shows, in the same place
+    ...noticeVals(c, errBottom),
     navItems: [
       ['shop', t('navShop'), 'fa-solid fa-house', () => app.go({ page: 'shop' })],
       ['search', t('searchSmall'), 'fa-solid fa-magnifying-glass', () => app.focusSearch()],
@@ -39,6 +40,8 @@ export function pageVals(c) {
     tourBack: () => app.setState({ tourStep: Math.max(0, TS - 1) }),
     closeTour, openTour: () => app.setState({ tourStep: 0, langOpen: false }),
     tourDots: [0, 1, 2].map(i => ({ w: i === TS ? '22px' : '8px', bg: i === TS ? '#0950e3' : '#cfd8e3' })),
+    // step 3's PayPal → .pine → TradingView reads the other way in Arabic
+    arrowFwd: c.rtl ? 'fa-solid fa-arrow-left' : 'fa-solid fa-arrow-right',
     tourIcons: ['AAPL', 'NVDA', 'AMZN', 'ADBE', 'BTC+USDT', 'ETH+USDT'].map(k => ({ src: '/assets/icons/' + k + '_big.svg' })),
     tourPD: e => app.swDown(e), tourPU: e => app.swUp(e, 'tourStep')
   };
@@ -52,7 +55,7 @@ const NOTICES = {
 function noticeVals(c, bottom) {
   const { app, s, t } = c;
   const n = NOTICES[s.notice];
-  if (!n) return { noticeOpen: false };
+  if (!n || s.error) return { noticeOpen: false };
   return {
     noticeOpen: true, noticeIcon: n[0], noticeColor: n[1],
     noticeTitle: t(s.notice + 'Title'), noticeText: t(s.notice + 'Text'), noticeBottom: bottom + 'px',
@@ -107,7 +110,8 @@ function detailVals(c) {
     detTf: t('tfNote', { tf: r.interval }),
     liveNote: r.live == null ? tx.liveUnknown : r.live_as_of ? t('liveAsOf', { date: f.fmtDate(r.live_as_of) }) : '',
     versions: versions.map((x, i) => ({
-      title: 'v' + x.v + (x.date ? ' · ' + f.fmtDate(x.date) : ''), note: x.note || (x.v === 1 ? tx.v1note : ''),
+      // the date isolated (FSI…PDI): in Arabic "27/09/2024" would otherwise mix with "v1 · "
+      title: 'v' + x.v + (x.date ? ' · \u2068' + f.fmtDate(x.date) + '\u2069' : ''), note: x.note || (x.v === 1 ? tx.v1note : ''),
       dot: i === 0 ? '#0950e3' : '#cfd8e3', update: i === 0 && x.v > 1
     })),
     detMetrics: [
@@ -165,7 +169,7 @@ function mineVals(c) {
       when: t(it.kind === 'free' ? 'freeOn' : 'boughtOn', { date: f.fmtDate(it.date) }), order: it.order ? t('orderN', { id: it.order }) : '',
       valid: it.valid, expired: !it.valid, pineUrl: it.url, zipUrl: it.zip,
       hasUpdate: !!it.update, updateLabel: 'v' + it.update, getUpdate: () => app.renew(it.id),
-      status: it.valid ? t('linkValid', { n: f.int(it.days_left) }) : t('linkExpired'),
+      status: it.valid ? t('linkValid', { n: f.int(it.days_left) }, it.days_left) : t('linkExpired'),
       stBg: it.valid ? '#e8f7ef' : '#f1f4f8', stColor: it.valid ? '#15603c' : '#5a6b80',
       renew: () => app.renew(it.id) })),
     favEmpty: s.favs.length === 0,

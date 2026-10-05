@@ -11,7 +11,7 @@ export default function Lite(v) {
         </div>
       </div>
     <section style="position:relative;overflow:hidden;background:#fff;border-bottom:1px solid #e2e9f0">${' '}
-      <img src="/assets/charts/AMZN_1Day_1BOL_9d10c25f_candel.png" alt="" decoding="async" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.2;mask-image:linear-gradient(${s(v.g90)},transparent 15%,#000 75%)" />${' '}
+      <img src="/img/hero_candle.png" alt="" decoding="async" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.2;mask-image:linear-gradient(${s(v.g90)},transparent 15%,#000 75%)" />${' '}
       <div style="position:relative;max-width:1320px;margin:0 auto;padding:44px 28px 28px;display:flex;flex-direction:column;gap:14px">
         <h1 style="margin:0;font-size:40px;font-weight:700;letter-spacing:-.6px;line-height:1.1;max-width:640px;text-wrap:balance">${v.tx?.liteTitle}</h1>
         <p style="margin:0;font-size:16px;color:#5a6b80;max-width:540px;text-wrap:pretty">${v.tx?.liteSub}</p>
@@ -48,7 +48,7 @@ export default function Lite(v) {
           <div class="sf-hover2" style="position:relative;background:#fff;border:1px solid #e2e9f0;border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:12px">
             <div style="display:flex;align-items:center;gap:10px">
               <span role="img" aria-hidden="true" style="width:36px;height:36px;border-radius:10px;flex-shrink:0;display:inline-block;flex-shrink:0;background-image:url('${s(r?.icon)}');background-size:cover;background-position:center"></span>
-              <div style="min-width:0;flex:1;line-height:1.25"><div onClick=${r?.onOpen} style="font-weight:700;font-size:16px;cursor:pointer">${r?.ticker}</div><div style="font-size:12px;color:#5a6b80;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r?.name}</div></div>
+              <div style="min-width:0;flex:1;line-height:1.25"><div onClick=${r?.onOpen} style="font-weight:700;font-size:16px;cursor:pointer">${r?.ticker}</div><div dir="auto" style="font-size:12px;color:#5a6b80;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r?.name}</div></div>
               <button onClick=${r?.tipNpp} title=${v.tx?.npPct} style="font-family:inherit;border:none;cursor:pointer;font-size:15px;font-weight:700;color:#15803d;background:#e8f7ef;border-radius:8px;padding:4px 8px;white-space:nowrap;font-variant-numeric:tabular-nums;display:inline-flex;align-items:center;gap:5px">${T(r?.nppSigned)}<i class="fa-regular fa-circle-question" style="font-size:11px"></i></button>
               </div>
             <div onClick=${r?.onOpen} title=${v.tx?.openPage} style="position:relative;aspect-ratio:1466/260;border-radius:12px;overflow:hidden;border:1px solid #e2e9f0;background:#fff;cursor:pointer"><span style="position:absolute;top:6px;inset-inline-start:6px;font-size:10.5px;font-weight:700;background:rgba(255,255,255,.94);color:#5a6b80;border:1px solid #e2e9f0;border-radius:6px;padding:1px 6px;display:inline-flex;align-items:center;gap:4px"><i class="fa-solid fa-triangle-exclamation" style="color:#f79009;font-size:9px"></i>${T(v.tx?.colBacktest)}</span><img loading="lazy" decoding="async" src=${r?.profit} alt="" style="width:100%;height:100%;object-fit:cover;object-position:50% 82%;display:block" /></div>

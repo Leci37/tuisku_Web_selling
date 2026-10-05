@@ -54,7 +54,7 @@ function proVals(c, seg) {
       bars: cnt.map((n, i) => {
         const mid = (i + 0.5) / hl, inR = mid >= a && mid <= b, small = n > 0 && n / mx < 0.15;
         return { h: n <= 0 ? '0px' : Math.max(4, Math.round(n / mx * 40)) + 'px', op: inR ? '1' : '.25',
-          bg: small ? '#0950e3' : 'linear-gradient(180deg,#47f9e5,#0950e3)', tip: t('nStrategies', { n: f.int(n) }) };
+          bg: small ? '#0950e3' : 'linear-gradient(180deg,#47f9e5,#0950e3)', tip: t('nStrategies', { n: f.int(n) }, n) };
       }),
       onDown: e => {
         const el = e.currentTarget, rect = el.getBoundingClientRect();

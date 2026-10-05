@@ -23,10 +23,10 @@ export default function Thanks(v) {
         ${(v.orderRows || []).map((o, $index) => html`
           <div style="display:flex;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid #e2e9f0;flex-wrap:wrap">
             <span role="img" aria-hidden="true" style="width:32px;height:32px;border-radius:8px;display:inline-block;flex-shrink:0;background-image:url('${s(o?.icon)}');background-size:cover;background-position:center"></span>
-            <div style="flex:1 1 240px;min-width:0;line-height:1.3"><div style="font-weight:700">${T(o?.name)} · ${T(o?.ticker)}</div><div style="font-size:12px;color:#5a6b80;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${T(o?.key)} · ${T(o?.ind)} · ${T(o?.interval)}</div></div>
+            <div style="flex:1 1 240px;min-width:0;line-height:1.3"><div style="font-weight:700">${T(o?.name)} · ${T(o?.ticker)}</div><div dir="auto" style="font-size:12px;color:#5a6b80;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${T(o?.key)} · ${T(o?.ind)} · ${T(o?.interval)}</div></div>
             <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
-              <a href=${o?.pineUrl} style="font-family:inherit;line-height:normal;background:#fff;border:1px solid #e2e9f0;color:#16263a;font-weight:600;border-radius:10px;padding:8px 14px;font-size:13px;cursor:pointer;display:inline-flex;gap:7px;align-items:center;text-decoration:none"><i class="fa-solid fa-file-code" style="color:#0950e3"></i>.pine</a>
-              <a href=${o?.zipUrl} title=${v.tyZip} style="font-family:inherit;line-height:normal;background:#fff;border:1px solid #e2e9f0;color:#16263a;font-weight:600;border-radius:10px;padding:8px 14px;font-size:13px;cursor:pointer;display:inline-flex;gap:7px;align-items:center;text-decoration:none"><i class="fa-solid fa-file-zipper" style="color:#0950e3"></i>.zip</a>
+              <a href=${o?.pineUrl} style="font-family:inherit;line-height:normal;background:#fff;border:1px solid #e2e9f0;color:#16263a;font-weight:600;border-radius:10px;padding:8px 14px;font-size:13px;cursor:pointer;display:inline-flex;gap:7px;align-items:center;text-decoration:none"><i class="fa-solid fa-file-code" style="color:#0950e3"></i><span dir="ltr">.pine</span></a>
+              <a href=${o?.zipUrl} title=${v.tyZip} style="font-family:inherit;line-height:normal;background:#fff;border:1px solid #e2e9f0;color:#16263a;font-weight:600;border-radius:10px;padding:8px 14px;font-size:13px;cursor:pointer;display:inline-flex;gap:7px;align-items:center;text-decoration:none"><i class="fa-solid fa-file-zipper" style="color:#0950e3"></i><span dir="ltr">.zip</span></a>
               <a class="sf-hover8" href=${o?.tabHref} target="_blank" rel="noopener" title=${v.tyNewTab} style="border-radius:999px;padding:6px 11px;font-size:12px;font-weight:700;display:inline-flex;gap:5px;align-items:center;white-space:nowrap;text-decoration:none;border:1px solid #c5d6f8;background:#e9f0fd;color:#0950e3"><i class="fa-regular fa-file-lines"></i>${T(v.tx?.overviewTab)}<i class="fa-solid fa-arrow-up-right-from-square" style="font-size:9px"></i></a>
               <a class="sf-hover9" href=${o?.treeHref} target="_blank" rel="noopener" title=${v.tyNewTab} style="border-radius:999px;padding:6px 11px;font-size:12px;font-weight:700;display:inline-flex;gap:5px;align-items:center;white-space:nowrap;text-decoration:none;border:1px solid #b5e0ea;background:#e3f4f8;color:#0e7c98"><i class="fa-solid fa-sitemap"></i>${T(v.tx?.howItDecides)}<i class="fa-solid fa-arrow-up-right-from-square" style="font-size:9px"></i></a>
               </div>
@@ -43,7 +43,7 @@ export default function Thanks(v) {
           </ol>
         </div>
       <div style="display:flex;gap:10px;flex-wrap:wrap"><button onClick=${v.goMine} style="font-family:inherit;background:linear-gradient(135deg,#0950e3,#0e7c98);border:none;color:#fff;font-weight:700;border-radius:12px;padding:12px 22px;font-size:14.5px;cursor:pointer;box-shadow:0 8px 20px rgba(9,80,227,.22)">${v.tx?.goMine}</button><button onClick=${v.goShop} style="font-family:inherit;background:#fff;border:1px solid #e2e9f0;color:#16263a;font-weight:600;border-radius:12px;padding:11px 20px;font-size:14px;cursor:pointer">${v.tx?.backShop}</button></div>
-      <p style="margin:0;font-size:12.5px;color:#5a6b80">${v.tx?.contactProblems}</p>
+      ${v.contactOn ? html`<p style="margin:0;font-size:12.5px;color:#5a6b80">${v.tx?.contactProblems}</p>` : null}
       </main>
     ` : null}
 `;

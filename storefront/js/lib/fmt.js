@@ -7,12 +7,15 @@ export const LOCAL_CURRENCY = { es: 'EUR', pt: 'EUR', fr: 'EUR', de: 'EUR', hi: 
 const DASH = '—';
 const bad = n => n == null || (typeof n === 'number' && isNaN(n));
 
-// t(key, vars) exactly as the design: tool dictionary first, then the core's; plural objects use .other.
+// t(key, vars, count) as the design: tool dictionary first, then the core's. An entry with plural
+// forms ({one, other}; Arabic also zero, two, few, many) takes the form the language's rules give for
+// count (Intl.PluralRules), else .other: "1 strategy", "2 strategies".
 export function translator(dict, common, lang) {
-  return (key, vars) => {
+  const plural = new Intl.PluralRules(LOCALES[lang] || 'en-US');
+  return (key, vars, count) => {
     const e = dict[key] || common[key];
     let v = e ? (e[lang] ?? e.es ?? e.en ?? '') : '';
-    if (typeof v === 'object') v = v.other || '';
+    if (v && typeof v === 'object') v = (count != null && v[plural.select(count)]) || v.other || '';
     if (vars) Object.keys(vars).forEach(k => { v = v.split('{' + k + '}').join(vars[k]); });
     return v;
   };
