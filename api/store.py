@@ -70,7 +70,15 @@ CREATE TABLE IF NOT EXISTS favourites (
     item_key TEXT NOT NULL,
     alerts   TEXT NOT NULL DEFAULT '{}',
     created  REAL NOT NULL,
+    lang     TEXT NOT NULL DEFAULT 'en',   -- the language of its alert emails
     PRIMARY KEY (email, item_key)
+);
+CREATE TABLE IF NOT EXISTS alert_state (
+    item_key TEXT PRIMARY KEY,    -- what each strategy looked like at the last alert run
+    version  INTEGER NOT NULL,
+    price    TEXT NOT NULL,
+    bundles  TEXT NOT NULL,       -- JSON list of the bundle keys it is in
+    updated  REAL NOT NULL
 );
 CREATE TABLE IF NOT EXISTS outbox (
     id      INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -92,6 +100,7 @@ MIGRATIONS = (
     # rows from before the double opt-in stay unconfirmed: they never clicked a confirmation link
     ("subscribers", "token_hash", "TEXT NOT NULL DEFAULT ''"),
     ("subscribers", "confirmed_at", "REAL"),
+    ("favourites", "lang", "TEXT NOT NULL DEFAULT 'en'"),   # the language of its alert emails
 )
 
 DAY = 86400
@@ -342,9 +351,27 @@ class Store:
         return [dict(r, alerts=json.loads(r["alerts"])) for r in self.db.execute(
             "SELECT item_key, alerts, created FROM favourites WHERE email=? ORDER BY created", (norm(email),))]
 
-    def set_favourite(self, email: str, key: str, alerts: dict):
-        self._write("INSERT INTO favourites VALUES (?,?,?,?) ON CONFLICT(email, item_key) DO UPDATE SET "
-                    "alerts=excluded.alerts", (norm(email), key, json.dumps(alerts), time.time()))
+    def set_favourite(self, email: str, key: str, alerts: dict, lang: str = "en"):
+        self._write("INSERT INTO favourites (email, item_key, alerts, created, lang) VALUES (?,?,?,?,?) "
+                    "ON CONFLICT(email, item_key) DO UPDATE SET alerts=excluded.alerts, lang=excluded.lang",
+                    (norm(email), key, json.dumps(alerts), time.time(), lang))
+
+    def alert_subscriptions(self) -> list:
+        """Every favourite with at least one alert switched on: {email, item_key, alerts, lang}."""
+        rows = self.db.execute("SELECT email, item_key, alerts, lang FROM favourites ORDER BY email, created")
+        out = [dict(r, alerts=json.loads(r["alerts"])) for r in rows]
+        return [r for r in out if any(r["alerts"].values())]
+
+    def alert_state(self) -> dict:
+        return {r["item_key"]: {"version": r["version"], "price": r["price"], "bundles": json.loads(r["bundles"])}
+                for r in self.db.execute("SELECT * FROM alert_state")}
+
+    def save_alert_state(self, state: dict):
+        now = time.time()
+        with self.lock, self.db:
+            self.db.execute("DELETE FROM alert_state")
+            self.db.executemany("INSERT INTO alert_state VALUES (?,?,?,?,?)",
+                                [(k, v["version"], v["price"], json.dumps(v["bundles"]), now) for k, v in state.items()])
 
     def delete_favourite(self, email: str, key: str):
         self._write("DELETE FROM favourites WHERE email=? AND item_key=?", (norm(email), key))

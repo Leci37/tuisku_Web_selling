@@ -168,7 +168,8 @@ new columns in place, nothing to run by hand. Back it up with the rest of `priva
 | `subscribers` | news opt-ins: only addresses that ticked the box and confirmed it from the email |
 | `login_tokens` | emailed sign-in links (SHA-256 of the token only), single use, 15 minutes |
 | `sessions` | signed-in browsers (SHA-256 of the cookie only) |
-| `favourites` | favourites per email, with the alert opt-ins (new version, price drop, in a bundle) |
+| `favourites` | favourites per email, with the alert opt-ins (new version, price drop, in a bundle) and the language of their emails |
+| `alert_state` | what each strategy looked like at the last alert run (version, price, bundles), so a change is emailed once |
 | `outbox` | every email the shop wrote, with its status (`console`, `sent`, `failed`) |
 
 To look inside: `sqlite3 private/shop.db '.tables'`, or `python tools/outbox.py` for the emails.
@@ -219,7 +220,8 @@ api/          FastAPI: search, pricing, orders + capture + PayPal, downloads + f
               free downloads, My strategies, mail, thumbnails, SQLite
 catalogue/    catalogue.csv, indicators.csv, bundles.json, fx.json; publish.py and previews.py
 tests/        prices, bundles, filters, payments, links, accounts, formats, what must stay private
-tools/        screenshots.py (the walk in a browser), outbox.py, update_fx.py, sync_core_i18n.py
+tools/        screenshots.py (the walk in a browser), send_alerts.py, update_fx.py, outbox.py,
+              sync_core_i18n.py
 docs/         IMPLEMENTATION-v7.md (the design spec), catalogue-updates.md, design/ (the reference
               design: python docs/design/serve.py opens it), img/, notes/
 ```
@@ -239,6 +241,14 @@ disk that is not served and kept between deploys. `--proxy-headers` lets the ser
 address (for the per-address limits on sign-in and free downloads) and https behind the proxy. Try
 `PAYPAL_MODE=sandbox` with sandbox credentials first; with `live`, the first real purchase is the test.
 
+Two daily jobs, with the same environment as the server (cron, or the host's scheduler):
+
+```bash
+python tools/send_alerts.py   # favourites' alerts: one email per person for a new version, a price drop
+                              # or a new bundle since the previous run (the first run only records)
+python tools/update_fx.py     # exchange rates from the ECB for the local-currency prices
+```
+
 ## Before selling again
 
 The strategies were generated on 2024-10-18 and carry a "recommended expiry" of 2025-06-18. A review of
@@ -247,9 +257,10 @@ TradingView than in the Python that trained them, and that the Ichimoku family u
 training. Regenerate the catalogue with those fixed before relaunching.
 
 Also not built yet, because they need data or jobs the shop does not have: the daily job that measures
-each strategy since its release (`since_release.csv`), versions and update notices beyond v1, the emails
-for favourites' alerts (the opt-ins are stored), and descriptions for the indicator values the tree view
-does not know yet (`storefront/trees/features.json` covers the most common ones).
+each strategy since its release (`since_release.csv`), versions and update notices beyond v1 (the page and
+the alert emails show them once the catalogue has a `version` column above 1), and descriptions for the
+indicator values the tree view does not know yet (`storefront/trees/features.json` covers the most common
+ones).
 
 ## What changed in the Edgefolio redesign
 

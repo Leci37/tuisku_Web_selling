@@ -2313,5 +2313,55 @@
   "zh": "你申请了在有新策略时收到通知。请点击此链接确认（确认之前我们不会给你发送任何邮件）：\n{link}\n如果不是你本人操作，请忽略。\n",
   "ar": "طلبت أن نُعلمك بالاستراتيجيات الجديدة. أكّد ذلك عبر هذا الرابط (لن نرسل إليك شيئًا قبل التأكيد):\n{link}\nإذا لم تكن أنت من طلب ذلك، فتجاهله.\n",
   "hi": "आपने नई रणनीतियों की जानकारी पाने का अनुरोध किया है। इस लिंक से इसकी पुष्टि करें (पुष्टि होने तक हम आपको कुछ नहीं भेजेंगे):\n{link}\nअगर यह अनुरोध आपने नहीं किया था, तो इसे अनदेखा करें।\n"
+ },
+ "mailAlertSubject": {
+  "es": "Edgefolio: novedades de tus estrategias favoritas",
+  "en": "Edgefolio: news about your favourite strategies",
+  "pt": "Edgefolio: novidades das tuas estratégias favoritas",
+  "fr": "Edgefolio : du nouveau sur vos stratégies favorites",
+  "de": "Edgefolio: Neues zu deinen Lieblingsstrategien",
+  "zh": "Edgefolio：你收藏的策略有新动态",
+  "ar": "Edgefolio: مستجدات استراتيجياتك المفضلة",
+  "hi": "Edgefolio: आपकी पसंदीदा रणनीतियों के बारे में नई जानकारी"
+ },
+ "mailAlertBody": {
+  "es": "Hay novedades en estrategias que sigues en Edgefolio:\n\n{lines}\n\nVelas, y cambia o quita estos avisos, en Mis estrategias: {mine}\n",
+  "en": "There is news about strategies you follow on Edgefolio:\n\n{lines}\n\nSee them, and change or switch off these alerts, in My strategies: {mine}\n",
+  "pt": "Há novidades em estratégias que segues no Edgefolio:\n\n{lines}\n\nVê-as, e altera ou desliga estes avisos, em As minhas estratégias: {mine}\n",
+  "fr": "Il y a du nouveau sur des stratégies que vous suivez sur Edgefolio :\n\n{lines}\n\nRetrouvez-les, et modifiez ou coupez ces alertes, dans Mes stratégies : {mine}\n",
+  "de": "Es gibt Neues zu Strategien, denen du auf Edgefolio folgst:\n\n{lines}\n\nSieh sie dir an und ändere oder beende diese Benachrichtigungen unter Meine Strategien: {mine}\n",
+  "zh": "你在 Edgefolio 关注的策略有新动态：\n\n{lines}\n\n在“我的策略”中查看，并可修改或关闭这些提醒：{mine}\n",
+  "ar": "هناك مستجدات في استراتيجيات تتابعها على Edgefolio:\n\n{lines}\n\nاطّلع عليها، وغيّر هذه التنبيهات أو أوقفها، في استراتيجياتي: {mine}\n",
+  "hi": "Edgefolio पर आप जिन रणनीतियों को फ़ॉलो करते हैं, उनके बारे में नई जानकारी है:\n\n{lines}\n\nइन्हें देखें, और इन अलर्ट को बदलें या बंद करें, मेरी रणनीतियाँ में: {mine}\n"
+ },
+ "mailAlertNew": {
+  "es": "{name} ({ticker} · {code}): versión nueva, v{version}. {url}",
+  "en": "{name} ({ticker} · {code}): a new version, v{version}. {url}",
+  "pt": "{name} ({ticker} · {code}): nova versão, v{version}. {url}",
+  "fr": "{name} ({ticker} · {code}) : nouvelle version, v{version}. {url}",
+  "de": "{name} ({ticker} · {code}): neue Version, v{version}. {url}",
+  "zh": "{name}（{ticker} · {code}）：新版本 v{version}。{url}",
+  "ar": "{name} ({ticker} · {code}): إصدار جديد، v{version}. {url}",
+  "hi": "{name} ({ticker} · {code}): नया वर्ज़न, v{version}. {url}"
+ },
+ "mailAlertPrice": {
+  "es": "{name} ({ticker} · {code}): ahora {price}, antes {was}. {url}",
+  "en": "{name} ({ticker} · {code}): now {price}, was {was}. {url}",
+  "pt": "{name} ({ticker} · {code}): agora {price}, antes {was}. {url}",
+  "fr": "{name} ({ticker} · {code}) : désormais {price}, au lieu de {was}. {url}",
+  "de": "{name} ({ticker} · {code}): jetzt {price}, vorher {was}. {url}",
+  "zh": "{name}（{ticker} · {code}）：现价 {price}，原价 {was}。{url}",
+  "ar": "{name} ({ticker} · {code}): الآن {price} بعد أن كان {was}. {url}",
+  "hi": "{name} ({ticker} · {code}): अब {price}, पहले {was}. {url}"
+ },
+ "mailAlertBundle": {
+  "es": "{name} ({ticker} · {code}): ahora está en el pack «{bundle}», {price} por {n} estrategias. {url}",
+  "en": "{name} ({ticker} · {code}): now in the bundle “{bundle}”, {price} for {n} strategies. {url}",
+  "pt": "{name} ({ticker} · {code}): agora está no pacote «{bundle}», {price} por {n} estratégias. {url}",
+  "fr": "{name} ({ticker} · {code}) : désormais dans le pack « {bundle} », {price} pour {n} stratégies. {url}",
+  "de": "{name} ({ticker} · {code}): jetzt im Paket „{bundle}“, {price} für {n} Strategien. {url}",
+  "zh": "{name}（{ticker} · {code}）：现已加入组合包“{bundle}”，{n} 个策略共 {price}。{url}",
+  "ar": "{name} ({ticker} · {code}): أصبحت ضمن باقة «{bundle}»، {price} مقابل {n} استراتيجيات. {url}",
+  "hi": "{name} ({ticker} · {code}): अब बंडल “{bundle}” में है, {n} रणनीतियाँ {price} में। {url}"
  }
 }

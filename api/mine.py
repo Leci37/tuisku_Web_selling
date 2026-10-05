@@ -13,6 +13,7 @@ from fastapi.responses import PlainTextResponse
 from pydantic import BaseModel, Field
 
 from api.auth import require_email
+from api.web import language
 
 router = APIRouter()
 
@@ -111,13 +112,14 @@ class Alerts(BaseModel):
 
 class Favourite(BaseModel):
     alerts: Alerts = Alerts()
+    lang: str = Field("en", max_length=16)  # the language its alert emails are written in
 
 
 @router.put("/api/favourites/{item_id}")
 def put_favourite(item_id: str, request: Request, body: Favourite = Favourite()):
     email = require_email(request)
     s = strategy_or_404(request, item_id)
-    request.app.state.store.set_favourite(email, s.key, body.alerts.model_dump())
+    request.app.state.store.set_favourite(email, s.key, body.alerts.model_dump(), language(body.lang))
     return {"id": s.id, "alerts": body.alerts.model_dump(), "row": s.as_row()}
 
 

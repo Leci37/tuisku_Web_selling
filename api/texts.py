@@ -5,7 +5,8 @@ import json
 import re
 from pathlib import Path
 
-MAIL_KEYS = ("mailSignInSubject", "mailSignInBody", "mailFreeSubject", "mailFreeBody", "mailNewsConfirm")
+MAIL_KEYS = ("mailSignInSubject", "mailSignInBody", "mailFreeSubject", "mailFreeBody", "mailNewsConfirm",
+             "mailAlertSubject", "mailAlertBody", "mailAlertNew", "mailAlertPrice", "mailAlertBundle")
 PLACEHOLDER = re.compile(r"\{(\w+)\}")
 
 

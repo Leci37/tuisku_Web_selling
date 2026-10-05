@@ -401,7 +401,7 @@ export class App extends Component {
   afterSignIn() {
     const local = readJSON(FAVS_KEY, {}), favs = list(local.favs), alerts = local.alerts || {};
     this.uploading = true;
-    Promise.all(favs.map(id => api('/api/favourites/' + encodeURIComponent(id), { method: 'PUT', body: { alerts: alerts[id] || {} } })
+    Promise.all(favs.map(id => api('/api/favourites/' + encodeURIComponent(id), { method: 'PUT', body: { alerts: alerts[id] || {}, lang: this.state.lang } })
       .then(() => null, e => ({ id, e }))))
       .then(res => {
         const failed = res.filter(Boolean), left = failed.map(x => x.id);
@@ -439,7 +439,7 @@ export class App extends Component {
   saveFav(id, alerts) {
     if (!this.signedIn()) return;
     const url = '/api/favourites/' + encodeURIComponent(id);
-    (alerts ? api(url, { method: 'PUT', body: { alerts } }) : api(url, { method: 'DELETE' })).catch(e => this.fail(e));
+    (alerts ? api(url, { method: 'PUT', body: { alerts, lang: this.state.lang } }) : api(url, { method: 'DELETE' })).catch(e => this.fail(e));
   }
 
   toggleFav(id) {
