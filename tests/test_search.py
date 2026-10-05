@@ -1,15 +1,15 @@
-"""The catalogue API: filters, sorting, paging and the Pro panel's counts, checked against the real
-catalogue by recounting its rows in plain Python."""
+# -*- coding: utf-8 -*-
+"""La API del catálogo: filtros, orden, páginas y los recuentos del panel Pro, comprobados contra el
+catálogo de verdad contando sus filas en Python a secas."""
 import math
 import time
 
 import pytest
-from fastapi.testclient import TestClient
 
-from api.app import create_app
-from api.catalogue import Catalogue
-from api.search import RANGES
-from api.settings import ROOT
+from edgefolio.catalogue import Catalogue
+from edgefolio.search import RANGES
+from edgefolio.settings import ROOT
+from edgefolio.shop import install
 from tests.conftest import ROWS, TODAY, cart_id, strategy_id
 
 ROW_FIELDS = {"id", "ticker", "interval", "key", "hash", "name", "ind", "index", "market", "price", "np", "npp", "tr",
@@ -26,7 +26,7 @@ def rows():
 def get(client, query=""):
     r = client.get("/api/strategies?" + query)
     assert r.status_code == 200, r.text
-    return r.json()
+    return r.json
 
 
 def test_first_page(real_client, rows):
@@ -43,10 +43,10 @@ def test_row_fields(real_client):
     assert row["id"] == f"{row['ticker']}_{row['interval']}_{row['key']}_{row['hash']}"
     assert row["file"] == "Tuisku_" + row["id"] and row["tv_symbol"] == "NASDAQ:AAPL"
     for k in ("profit", "candle", "icon", "preview"):
-        assert row[k].startswith("/assets/") and (ROOT / "storefront" / row[k][1:]).is_file(), k
+        assert row[k].startswith("/static/assets/") and (ROOT / row[k][1:]).is_file(), k
     assert row["thumb_profit"] == f"/thumbs/{row['id']}_profit.webp"
     assert row["grade"] == ("A" if row["tr"] >= 300 else "B" if row["tr"] >= 100 else "C" if row["tr"] >= 30 else "D")
-    assert row["live"] is None, "no figure since release until the daily job writes one"
+    assert row["live"] is None, "sin cifra desde la publicación hasta que la escriba el trabajo diario"
 
 
 def test_crypto_symbol_and_missing_values(real_client, rows):
@@ -113,13 +113,13 @@ def test_paging(real_client):
     assert one["rows"][-1]["tr"] >= two["rows"][0]["tr"]
     assert get(real_client, "page=999")["rows"] == []
     r = real_client.get("/api/strategies?size=101")
-    assert r.status_code == 400 and r.json() == {"detail": {"error": "size is invalid"}}
+    assert r.status_code == 400 and r.json == {"error": "errRequest", "field": "size"}
 
 
 def test_bad_parameters(real_client):
     for query in ("sort=cheap", "tab=hidden", "np_min=lots", "win_max=nan"):
         r = real_client.get("/api/strategies?" + query)
-        assert r.status_code == 400 and "error" in r.json()["detail"], query
+        assert r.status_code == 400 and r.json["error"] == "errRequest", query
 
 
 def bin_of(value, key):
@@ -160,7 +160,7 @@ def test_options(real_client, rows):
     body = get(real_client, "facets=1&sym=AAPL&tf=1Hour")
     sym = {o["v"]: o for o in body["options"]["sym"]}
     assert len(sym) == len({r["ticker"] for r in rows}), "every value is listed, even with a count of 0"
-    assert sym["AAPL"]["label"] == "Apple (AAPL)" and sym["AAPL"]["icon"] == "/assets/icons/AAPL_big.svg"
+    assert sym["AAPL"]["label"] == "Apple (AAPL)" and sym["AAPL"]["icon"] == "/static/assets/icons/AAPL_big.svg"
     assert sym["MSFT"]["count"] == sum(r["ticker"] == "MSFT" and r["interval"] == "1Hour" for r in rows)
     tf = {o["v"]: o["count"] for o in body["options"]["tf"]}
     assert tf["1Day"] == sum(r["ticker"] == "AAPL" and r["interval"] == "1Day" for r in rows)
@@ -185,16 +185,17 @@ def timed(client, query):
 
 def test_one_strategy(client, real_client):
     s = ROWS[0]
-    by_id = client.get(f"/api/strategies/{strategy_id(s)}").json()
-    assert by_id == client.get(f"/api/strategies/{cart_id(s)}").json()
+    by_id = client.get(f"/api/strategies/{strategy_id(s)}").json
+    assert by_id == client.get(f"/api/strategies/{cart_id(s)}").json
     assert by_id["versions"] == [{"v": 1, "date": "2024-09-27", "note": ""}]
-    assert client.get("/api/strategies/NOPE_1Day_X_0").status_code == 404
-    detail = real_client.get("/api/strategies/AAPL_1Day_1C00_ac87f0dc").json()
+    assert client.get("/api/strategies/NOPE_1Day_X_0").json == {"error": "errUnknownStrategy"}
+    detail = real_client.get("/api/strategies/AAPL_1Day_1C00_ac87f0dc").json
     assert detail["ind_text"].startswith("The Chaikin") and detail["ind_url"].startswith("https://www.tradingview.com/")
 
 
-def test_since_release_when_the_daily_job_has_run(settings):
+def test_since_release_when_the_daily_job_has_run(app, client, settings, paypal):
     settings.since_release.write_text(f"id\tpct\tas_of\n{strategy_id(ROWS[0])}\t-3.25\t2026-10-04\n")
-    rows = {r["id"]: r for r in get(TestClient(create_app(settings)), "size=10")["rows"]}
+    install(app, settings, paypal)   # la tienda, arrancada otra vez
+    rows = {r["id"]: r for r in get(client, "size=10")["rows"]}
     assert rows[strategy_id(ROWS[0])]["live"] == -3.25 and rows[strategy_id(ROWS[0])]["live_as_of"] == "2026-10-04"
     assert rows[strategy_id(ROWS[1])]["live"] is None
