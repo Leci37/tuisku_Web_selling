@@ -21,6 +21,8 @@ export function pageVals(c) {
     errText: t(s.error) + ((s.error === 'errPayment' || s.error === 'errLater') && c.contact ? ' ' + t('contactProblems', { e: c.contact }) : ''),
     errBottom: errBottom + 'px',
     cmpBottom: (s.vw < 640 ? 76 : 16) + 'px',
+    // on a phone the bottom bar takes the last 60px: the floating cart sits above it, as the compare pill does
+    cartBarBottom: (s.vw < 640 ? 76 : 16) + 'px',
     // a short notice (the news opt-in confirmed or its link expired): the toast's look, not an error;
     // it waits while an error toast shows, in the same place
     ...noticeVals(c, errBottom),

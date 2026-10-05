@@ -370,12 +370,11 @@ export class App extends Component {
   // scanners open links too); the visitor's own click spends it.
   peekSignIn(token) {
     post('/api/auth/peek', { token }).then(r => {
+      if (!r.email) { this.setState({ signExpired: true, signToken: '', signAs: '' }); dropParams('signin'); return; }
       const me = this.state.me;
       if (me && me.email && r.email === me.email) { dropParams('signin'); return; } // already in, as that address
-      this.setState({ signToken: token, signAs: r.email || '', signExpired: false });
-    }).catch(e => {
-      if (e.status === 400) { this.setState({ signExpired: true, signToken: '', signAs: '' }); dropParams('signin'); } else this.fail(e);
-    });
+      this.setState({ signToken: token, signAs: r.email, signExpired: false });
+    }).catch(e => this.fail(e));
   }
 
   confirmSignIn() {

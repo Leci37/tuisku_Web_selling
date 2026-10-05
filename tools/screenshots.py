@@ -36,7 +36,8 @@ def step(name):
 
 def shot(page, name, height=None, full=False):
     """Load the lazy images first, then save the top `height` px (or the whole page)."""
-    page.evaluate("document.querySelectorAll('img[loading=lazy]').forEach(i => i.loading = 'eager')")
+    # from the top: the bar is sticky, and a full-page shot taken scrolled down draws it mid-page
+    page.evaluate("window.scrollTo(0, 0); document.querySelectorAll('img[loading=lazy]').forEach(i => i.loading = 'eager')")
     page.wait_for_load_state("networkidle")
     page.wait_for_timeout(700)
     path = OUT / f"edgefolio_{name}.png"

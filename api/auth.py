@@ -2,7 +2,8 @@
 emailed link nor another site sending a token can sign anybody in:
 
 1. POST /api/auth/login {email, lang} emails <PUBLIC_URL>/mine?signin=<token> (LOGIN_MINUTES, single use).
-2. That page asks whose link it is (POST /api/auth/peek {token} -> {email}; nothing is used up) and signs
+2. That page asks whose link it is (POST /api/auth/peek {token} -> {email}, null when it is used or
+   expired; nothing is used up) and signs
    in only when the person confirms: POST /api/auth/verify {token} -> {email} and the ef_session cookie.
    Both take a JSON body: a form on another site cannot send one (FastAPI answers 422 to anything else)
    and a cross-site fetch with it needs CORS, which the shop does not allow.
@@ -89,11 +90,11 @@ def login(body: Login, request: Request):
 
 @router.post("/api/auth/peek")
 def peek(body: SignInToken, request: Request):
-    """Whose sign-in link this is, so the page can ask "Sign in as ...?"; the link stays usable."""
+    """Whose sign-in link this is, so the page can ask "Sign in as ...?"; the link stays usable.
+    A used or unknown link is nobody's ({"email": null}), an answer rather than an error, so the page
+    that opens an old link has nothing to log."""
     email = request.app.state.store.peek_login_token(body.token) if body.token else None
-    if not email:
-        raise expired()
-    return {"email": email}
+    return {"email": email or None}
 
 
 @router.post("/api/auth/verify")

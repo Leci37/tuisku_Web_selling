@@ -56,9 +56,9 @@ def test_link_works_once(client):
     token = emailed_token(client)
     assert client.post("/api/auth/verify", json={"token": token}).json() == {"email": "ana@example.com"}
     client.cookies.clear()
-    for path in ("/api/auth/peek", "/api/auth/verify"):
-        again = client.post(path, json={"token": token})
-        assert again.status_code == 400 and again.json() == {"detail": {"error": "expired"}}, path
+    again = client.post("/api/auth/verify", json={"token": token})
+    assert again.status_code == 400 and again.json() == {"detail": {"error": "expired"}}
+    assert client.post("/api/auth/peek", json={"token": token}).json() == {"email": None}, "a used link is nobody's"
     assert client.get("/api/me").json() == {"email": None}
 
 
@@ -67,9 +67,9 @@ def test_expired_or_made_up_link(client, settings):
     client.post("/api/auth/login", json={"email": "ana@example.com"})
     token = emailed_token(client)
     for t in (token, "made-up", ""):
-        for path in ("/api/auth/peek", "/api/auth/verify"):
-            r = client.post(path, json={"token": t})
-            assert r.status_code == 400 and r.json()["detail"] == {"error": "expired"}, (path, t)
+        assert client.post("/api/auth/peek", json={"token": t}).json() == {"email": None}, t
+        r = client.post("/api/auth/verify", json={"token": t})
+        assert r.status_code == 400 and r.json()["detail"] == {"error": "expired"}, t
     assert "set-cookie" not in r.headers and client.get("/api/me").json() == {"email": None}
 
 

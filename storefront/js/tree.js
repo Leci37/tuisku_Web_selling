@@ -24,6 +24,8 @@ const TEXT = {
     unused: 'Not used in the visible part:', no: 'No', yes: 'Yes', visitor: 'Visitor', owner: 'Owner', tree1: 'Tree 1 of the forest',
     treeOf: 'Tree {n} of the forest',
     treeTab: 'Tree', rulesTab: 'Rules', buy: 'Buy', sell: 'Sell', none: 'No signal', paid: 'Paid part', path: 'Current path',
+    // a free strategy's hidden branches are in the full script, which is sent by email
+    fPaid: 'Full script', fPaid1: '1 branch in the full script', fPaidN: '{n} branches in the full script', fCta1: '1 branch of this tree is in the full script.', fCtaN: '{n} branches of this tree are in the full script.', fCtaRest: ' The strategy is free: ask for it by email to see the complete tree and download the .pine.', fLock: 'This branch is in the full script. The strategy is free: ask for it by email to see the complete tree and download the .pine.', fBtn: 'Get it free',
     unlockBtn: 'Buy to unlock', added: 'Added to the cart', download: 'Download .pine', signIn: 'Sign in',
     source: 'Source: the Pine script of each strategy, its free preview or, for owners, the complete script. Values and scores are exactly as written there.',
     statusPreview: 'preview', statusComplete: 'complete tree', visible: '{n} results visible', paid1: '1 branch in the paid part', paidN: '{n} branches in the paid part',
@@ -55,6 +57,8 @@ const TEXT = {
     unused: 'No se usan en la parte visible:', no: 'No', yes: 'Sí', visitor: 'Visitante', owner: 'Propietario', tree1: 'Árbol 1 del bosque',
     treeOf: 'Árbol {n} del bosque',
     treeTab: 'Árbol', rulesTab: 'Reglas', buy: 'Compra', sell: 'Venta', none: 'Sin señal', paid: 'Parte de pago', path: 'Camino actual',
+    // a free strategy's hidden branches are in the full script, which is sent by email
+    fPaid: 'Script completo', fPaid1: '1 rama en el script completo', fPaidN: '{n} ramas en el script completo', fCta1: '1 rama de este árbol está en el script completo.', fCtaN: '{n} ramas de este árbol están en el script completo.', fCtaRest: ' La estrategia es gratis: pídela por email para ver el árbol completo y descargar el .pine.', fLock: 'Esta rama está en el script completo. La estrategia es gratis: pídela por email para ver el árbol completo y descargar el .pine.', fBtn: 'Conseguirla gratis',
     unlockBtn: 'Comprar para desbloquear', added: 'Añadida al carrito', download: 'Descargar .pine', signIn: 'Entrar',
     source: 'Fuente: el script Pine de cada estrategia, su vista previa gratuita o, para quien la ha comprado, el script completo. Los valores y las puntuaciones son exactamente los que aparecen ahí.',
     statusPreview: 'vista previa', statusComplete: 'árbol completo', visible: '{n} resultados visibles', paid1: '1 rama en la parte de pago', paidN: '{n} ramas en la parte de pago',
@@ -83,6 +87,13 @@ const sharedData = () => shared || (shared = Promise.all([
 
 const text = (url, init) => fetch(url, init).then(r => { if (!r.ok) throw new Error(url + ' (' + r.status + ')'); return r.text(); });
 const rowId = P => (P.strategy && P.strategy.id) || '';
+
+// What the script does with a score. Every script of the catalogue (all 4,578 checked) buys at
+// op_operation >= 0.55 and closes at <= -0.9, the levels api/formats.py reads from the full script;
+// the factory's "// buy|sell" comments mark ±0.7 instead, so a leaf at +0.64 would read "Wait" while
+// the script buys on it. The preview never shows those lines, hence the constants.
+const BUY_AT = 0.55, CLOSE_AT = -0.9;
+const signalOf = v => (v >= BUY_AT ? 'buy' : v <= CLOSE_AT ? 'sell' : 'none');
 
 export class StrategyTree extends Component {
   state = { trees: null, full: null, fullFail: false, sel: 0, vals: {}, view: 'tree', err: '', vw: 1400, tip: null, owner: false, added: false, allRules: false };
@@ -178,7 +189,7 @@ export class StrategyTree extends Component {
       const L = lines[i];
       if (!L || L.ind !== ind) return stub(d);
       let m = L.text.match(reLeaf);
-      if (m) { i++; leaves++; return { id: id++, leaf: true, v: +m[1], sig: (m[2] || 'none').toLowerCase(), depth: d }; }
+      if (m) { i++; leaves++; return { id: id++, leaf: true, v: +m[1], sig: signalOf(+m[1]), mark: (m[2] || '').toLowerCase(), depth: d }; }
       m = L.text.match(reLe);
       if (!m) return stub(d);
       i++;
@@ -294,7 +305,9 @@ export class StrategyTree extends Component {
     const seg = on => on ? ['#ffffff', '#0950e3', '0 1px 3px rgba(22,38,58,.12)'] : ['transparent', '#5a6b80', 'none'];
     const [tBg, tColor, tShadow] = seg(s.view === 'tree'), [rBg, rColor, rShadow] = seg(s.view === 'rules');
     const [vBg, vColor, vShadow] = seg(!s.owner), [oBg, oColor, oShadow] = seg(s.owner);
-    const unlockLabel = s.added ? L.added : L.unlockBtn;
+    const free = !!(P.strategy && P.strategy.price === 0);
+    if (free) Object.assign(L, { paid: L.fPaid, paid1: L.fPaid1, paidN: L.fPaidN, cta1: L.fCta1, ctaN: L.fCtaN, ctaRest: L.fCtaRest, lockText: L.fLock });
+    const unlockLabel = free ? L.fBtn : s.added ? L.added : L.unlockBtn;
     const base = {
       L, steps: [L.s1, dir === 'vertical' ? L.s2v : L.s2h, L.s3].map((text, i) => ({ n: String(i + 1), text })),
       loading: !s.trees && !s.err, ready: !!s.trees, hasErr: !!s.err, err: s.err,
@@ -394,7 +407,7 @@ export class StrategyTree extends Component {
       if (n.le) return { ...o, nameC: on ? '#0950e3' : '#16263a', name: fdesc(n.f)[0], q: isBoolN(n) ? L.qBool : rpl(L.qNum, { t: fmt(n.t) }), title: `if( ${n.f} <= ${n.raw} )`, ic: 'fa-solid fa-chart-line', icBg: on ? '#0950e3' : '#eef3fa', icC: on ? '#ffffff' : '#5a6b80', bg: on ? '#f5f8ff' : '#ffffff', bd: on ? '1.5px solid #0950e3' : '1px solid #e2e9f0', shadow: on ? '0 6px 18px rgba(9,80,227,.14)' : 'none', onEnter: e => this.showTip(e, { kind: 'node', id: n.id }), onLeave: () => this.hideTip(), onClick: e => this.clickNode(e, n.id, 'node') };
       if (n.leaf) {
         const S = SIG[n.sig];
-        return { ...o, verb: S[0], value: fmtV(n.v), str: Math.round(Math.min(1, Math.abs(n.v)) * 100) + '%', c: S[1], ic: ICO[n.sig], icBg: S[1], icC: '#ffffff', title: `ret := ${n.v.toFixed(6)}${n.sig !== 'none' ? ' // ' + n.sig : ''}`, bg: S[2], bd: end ? `2px solid ${S[1]}` : `1px solid ${S[3]}`, shadow: end ? `0 0 0 3px ${S[4]}, 0 6px 16px rgba(22,38,58,.12)` : 'none', onClick: e => this.clickNode(e, n.id, 'leaf'), onEnter: e => this.showTip(e, { kind: 'leaf', id: n.id }), onLeave: () => this.hideTip() };
+        return { ...o, verb: S[0], value: fmtV(n.v), str: Math.round(Math.min(1, Math.abs(n.v)) * 100) + '%', c: S[1], ic: ICO[n.sig], icBg: S[1], icC: '#ffffff', title: `ret := ${n.v.toFixed(6)}${n.mark ? ' // ' + n.mark : ''}`, bg: S[2], bd: end ? `2px solid ${S[1]}` : `1px solid ${S[3]}`, shadow: end ? `0 0 0 3px ${S[4]}, 0 6px 16px rgba(22,38,58,.12)` : 'none', onClick: e => this.clickNode(e, n.id, 'leaf'), onEnter: e => this.showTip(e, { kind: 'leaf', id: n.id }), onLeave: () => this.hideTip() };
       }
       return { ...o, ic: 'fa-solid fa-lock', icBg: '#e2e9f0', icC: '#5a6b80', title: L.paid, bg: '#f7f9fc', bd: end ? '2px dashed #5a6b80' : '1px dashed #b8c4d3', shadow: 'none', onEnter: e => this.showTip(e, { kind: 'lock' }), onLeave: () => this.hideTip(), onClick: e => this.clickNode(e, n.id, 'lock') };
     });
@@ -477,8 +490,9 @@ export class StrategyTree extends Component {
       else if (TP.kind === 'lock') tip = { title: L.paid, code: '', text: L.lockText, rows: [], cta: unlockLabel };
     }
     const unlock = () => {
-      this.setState({ tip: null, added: true });
-      if (P.onBuy) { if (!s.added) P.onBuy({ stopPropagation() {}, preventDefault() {} }); }
+      // a free strategy opens its email dialog every time; a paid one goes to the cart once
+      this.setState({ tip: null, added: !free });
+      if (P.onBuy && (free || !s.added)) P.onBuy({ stopPropagation() {}, preventDefault() {} });
       else if (!P.embedded) window.location.href = '/s/' + encodeURIComponent(rowId(P));
     };
     const tipOut = tip ? { tipOn: true, tipTitle: tip.title, tipCode: tip.code, tipHasCode: !!tip.code, tipText: tip.text, tipRows: tip.rows.map(r => ({ k: r[0], v: r[1] })), tipBars: tip.bars || [], tipHasBars: !!(tip.bars && tip.bars.length), tipFoot: tip.foot || '', tipHasFoot: !!tip.foot, tipPinned: !!TP.pin, tipHasCta: !!tip.cta, tipCtaLabel: tip.cta || '', tipCta: unlock, tipX: TP.x + 'px', tipY: TP.y + 'px', tipTf: TP.up ? 'translateY(-100%)' : 'none' } : { tipOn: false, tipRows: [], tipBars: [] };
