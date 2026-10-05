@@ -14,12 +14,13 @@ sample strategies. It is a reference, not production code, and the server never 
 To open it:
 
 ```bash
-cd docs/design && python -m http.server 8765
+python docs/design/serve.py
 # open http://localhost:8765/Storefront%20v7.dc.html
 ```
 
-`storefront` here is a link to the repository's `storefront/` folder, where the mock-up finds the
-charts, icons and previews it shows.
+The script serves the charts, icons, previews and fonts the mock-up asks for from the repository's
+`storefront/`, so they are not copied here. The texts in `i18n/` and `trees/` are the handoff's copies,
+frozen: the storefront's own files have grown since (new texts for the parts the mock-up did not have).
 
 ## How the real storefront follows it
 

@@ -1,5 +1,7 @@
 # PR: Edgefolio storefront v7
 
+> The designer's proposed PR, kept for reference. The work went to `_ztool_dev` instead, and some items of "Not in this PR" were built after all (favourites, local-currency rates); see the status note in `../IMPLEMENTATION-v7.md`.
+
 **Base:** `zlecitool_main` · **Branch:** `design/edgefolio-v7`
 
 ## Summary

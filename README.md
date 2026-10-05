@@ -221,7 +221,7 @@ catalogue/    catalogue.csv, indicators.csv, bundles.json, fx.json; publish.py a
 tests/        prices, bundles, filters, payments, links, accounts, formats, what must stay private
 tools/        screenshots.py (the walk in a browser), outbox.py, update_fx.py, sync_core_i18n.py
 docs/         IMPLEMENTATION-v7.md (the design spec), catalogue-updates.md, design/ (the reference
-              design, to open in a browser), img/, notes/
+              design: python docs/design/serve.py opens it), img/, notes/
 ```
 
 ## Deploying

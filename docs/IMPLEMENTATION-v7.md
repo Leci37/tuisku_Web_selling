@@ -4,6 +4,18 @@ The design reference is `Storefront v7.dc.html`. This guide lists what to build 
 
 The mock-up uses 8 sample strategies, and some of its figures are examples (marked below).
 
+> **Status in this repository.** This is the designer's guide, kept as it was handed over; the build
+> follows it with these differences:
+> - **Built:** §1–§5 and §9–§12; from §6 the paged catalogue with server-side filters and histograms,
+>   bundles and the pack priced by the server, the grade (with the cut-offs of §2, still to agree),
+>   favourites with alert opt-ins, free download for an email (with double opt-in for news), local
+>   currency (`catalogue/fx.json`, refreshed by `tools/update_fx.py`), New this month, the previews.
+> - **Different:** My strategies has its own sign-in by emailed link (the shop is a FastAPI app, not a
+>   zlecitool tool, so the core's shared login is not available); thumbnails are made on request, not
+>   at publish time; the welcome tour is shown once per browser.
+> - **Not built (needs data or jobs the shop does not have):** the since-release job, versions beyond
+>   v1 and paid updates, the emails that send favourites' alerts, translations of the indicator texts.
+
 ## 0. Ground rules
 
 - **Brand.** The product name is **Edgefolio**, written as text in Ubuntu 700, with "Edge" in `#16263a` and "folio" in `#0950e3`. There is no "by tuisku" and no tuisku logo in the bar. The line under the bar stays: `linear-gradient(90deg, #47f9e5, #0950e3)`, flipped to 270deg in RTL.

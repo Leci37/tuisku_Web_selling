@@ -2,6 +2,10 @@
 
 How the shop's 2,834 strategies get refreshed, and how often that is realistic. It is based on `catalogue/publish.py` and the README of `tuisku_Web_selling` (branch `zlecitool_main`).
 
+> **Status in this repository.** Written with the v7 handoff. What it plans is built, except the
+> daily "results since release" job (the page reads `catalogue/since_release.csv` when it exists) and
+> object storage for the charts. Bundles are in `catalogue/bundles.json`.
+
 ## What has to change, and where it lives
 
 | What | Where it comes from | Tool today |
@@ -35,8 +39,8 @@ A full refresh is one sequence of steps, and it can be run as a single CI job:
 1. Rebuild in the factory, which produces the export CSV and `d_result/`.
 2. `python catalogue/publish.py EXPORT.csv --assets d_result --prune`
 3. Copy the new paid scripts to `STRATEGIES_DIR` (private storage, never the repo).
-4. `pytest`: the 20 tests cover prices, discounts, payment checks, download links and what must stay out of the page.
-5. New step: create small WebP thumbnails for the Lite cards and the table, so pages stay light.
+4. `pytest`: the tests cover prices, bundles, filters, payment checks, download links, accounts, the generated formats and what must stay out of the page (including that every public preview is cut).
+5. Nothing to do for thumbnails: the server makes the WebP thumbnails of the cards and the table on the first request (`/thumbs/...`) and keeps them in `THUMBS_DIR`; empty that folder after a refresh that replaces charts.
 6. Deploy, then tell owners about new versions (paid updates) and email the people who opted in through the free downloads.
 
 ## Daily: only the light part
@@ -52,7 +56,7 @@ Rebuilding 2,834 backtests every day means 5,668 new charts a day. That is heavy
 - **Repository size.** The assets are about 570 MB already, and monthly batches of thousands of PNGs will make the git history grow fast. Move the charts to object storage (S3 or R2) behind a CDN, and keep only `catalogue.csv` in the repo, or move it to the database.
 - **Versions.** Give every strategy a version and a release date. Buyers keep their old version, and "My strategies" shows when a newer one exists.
 - **Translations.** Indicator names and descriptions come from `catalogue/indicators.csv` in English only. New UI texts need all 8 languages.
-- **Heavy traffic.** The page should get the catalogue from the API one page at a time (for example 24 rows) and filter on the server. Today the browser loads and parses the whole CSV.
+- **Heavy traffic.** Done: the page gets the catalogue from the API one page at a time and the server filters, sorts and counts.
 
 ## Verdict
 
