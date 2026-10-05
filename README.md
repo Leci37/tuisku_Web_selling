@@ -1,325 +1,411 @@
-# Edgefolio · TradingView strategy shop
+# Edgefolio (`edgefolio`) · la tienda de estrategias de TradingView
 
-The shop behind tuisku.eu, sold as **Edgefolio**: a catalogue of **2,834 TradingView strategies**
-(Pine Script v5) with their backtests. Visitors browse them in a simple **Lite** view or filter them in
-**Pro**, see how each strategy decides, buy with PayPal and download the script. A small server prices
-every cart, takes the payment, and hands out the paid files only through signed, expiring links.
+La tienda de tuisku.eu, que se vende como **Edgefolio**: un catálogo de **2.834 estrategias de
+TradingView** (Pine Script v5) con su backtest. Se miran en una vista sencilla, **Lite**, o se filtran en
+**Pro**; se ve cómo decide cada una; se compran con PayPal y se descarga el script. El servidor pone el
+precio de cada carrito, cobra, y sólo entrega los scripts de pago por enlaces firmados que caducan.
+
+Es una **herramienta zlecitool**: una app Flask sobre [zlecitool-core](https://github.com/Leci37/zlecitool-core),
+como `cv_lin` o `md_pdf`. La barra (con la palabra Edgefolio), el idioma, las cuentas, la seguridad, el
+correo, el pie y las páginas legales son del núcleo; aquí sólo está la tienda. Es pública, sin
+publicidad, y **vende con PayPal, no con créditos**.
 
 <p align="center">
-  <img src="docs/img/edgefolio_lite.png" alt="Lite: the ticker strip, the search, the tabs, the overfitting warning, three bundles and Build your pack, and the strategy cards with their profit curves, grade and price" width="900">
+  <img src="docs/img/edgefolio_lite.png" alt="Lite: la cinta de tickers, la búsqueda, las pestañas, el aviso de sobreajuste, tres lotes y Crea tu pack, y las fichas con su curva, su nota y su precio" width="900">
 </p>
 
 <table>
 <tr>
-<td width="50%"><img src="docs/img/edgefolio_pro.png" alt="Pro: the discount ladder with the cart, the filter panel with histograms over every slider, and the list of strategies"></td>
-<td width="50%"><img src="docs/img/edgefolio_strategy.png" alt="Strategy page: charts, the 14 backtest results, the indicator, and the first lines of the Pine script"></td>
+<td width="50%"><img src="docs/img/edgefolio_pro.png" alt="Pro: la escalera de descuentos con el carrito, el panel de filtros con un histograma en cada deslizador y la lista"></td>
+<td width="50%"><img src="docs/img/edgefolio_strategy.png" alt="La página de una estrategia: los gráficos, los 14 resultados del backtest, el indicador y las primeras líneas del script"></td>
 </tr>
 <tr>
-<td><sub><b>Pro.</b> 21 filters, each slider with its histogram, filtered and counted on the server.</sub></td>
-<td><sub><b>Strategy page</b> (<code>/s/&lt;id&gt;</code>): charts, results, the script's first lines and what you buy.</sub></td>
+<td><sub><b>Pro.</b> 21 filtros, cada deslizador con su histograma, filtrados y contados en el servidor.</sub></td>
+<td><sub><b>La página de una estrategia</b> (<code>/s/&lt;id&gt;</code>): gráficos, resultados, el principio del script y lo que se compra.</sub></td>
 </tr>
 <tr>
-<td><img src="docs/img/edgefolio_tree.png" alt="How it decides: the strategy's first decision tree drawn box by box, with the indicator values as sliders"></td>
-<td><img src="docs/img/edgefolio_thanks.png" alt="Thank-you page: the order, one row per strategy with .pine and .zip downloads, and the five install steps"></td>
+<td><img src="docs/img/edgefolio_tree.png" alt="Cómo decide: el primer árbol de decisión de la estrategia, caja a caja, con los valores de los indicadores como deslizadores"></td>
+<td><img src="docs/img/edgefolio_thanks.png" alt="La página de gracias: el pedido, una fila por estrategia con su .pine y su .zip, y los cinco pasos para instalarla"></td>
 </tr>
 <tr>
-<td><sub><b>How it decides</b> (<code>/s/&lt;id&gt;/tree</code>): the free part of the tree, read from the public preview.</sub></td>
-<td><sub><b>After paying:</b> the downloads, then a tutorial to add the script to TradingView.</sub></td>
+<td><sub><b>Cómo decide</b> (<code>/s/&lt;id&gt;/tree</code>): la parte gratis del árbol, leída de la vista previa pública.</sub></td>
+<td><sub><b>Después de pagar:</b> las descargas y el tutorial para ponerla en TradingView.</sub></td>
 </tr>
 <tr>
-<td><img src="docs/img/edgefolio_mine.png" alt="My strategies: every purchase and free download with how long its link lasts, and favourites with alerts"></td>
-<td align="center"><img src="docs/img/edgefolio_phone.png" alt="The shop on a phone, with the bottom bar" width="260"></td>
+<td><img src="docs/img/edgefolio_mine.png" alt="Mis estrategias: cada compra con lo que dura su enlace, la tarjeta para confirmar un correo y las favoritas"></td>
+<td align="center"><img src="docs/img/edgefolio_phone.png" alt="La tienda en un móvil, con la barra de abajo" width="260"></td>
 </tr>
 <tr>
-<td><sub><b>My strategies</b> (<code>/mine</code>): sign in with an emailed link; new links when one expires.</sub></td>
-<td><sub>Every page works from 390 px up, in 8 languages, Arabic right to left.</sub></td>
+<td><sub><b>Mis estrategias</b> (<code>/mine</code>, con la cuenta del núcleo): lo comprado con la sesión abierta y lo comprado sin cuenta con un correo que la cuenta ha confirmado.</sub></td>
+<td><sub>Cada página funciona desde 390 px, en 8 idiomas, el árabe de derecha a izquierda.</sub></td>
 </tr>
 </table>
 
-### The shop working
+### La tienda funcionando
 
 <table>
 <tr>
-<td width="50%"><img src="docs/img/edgefolio_pro_filters.png" alt="Pro with two symbols and a win rate of 90% or more: 14 strategies, the chips above the list and the histogram of the win rate"></td>
-<td width="50%"><img src="docs/img/edgefolio_table.png" alt="The same filters in the Table view, sortable, with the grade next to each ticker"></td>
+<td width="50%"><img src="docs/img/edgefolio_pro_filters.png" alt="Pro con dos símbolos y un porcentaje de aciertos del 90 % o más"></td>
+<td width="50%"><img src="docs/img/edgefolio_table.png" alt="Los mismos filtros en la vista de tabla"></td>
 </tr>
 <tr>
-<td><sub><b>Filtering.</b> Apple and NVIDIA, win rate ≥ 90 %: the count, the chips, the histograms and the list come from the server.</sub></td>
-<td><sub>The same result as a sortable table.</sub></td>
+<td><sub><b>Filtrar.</b> Apple y NVIDIA, aciertos ≥ 90 %: el recuento, las etiquetas, los histogramas y la lista salen del servidor.</sub></td>
+<td><sub>El mismo resultado, en una tabla que se ordena.</sub></td>
 </tr>
 <tr>
-<td><img src="docs/img/edgefolio_install.png" alt="Right after paying: the install tutorial, step 1 of 5, over the thank-you page"></td>
-<td><img src="docs/img/edgefolio_tour.png" alt="The welcome tour, step 1 of 3, on the first visit"></td>
+<td><img src="docs/img/edgefolio_install.png" alt="Justo después de pagar: el tutorial de instalación, paso 1 de 5"></td>
+<td><img src="docs/img/edgefolio_tour.png" alt="El recorrido de bienvenida, paso 1 de 3, la primera vez"></td>
 </tr>
 <tr>
-<td><sub><b>After paying</b> (fake PayPal): the 5-step tutorial to add the script to TradingView opens once.</sub></td>
-<td><sub><b>First visit:</b> the 3-step welcome tour.</sub></td>
+<td><sub><b>Después de pagar</b> (PayPal de prueba): el tutorial de 5 pasos para ponerla en TradingView, una vez.</sub></td>
+<td><sub><b>La primera visita:</b> el recorrido de bienvenida, de 3 pasos.</sub></td>
 </tr>
 <tr>
-<td><img src="docs/img/edgefolio_compare.png" alt="Three strategies compared side by side, the best value of each row marked in green"></td>
-<td><img src="docs/img/edgefolio_pack.png" alt="Build your pack: five strategies picked from the searchable list"></td>
+<td><img src="docs/img/edgefolio_compare.png" alt="Tres estrategias comparadas, con lo mejor de cada fila en verde"></td>
+<td><img src="docs/img/edgefolio_pack.png" alt="Crea tu pack: cinco estrategias elegidas de la lista"></td>
 </tr>
 <tr>
-<td><sub><b>Compare</b> up to 3 strategies; the best value of each row in green.</sub></td>
-<td><sub><b>Build your pack:</b> 5 strategies for one price, searchable among all 2,834.</sub></td>
+<td><sub><b>Comparar</b> hasta 3; lo mejor de cada fila, en verde.</sub></td>
+<td><sub><b>Crea tu pack:</b> 5 estrategias por un precio, buscadas entre las 2.834.</sub></td>
 </tr>
 <tr>
-<td><img src="docs/img/edgefolio_free.png" alt="A free strategy: the email was sent, check your inbox"></td>
-<td><img src="docs/img/edgefolio_arabic.png" alt="The shop in Arabic, laid out right to left"></td>
+<td><img src="docs/img/edgefolio_free.png" alt="Una estrategia gratis: el correo ha salido"></td>
+<td><img src="docs/img/edgefolio_arabic.png" alt="La tienda en árabe, de derecha a izquierda"></td>
 </tr>
 <tr>
-<td><sub><b>Free strategies</b> are sent by email (news is a separate box, unticked).</sub></td>
-<td><sub><b>Arabic</b>, right to left, prices shown in riyals and charged in dollars.</sub></td>
+<td><sub><b>Las gratis</b> se mandan por correo (las novedades, en una casilla aparte y sin marcar).</sub></td>
+<td><sub><b>En árabe</b>, de derecha a izquierda, con los precios en riales y el cobro en dólares.</sub></td>
 </tr>
 <tr>
-<td><img src="docs/img/edgefolio_spanish.png" alt="The strategy page in Spanish, prices in euros"></td>
-<td align="center"><img src="docs/img/edgefolio_phone_tree.png" alt="How it decides on a phone: the tree output and the bottom bar" width="260"></td>
+<td><img src="docs/img/edgefolio_spanish.png" alt="La página de una estrategia en español, con los precios en euros"></td>
+<td align="center"><img src="docs/img/edgefolio_phone_tree.png" alt="Cómo decide en un móvil" width="260"></td>
 </tr>
 <tr>
-<td><sub><b>Spanish</b> strategy page, prices in euros; 8 languages in all.</sub></td>
-<td><sub><b>How it decides</b> on a phone.</sub></td>
+<td><sub><b>En español</b>, con los precios en euros; 8 idiomas en total, los del menú del núcleo.</sub></td>
+<td><sub><b>Cómo decide</b>, en un móvil.</sub></td>
 </tr>
 </table>
 
-<sub>All screenshots come from `tools/screenshots.py`, which walks the shop in a real browser against a
-local server in test mode: a cart with a code, filters, a purchase and a real download, the emailed
-sign-in, compare, the pack, a free download, three languages and a phone. It fails at the first step
-that does not work, and on any console error.</sub>
+<sub>Las capturas son de `tools/screenshots.py`, que recorre la tienda en un navegador de verdad contra el
+servidor local en modo de prueba: un carrito con un código, los filtros, una compra sin cuenta y una
+descarga de verdad, el alta en el núcleo y la confirmación del correo con el que se pagó, comparar, el
+pack, una gratis, tres idiomas y un móvil. Para en el primer paso que no funciona, y con cualquier error
+de la consola (también de la CSP).</sub>
 
-## Run it locally
+## Arrancar
 
-Python 3.11 or newer.
+### Con el lanzador de la familia
 
-```bash
-pip install -r api/requirements.txt
-PAYPAL_MODE=fake DISCOUNT_CODES=demo20=0.20 uvicorn --factory api.app:create_app --port 8000
-# open http://localhost:8000
-```
-
-That is all the shop needs to run: the catalogue, the charts and the page are in the repository, and
-the database (`private/shop.db`, SQLite) is created on the first start.
-
-- **Payments.** With `PAYPAL_MODE=fake` there is no PayPal: Checkout goes straight to the thank-you
-  page as if the buyer had paid, so the whole flow works offline.
-- **Emails.** With `MAIL_MODE=console` (the default) nothing is sent: every email is kept in the
-  database. `python tools/outbox.py` prints the last ones, with their links; that is how you sign in
-  to *My strategies* on a local run.
-- **Downloads** need the paid scripts in `private/strategies/` (see [Private storage](#private-storage)).
-  Without them everything else works and a download answers 404.
-
-Tests and the browser walk:
-
-```bash
-pip install -r requirements-dev.txt && pytest          # no network, PayPal and email faked
-pip install playwright && python tools/screenshots.py  # with the server above running; Chromium needed
-```
-
-## What is on the page
-
-| | Where | What it does |
-|---|---|---|
-| **Lite** (default) | `/` | Ticker strip, search, tabs (Hot, Win rate, Stocks, Crypto, New, Free), the overfitting warning, three bundles and *Build your pack* (5 strategies for one price), cards with grade A–D, favourite and compare, a floating cart with the discount code. |
-| **Pro** | `/` + the Lite \| Pro switch | The discount ladder, the filter panel (16 sliders with histograms and typed min / max, 5 multi-selects, Only FREE), chips, Rows / Cards / Table, 25 per page. |
-| **Strategy page** | `/s/<id>` | Both TradingView charts, the 14 results, backtest against results since release, versions, the indicator, the first lines of the script, the formats you get. |
-| **How it decides** | `/s/<id>/tree` | The first decision tree of the strategy, from its public preview: values as sliders, the path to the result, every rule in plain words. Owners see the complete tree. |
-| **Thank-you page** | `/thanks` | The order, `.pine` and `.zip` per strategy, *Download all*, and the 5-step install tutorial. |
-| **My strategies** | `/mine` | Everything bought or downloaded with how long its link lasts, *Get a new link*, favourites with alert opt-ins. Sign-in by emailed link, no password. |
-| **Free download** | a dialog | Free strategies are sent by email; news is a separate box, unticked, confirmed by email. |
-
-Other things the page remembers in the browser: Lite or Pro, the language, the view, the cart (it
-survives the trip to PayPal), the welcome tour and the install tutorial (each shown once).
-The 8 languages are the ones of zlecitool-core (es en pt fr de zh ar hi); prices can be shown in the
-local currency ("≈ €72"), and PayPal always charges USD.
-
-## How a purchase works
+`arrancar.ps1` es el lanzador de todas las herramientas: **no está en ningún repo**, va en la carpeta
+que los tiene todos al lado (`zlecitool-core`, `linkedin-to-chatgpt-cv`, `tuisku_Web_selling`…). Desde
+esa carpeta:
 
 ```
-browser                                  server (api/)                         PayPal
-  │ POST /api/quote {items, bundles,      prices from catalogue.csv and
-  │       pack, code} ───────────────────▶ bundles.json, tiers + code, ≤ 70%
-  │ ◀─────────────── total, discount ──────
-  │ POST /api/orders (same body) ─────────▶ same price ─────────────────────▶ create order
-  │ ◀──────────────────────── approve link ───────────────────────────────────┘
-  │ the buyer pays on PayPal, PayPal sends them back to /thanks?token=<order>
-  │ POST /api/orders/{id}/capture ────────▶ capture ─────────────────────────▶ money moves
-  │                                          amount = order total? ◀─────────┘
-  │ ◀──────── receipt + one link per file (only to the browser that ordered)
-  │ GET /api/download/{token}[?format=zip] ▶ file from private storage
+pwsh ./arrancar.ps1          # en Windows: powershell -ExecutionPolicy Bypass -File arrancar.ps1
 ```
 
-The browser only ever sends strategy ids, bundle names and the code the buyer typed. It holds no
-price it can change, no discount code, and no path to a paid file. A strategy is never charged twice:
-items inside a chosen bundle or the pack are dropped, and two bundles that share a strategy are refused.
+Clona o pone al día cada repo, monta **un solo entorno** de Python en el que el
+`requirements-dev.txt` de cada herramienta instala el núcleo desde `../zlecitool-core`, escribe **el
+mismo `.env`** en todas (el mismo `FLASK_SECRET_KEY`, `ZLECITOOL_DATA_DIR`, `DATABASE_URL`,
+`ZLECITOOL_INSECURE_COOKIES=1`, `ZLECITOOL_ADMINS`; a la tienda, además, `PAYPAL_MODE=fake` y
+`DISCOUNT_CODES=demo20=0.20`), copia la primera vez los scripts de pago
+(`flask --app app edgefolio restore-scripts`) y arranca cada una con `python app.py` en su puerto. **La
+tienda queda en http://localhost:5105**. Una sola cuenta vale para todas (en `localhost`, no en
+`127.0.0.1`).
 
-## Server API
+### A mano
+
+```
+git clone https://github.com/Leci37/tuisku_Web_selling     # al lado de zlecitool-core
+cd tuisku_Web_selling
+python -m venv .venv && . .venv/bin/activate              # Python 3.10 o más (3.11 recomendado)
+pip install -r requirements-dev.txt                       # el núcleo, editable, desde ../zlecitool-core
+cp .env.example .env                                      # y un FLASK_SECRET_KEY dentro (48 caracteres)
+flask --app app edgefolio restore-scripts                 # los scripts de pago, a <datos>/edgefolio/strategies
+python app.py                                             # http://localhost:5105
+```
+
+`.env.example` trae `PAYPAL_MODE=fake` y `DISCOUNT_CODES=demo20=0.20`: sin PayPal, «Pagar» va directo a la
+página de gracias como si se hubiera pagado, y el código `demo20` descuenta un 20 %. Sin
+`ZLECITOOL_SMTP_HOST`, **ningún correo sale**: el núcleo deja cada uno en `<datos>/mail/*.eml` (el enlace
+de una gratis, el de confirmar un correo, los avisos); se abren con cualquier lector de correo. Sin los
+scripts de pago todo funciona, y una descarga contesta que el fichero no está.
+
+## Pruebas
+
+```
+pip install -r requirements-dev.txt
+python -m playwright install chromium        # sólo para tools/screenshots.py
+pytest
+```
+
+Ninguna prueba sale a la red: PayPal es el de prueba y los correos se quedan en
+`testing.mail_outbox()`. `tests/test_smoke.py` lleva `testing.check_tool(app)`, el contrato del núcleo
+hecho prueba. Las de los scripts de pago (`test_formats.py`, `test_cli.py`) los sacan de la historia del
+repo; en un clon sin ella, se saltan.
+
+| Fichero | Qué prueba |
+|---|---|
+| `test_smoke.py` | el contrato del núcleo; la ficha (pública, sin precios en créditos, la palabra Edgefolio); lo público y lo que pide sesión; la página en el idioma de la carcasa |
+| `test_pricing.py`, `test_bundles.py` | los precios sólo del catálogo; los escalones y el código sumados con el tope del 70 %; los códigos de precio único; los lotes y el pack; una estrategia nunca dos veces; los lotes que se publican |
+| `test_search.py` | los filtros, el orden, las páginas y los histogramas contra el catálogo de verdad; que sean rápidos |
+| `test_orders.py` | pagar y descargar; el importe de PayPal comprobado; los enlaces que caducan y se gastan (también a la vez); el recibo con enlaces sólo para el navegador que compró, la cuenta que compró o la que demostró el correo |
+| `test_free.py` | las gratis por correo; el límite del día (también a la vez); las novedades con doble confirmación; el idioma del correo |
+| `test_mine.py` | Mis estrategias: lo de la cuenta y lo de un correo demostrado; renovar; las versiones nuevas; el script del propietario; las favoritas; el zip de un pedido |
+| `test_proofs.py` | la prueba de un correo: un uso, en dos pasos, sólo para la cuenta que la pidió, sólo hashes, sin llenar buzones, CSRF, el idioma |
+| `test_alerts.py` | los avisos de las favoritas: una vez, en su idioma, sólo a un correo demostrado |
+| `test_security.py` | los enlaces nunca con la cabecera Host; la cookie de quien compra; correos que un programa leería distinto; los límites por IP; la forma de los rechazos; CSRF |
+| `test_formats.py` | los formatos del zip (.md, .py, .js) contra el script; cada script de pago entendido |
+| `test_site.py`, `test_media.py`, `test_cli.py`, `test_layout.py` | la página sobre la carcasa; nada privado en `static/`; las vistas previas cortadas; las miniaturas y los cambios; los comandos; la forma del repo |
+
+## Cómo funciona
+
+### Una compra
+
+```
+navegador                                 servidor (edgefolio/)                       PayPal
+  │ POST /api/quote {items, bundles,       precios de catalogue.csv y bundles.json,
+  │       pack, code} ───────────────────▶ escalones + código, ≤ 70 %
+  │ ◀──────────────── total, descuento ────
+  │ POST /api/orders (lo mismo) ──────────▶ el mismo precio ───────────────────────▶ crear el pedido
+  │ ◀──────────────────── enlace para aprobar (y la cookie edgefolio_buyer) ───────┘
+  │ se paga en PayPal, que vuelve a /thanks?token=<pedido>
+  │ POST /api/orders/<id>/capture ────────▶ cobrar ─────────────────────────────────▶ el dinero se mueve
+  │                                          ¿importe = total del pedido? ◀─────────┘
+  │ ◀──────── recibo + un enlace por fichero (sólo a quien puede verlos)
+  │ GET /api/download/<token>[?format=zip] ▶ el fichero, de la carpeta privada
+```
+
+El navegador sólo manda ids de estrategias, claves de lotes y el código tecleado: no tiene ningún precio
+que pueda cambiar, ningún código de descuento ni la ruta de un fichero de pago. Una estrategia nunca se
+cobra dos veces: lo que va en un lote o en el pack no se cobra suelto, y dos lotes que comparten una
+estrategia se rechazan. Cada POST lleva el token CSRF del núcleo (lo pone `csrf.js` en cada `fetch`).
+
+### Las descargas
+
+Cada estrategia de un pedido pagado tiene su enlace (`/api/download/<token>`): vale `DOWNLOAD_DAYS` días y
+`MAX_DOWNLOADS` descargas, que se gastan con un único `UPDATE` condicional antes de mandar nada (dos
+peticiones a la vez no se llevan la misma última descarga). `?format=zip` añade las reglas en Markdown y
+las versiones beta en Python y JavaScript; `/api/download/all?t=…&t=…` junta los `.pine` de un pedido.
+Los scripts completos están en la carpeta privada (`STRATEGIES_DIR`), nunca en `static/`; las vistas
+previas públicas van cortadas a 50 líneas de su primer árbol.
+
+**Quién ve los enlaces del recibo:** el navegador que hizo el pedido (su cookie `edgefolio_buyer`,
+HttpOnly, 30 días; en la base de datos sólo su hash), la cuenta que compró con la sesión abierta y, si se
+compró sin cuenta, una cuenta que ha demostrado el correo de PayPal. Cualquier otro (alguien con el id del
+pedido, que va en la dirección de vuelta de PayPal) recibe el recibo sin enlaces.
+
+### Mis estrategias y la prueba de un correo
+
+Las cuentas son **las del núcleo**: entrar en la tienda es haber entrado en todas las herramientas.
+`/mine` pide la sesión (el núcleo lleva a `/login?next=/mine`). Pero **el núcleo no comprueba el correo
+de quien se da de alta**: si Mis estrategias enseñara los pedidos cuyo correo es el de la cuenta,
+cualquiera podría registrarse con el de quien compró y llevarse sus enlaces. Por eso:
+
+- lo comprado o pedido gratis **con la sesión abierta** lleva `user_id`: es de esa cuenta;
+- lo hecho **sin cuenta** (se puede comprar sin ella) sólo sale en una cuenta cuando ha **demostrado**
+  ese correo. Mis estrategias ofrece «¿Compraste sin cuenta?»: `POST /api/mine/proofs {email}` manda a
+  esa dirección un enlace de un solo uso (24 horas, sólo para la cuenta que lo pidió). Abrirlo
+  (`/mine?proof=<token>`) sólo pregunta de qué correo es (`/api/mine/proofs/peek`, sin gastar nada: un
+  lector de correo que lo abre no confirma nada); el clic de la persona lo confirma
+  (`/api/mine/proofs/confirm`) y queda en `edgefolio_email_proof`.
+
+La misma prueba hace falta para los avisos de las favoritas: nadie recibe correos porque otro se
+registró con su dirección y marcó unas casillas.
+
+Desde Mis estrategias se pide un enlace nuevo cuando uno caduca o se gasta (o hay una versión nueva; uno
+que funciona no se cambia, para que el botón no reinicie el límite), se lee el script entero (la vista de
+propietario de «Cómo decide») y se guardan las favoritas con sus avisos.
+
+### Las gratis y las novedades
+
+Las 79 estrategias gratis se mandan por correo (`POST /api/free`): el enlace va en el correo, nunca en la
+respuesta. Como mucho 10 al día por dirección (contadas con la fila de la dirección bloqueada, así que
+diez peticiones a la vez no se cuelan) y 20 por IP a la hora. Las novedades son una casilla aparte, sin
+marcar: se apuntan sólo si se marca y sólo cuentan cuando se confirman desde el correo
+(`/api/news/confirm`, doble opt-in).
+
+### Idiomas y textos
+
+Los textos de la tienda están en `i18n/ui.json`, en los 8 idiomas del núcleo; la página los lee del
+diccionario del núcleo (`/zt/i18n.json`, con los comunes) y sigue el idioma de la carcasa: al cambiarlo
+en su menú, se repinta sin recargar (`zt:language`). Los correos salen en el idioma de la petición. Un
+rechazo del servidor es una clave (`{"error": "errLinkExpired", "vars": {…}}`) y la página enseña su texto.
+
+## Rutas
 
 | | |
 |---|---|
-| `GET /api/strategies` | the catalogue, filtered, sorted and paged on the server. `q`, `tab` (`hot`, `win`, `stocks`, `crypto`, `new`, `free`), `free=1`, `paid=1`, `sort` (`np`, `npp`, `win`, `price`, `trades`, `avg`, `months`, `hot`), `page`, `size` (≤ 100), ranges as `<key>_min` / `<key>_max` (an absent end is open), multi-selects as repeated `sym`, `tf`, `ind`, `idx`, `rel`. `facets=1` adds every histogram and option count, each counted against all the other filters. `hot` is net profit % with the tickers taken in turns, so one ticker's variants do not fill the page. |
-| `GET /api/strategies/{id}` | one strategy with the indicator's description and its versions |
-| `GET /api/bundles` | the bundles and the pack: contents and prices |
-| `POST /api/quote`, `POST /api/orders` | the price of a cart; create the PayPal order (`approve_url`) |
-| `POST /api/orders/{id}/capture` | take the payment, check the amount, issue the links |
-| `GET /api/download/{token}` | the `.pine`; `?format=zip` adds the rules in Markdown and beta Python and JavaScript; `/api/download/all?t=…` zips several |
-| `POST /api/free` | a free strategy, sent by email |
-| `POST /api/auth/login`, `/peek`, `/verify`, `/logout`, `GET /api/me` | sign-in by emailed link, in two steps so a mail scanner cannot use the link up |
-| `GET /api/mine`, `POST /api/mine/renew`, `GET /api/mine/{id}/script` | My strategies, a new link, the full script for its owner (the tree's owner view) |
-| `PUT` / `DELETE /api/favourites/{id}` | favourites and their alert opt-ins |
-| `GET /api/config`, `GET /api/fx` | tiers, pack, links for the page (never a code); exchange rates |
-| `GET /thumbs/{chart}.webp` | 640 px WebP of a chart for the lists, made on first request and cached |
+| `/`, `/thanks`, `/s/<id>`, `/s/<id>/tree` | la tienda (una sola plantilla; la página lee la ruta), públicas |
+| `/mine` | Mis estrategias, con sesión |
+| `GET /api/strategies` | el catálogo filtrado, ordenado y por páginas en el servidor: `q`, `tab` (`hot`, `win`, `stocks`, `crypto`, `new`, `free`), `free=1`, `paid=1`, `sort`, `page`, `size` (≤ 100), los rangos como `<clave>_min` / `<clave>_max`, las listas como `sym`, `tf`, `ind`, `idx`, `rel` repetidos; `facets=1` añade cada histograma y recuento |
+| `GET /api/strategies/<id>`, `GET /api/bundles` | una estrategia con su indicador y sus versiones; los lotes y el pack |
+| `POST /api/quote`, `POST /api/orders`, `POST /api/orders/<id>/capture` | el precio, el pedido de PayPal, el cobro y el recibo |
+| `GET /api/download/<token>`, `GET /api/download/all` | las descargas |
+| `POST /api/free`, `GET /api/news/confirm` | una gratis por correo; confirmar las novedades |
+| `GET /api/config`, `GET /api/fx`, `GET /api/me`, `GET /thumbs/<raíz>.webp` | lo que la página necesita (nunca un código), los cambios de moneda, quién es, las miniaturas |
+| `GET /api/mine`, `POST /api/mine/renew`, `GET /api/mine/<id>/script` | Mis estrategias, un enlace nuevo, el script del propietario (con sesión) |
+| `POST /api/mine/proofs`, `/peek`, `/confirm` | la prueba de un correo (con sesión) |
+| `PUT` / `DELETE /api/favourites/<id>` | las favoritas y sus avisos (con sesión) |
 
-## Configuration
+Sin sesión, un script recibe `401 {"error": "errLoginRequired"}` en lo que la pide. Las cuentas
+(`/register`, `/login`, `/cuenta`), el idioma, lo legal (`/legal/…`) y el contacto son del núcleo.
 
-All from environment variables (`api/settings.py`):
+## Comandos
 
-| Variable | Default | |
+```
+flask --app app edgefolio restore-scripts [--force]   # los scripts de pago, de la historia del repo
+flask --app app edgefolio fx-update                   # los cambios del día del BCE (una vez al día)
+flask --app app edgefolio send-alerts                 # los avisos de las favoritas (una vez al día)
+flask --app app edgefolio subscribers                 # quién confirmó las novedades, en CSV
+```
+
+Los scripts de pago **no están en el repo**, sólo en su historia (`c3fa796:d_result/pine_TW_b`).
+`restore-scripts` los copia a `STRATEGIES_DIR` con `git archive`, **sin tocar la copia de trabajo ni el
+índice**, y sólo si la carpeta está vacía (o con `--force`): es lo que hace el lanzador la primera vez.
+Como siguen en la historia, cualquiera con el repo puede sacarlos: para cerrarlo del todo, publicar la
+tienda en un repo nuevo (o reescribir la historia) antes de volver a vender.
+
+`send-alerts` compara el catálogo con la vuelta anterior y manda un correo por persona con lo nuevo de
+sus favoritas (versión nueva, bajada de precio, un lote nuevo); la primera vez sólo apunta cómo está.
+`fx-update` escribe `<datos>/edgefolio/fx.json`; hasta entonces valen los cambios de ejemplo de
+`catalogue/fx.json`. Los dos, con cron (o el programador del alojamiento) y el mismo entorno que el
+servidor.
+
+## Configuración
+
+Lo común, con las variables del núcleo (todas en `.env.example`): `FLASK_SECRET_KEY` (el mismo en todas
+las herramientas), `ZLECITOOL_DATA_DIR`, `DATABASE_URL`, `ZLECITOOL_PUBLIC_URL` (la dirección pública:
+los enlaces de los correos y la vuelta de PayPal se hacen con ella, nunca con la cabecera Host),
+`ZLECITOOL_SMTP_*` y `ZLECITOOL_MAIL_FROM` (el correo), `ZLECITOOL_TRUSTED_PROXIES`,
+`ZLECITOOL_LEGAL_*`, `ZLECITOOL_ADMINS`… Lo propio de la tienda (`edgefolio/settings.py`):
+
+| Variable | Por defecto | |
 |---|---|---|
-| `PUBLIC_URL` | | the shop's address, e.g. `https://edgefolio.tuisku.eu`. **Required** with real PayPal or real email: every link in an email and PayPal's return link are built from it, never from the request |
-| `PAYPAL_MODE` | `fake` | `fake`, `sandbox` or `live` |
-| `PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET` | | from a REST app in the PayPal developer dashboard; required outside `fake` |
-| `MAIL_MODE` | `console` | `console` keeps every email in the database; `smtp` sends them |
-| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_STARTTLS` | `587`, STARTTLS on | for `MAIL_MODE=smtp` |
-| `MAIL_FROM` | `Edgefolio <sales@tuisku.eu>` | sender |
-| `CONTACT_EMAIL` | `sales@tuisku.eu` | shown on the page for problems |
-| `LEGAL_BASE_URL` | `https://tuisku.eu` | the footer's legal pages (`/legal/privacidad`, `/legal/cookies`, `/legal/terminos`, `/legal/aviso-legal`, as in zlecitool-core) |
-| `STRATEGIES_DIR` | `private/strategies` | the paid `.pine` files |
-| `DATABASE` | `private/shop.db` | the SQLite file (see [Database](#database)) |
-| `THUMBS_DIR` | `cache/thumbs` | the WebP thumbnails, made on demand |
-| `DISCOUNT_CODES` | none | `code=rate` pairs, e.g. `spring20=0.20,partner40=0.40` |
-| `FLAT_PRICE_CODES` | none | `code=price` pairs that set every loose item to one price |
-| `MAX_DISCOUNT` | `0.70` | cap on order-size tier + code together |
-| `PACK_SIZE`, `PACK_PRICE` | `5`, `249` | *Build your pack* |
-| `DOWNLOAD_DAYS`, `MAX_DOWNLOADS` | `7`, `10` | life of a download link |
-| `NEW_DAYS` | `30` | how long a strategy is in the *New* tab |
-| `SESSION_DAYS`, `LOGIN_MINUTES` | `30`, `15` | how long a sign-in lasts; how long an emailed sign-in link works |
+| `PAYPAL_MODE` | `fake` | `fake`, `sandbox` o `live`. Con `sandbox` o `live` no arranca sin `ZLECITOOL_PUBLIC_URL` |
+| `PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET` | | de una app REST del panel de desarrolladores de PayPal; obligatorias fuera de `fake` |
+| `DISCOUNT_CODES` | ninguno | pares `código=porcentaje`: `spring20=0.20,partner40=0.40` |
+| `FLAT_PRICE_CODES` | ninguno | pares `código=precio` que ponen un precio a cada estrategia suelta |
+| `MAX_DISCOUNT` | `0.70` | el tope del escalón más el código, juntos |
+| `PACK_SIZE`, `PACK_PRICE` | `5`, `249` | «Crea tu pack» |
+| `DOWNLOAD_DAYS`, `MAX_DOWNLOADS` | `7`, `10` | lo que vale un enlace de descarga |
+| `NEW_DAYS` | `30` | lo que una estrategia sale en «Nuevas» |
+| `CONTACT_EMAIL` | `sales@tuisku.eu` | la dirección que la página da para los problemas |
+| `STRATEGIES_DIR` | `<datos>/edgefolio/strategies` | los `.pine` de pago |
+| `PORT` | `5105` | el de `python app.py` (y `gunicorn.conf.py`) |
 
-Order-size discounts (over $160: 15%, $290: 20%, $500: 25%, $1,000: 40%, $2,500: 70%) are in
-`api/settings.py`; the page draws its ladder from `/api/config`, so the two cannot disagree.
+Los escalones por importe (más de 160 $: 15 %, 290 $: 20 %, 500 $: 25 %, 1.000 $: 40 %, 2.500 $: 70 %)
+están en `edgefolio/settings.py`; la página pinta su escalera con `/api/config`, así que no pueden no
+coincidir.
 
-Files the server reads from `catalogue/`: `catalogue.csv` (strategies and prices), `indicators.csv`
-(what each indicator is), `bundles.json` (bundles: ids and price), `fx.json` (exchange rates, refreshed
-by `python tools/update_fx.py` from the ECB; the shipped file holds example rates) and, when it exists,
-`since_release.csv` (`id`, `pct`, `as_of`: each strategy's result since its release; until a job writes
-it, the page shows "—").
+## La base de datos
 
-## Database
+La de **todas las herramientas** (la del núcleo, `DATABASE_URL`; sin ella, SQLite en
+`<ZLECITOOL_DATA_DIR>/zlecitool.db`). Las tablas se crean solas al arrancar (`create_tables`). La tienda
+no lee ni escribe ninguna `core_*`: sus filas apuntan a **`core_user.id`** (la cuenta del núcleo) y las
+cuentas, la sesión, el idioma elegido y lo demás de la familia los lleva el núcleo en sus tablas.
 
-One SQLite file (`DATABASE`), created and migrated by `api/store.py` on start: an older file gets the
-new columns in place, nothing to run by hand. Back it up with the rest of `private/`.
+| Tabla | Columnas | Qué guarda |
+|---|---|---|
+| `edgefolio_order` | `paypal_id` (clave), `user_id` → `core_user` (vacío sin cuenta), `items` (JSON: las claves), `code`, `total`, `currency`, `status` (`CREATED`, `PAID`, `FAILED`), `payer`, `email`, `lines` (JSON: lo cobrado, línea a línea), `buyer_hash`, `created_at` | un pedido de PayPal; `email` es el de la cuenta o, sin cuenta, el de PayPal (en minúsculas); `buyer_hash`, el SHA-256 de la cookie del navegador que compró |
+| `edgefolio_download` | `token` (clave), `paypal_id` → `edgefolio_order`, `item_key`, `expires_at`, `count`, `version`, `created_at` | un enlace de descarga de una estrategia de un pedido pagado (y los que lo renuevan) |
+| `edgefolio_free_claim` | `token` (clave), `user_id` → `core_user` (vacío sin cuenta), `email`, `item_key`, `news`, `consent_at`, `expires_at`, `count`, `version`, `lang` | una gratis mandada a un correo, con su enlace y su consentimiento |
+| `edgefolio_subscriber` | `email` (clave), `news`, `consent_at`, `source`, `lang`, `token_hash`, `confirmed_at` | quien pidió las novedades; sólo cuenta con `confirmed_at` (doble opt-in) |
+| `edgefolio_favourite` | `user_id` → `core_user` y `item_key` (clave), `alerts` (JSON: `nv`, `pd`, `bd`), `email`, `lang`, `created_at` | las favoritas de una cuenta, con sus avisos, y el correo y el idioma a los que van |
+| `edgefolio_alert_state` | `item_key` (clave), `version`, `price`, `bundles` (JSON), `updated_at` | cómo era cada estrategia en la última vuelta de los avisos: un cambio se avisa una vez |
+| `edgefolio_email_proof` | `id`, `user_id` → `core_user`, `email` (únicos juntos), `token_hash`, `requested_at`, `expires_at`, `verified_at` | que una cuenta ha demostrado un correo (`verified_at`); hasta entonces, el hash del enlace mandado |
+| `edgefolio_mailbox` | `email` (clave), `first_seen_at`, `last_seen_at` | una fila por dirección a la que escribe la tienda: se bloquea para contar lo que va por dirección (las gratis del día) de una vez, en SQLite y en Postgres |
 
-| Table | What it keeps |
-|---|---|
-| `orders` | one row per PayPal order: the strategy keys, the code, the total, the status (`CREATED`, `PAID`, `FAILED`), the payer, the buyer's email, what was charged line by line, and a hash of the buying browser's cookie |
-| `downloads` | one link per strategy of a paid order: token, expiry, download count, version |
-| `free_claims` | free strategies sent by email: the address, the link, when the visitor asked for it |
-| `subscribers` | news opt-ins: only addresses that ticked the box and confirmed it from the email |
-| `login_tokens` | emailed sign-in links (SHA-256 of the token only), single use, 15 minutes |
-| `sessions` | signed-in browsers (SHA-256 of the cookie only) |
-| `favourites` | favourites per email, with the alert opt-ins (new version, price drop, in a bundle) and the language of their emails |
-| `alert_state` | what each strategy looked like at the last alert run (version, price, bundles), so a change is emailed once |
-| `outbox` | every email the shop wrote, with its status (`console`, `sent`, `failed`) |
+Los enlaces de un solo uso y la cookie de quien compra se guardan sólo como hash. Fuera de la base de
+datos, en `<ZLECITOOL_DATA_DIR>/edgefolio/`: `strategies/` (los scripts de pago), `thumbs/` (las
+miniaturas WebP, hechas la primera vez que se piden) y `fx.json` (los cambios del día). Con
+`flask --app app zt backup` (del núcleo) se copia la base de datos; la carpeta de datos, con el resto del
+servidor.
 
-To look inside: `sqlite3 private/shop.db '.tables'`, or `python tools/outbox.py` for the emails.
+## Publicar un catálogo nuevo
 
-## Private storage
-
-The paid scripts are **not in this repository**. The server reads them from `STRATEGIES_DIR`, with the
-names the strategy factory gives them (its `pine_TW_b/` folder), so that folder can be copied there as
-it is. They are still in the repository's history, from where you can restore them for a local run:
-
-```bash
-mkdir -p private/strategies && git archive c3fa796 d_result/pine_TW_b | tar -x -C private/strategies --strip-components=2
-```
-
-Because they stay in the history, anyone can still fetch them. To close that for good, publish this
-branch as a new repository (or rewrite the history) before selling again.
-
-The public previews (`storefront/assets/previews/`) are cut 50 lines into the first tree; the tests
-check every one of them.
-
-## Publishing a new catalogue
-
-The strategy factory (the private `ML-Sklearn-strategy-stock-crypto-for-TraderView` repository)
-writes a tab-separated export with the TradingView backtest of each strategy. To publish it:
-
-```bash
-python catalogue/publish.py path/to/pine_TW_img_info_6_WEB.csv --assets path/to/factory/d_result --prune
-```
-
-It keeps one row per strategy, makes every image path relative, drops the location of the paid file,
-gives exchange-coded names a readable one, copies the charts and previews the rows use (and with
-`--prune` deletes the ones no row uses), and cuts every preview to its public part. Then copy the new
-paid scripts to `STRATEGIES_DIR`, check `catalogue/bundles.json` still names existing strategies, and
-run the tests. `docs/catalogue-updates.md` describes a monthly full refresh and the daily light one.
-
-## Layout
+La fábrica de estrategias (el repo privado `ML-Sklearn-strategy-stock-crypto-for-TraderView`) escribe un
+export separado por tabuladores con el backtest de TradingView de cada estrategia. Para publicarlo:
 
 ```
-storefront/   the page, served as it is (no build step)
-  index.html    the shell; js/main.js mounts the app
-  js/app.js     state and actions; js/lib/ builds what the views show from the API's data
-  js/views/     the screens, ported one to one from the reference design (htm templates for Preact)
-  js/tree.js    "How it decides"
-  i18n/         texts in 8 languages (storefront.ui.json) + the shared ones from zlecitool-core
-  css/, fonts/, vendor/ (Preact, htm, Font Awesome), trees/ (indicator names and texts)
-  assets/       charts (5,668), previews (2,834), icons
-api/          FastAPI: search, pricing, orders + capture + PayPal, downloads + formats, accounts,
-              free downloads, My strategies, mail, thumbnails, SQLite
-catalogue/    catalogue.csv, indicators.csv, bundles.json, fx.json; publish.py and previews.py
-tests/        prices, bundles, filters, payments, links, accounts, formats, what must stay private
-tools/        screenshots.py (the walk in a browser), send_alerts.py, update_fx.py, outbox.py,
-              sync_core_i18n.py
-docs/         IMPLEMENTATION-v7.md (the design spec), catalogue-updates.md, design/ (the reference
-              design: python docs/design/serve.py opens it), img/, notes/
+python catalogue/publish.py ruta/a/pine_TW_img_info_6_WEB.csv --assets ruta/a/la/fabrica/d_result --prune
 ```
 
-## Deploying
+Deja una fila por estrategia, hace relativa cada ruta de imagen, quita dónde está el fichero de pago, da un
+nombre legible a los que tienen el código de la bolsa, copia a `static/assets/` los gráficos y las vistas
+previas que usan las filas (con `--prune` borra los que ya no usa ninguna) y corta cada vista previa a su
+parte pública. Después: los scripts de pago nuevos a `STRATEGIES_DIR`, comprobar que
+`catalogue/bundles.json` sigue nombrando estrategias que existen, y `pytest`. `docs/catalogue-updates.md`
+cuenta la renovación mensual y la diaria.
 
-One process serves everything:
+## Desplegar
 
-```bash
-PUBLIC_URL=https://shop.example PAYPAL_MODE=sandbox PAYPAL_CLIENT_ID=… PAYPAL_CLIENT_SECRET=… \
-MAIL_MODE=smtp SMTP_HOST=… SMTP_USER=… SMTP_PASSWORD=… \
-uvicorn --factory api.app:create_app --host 0.0.0.0 --port 8000 --proxy-headers --forwarded-allow-ips='*'
+1. **El servidor**: Python 3.10 o más (3.11 recomendado), con HTTPS delante.
+2. **El núcleo** es privado: un token de GitHub con lectura de `Leci37/zlecitool-core` para que `pip` lo
+   instale en la etiqueta que fija `requirements.txt` (**v0.23.0**).
+3. `pip install -r requirements.txt`
+4. **El entorno**: el común de la familia (`FLASK_SECRET_KEY` el mismo que las otras, `DATABASE_URL` a
+   Postgres, `ZLECITOOL_PUBLIC_URL`, el SMTP, `ZLECITOOL_TRUSTED_PROXIES=1` detrás de nginx, los datos
+   legales) y el de la tienda: `PAYPAL_MODE=sandbox` con sus claves de prueba primero; con `live`, la
+   primera compra de verdad es la prueba. Los códigos de descuento, en `DISCOUNT_CODES`.
+5. **Los scripts de pago**, a `STRATEGIES_DIR` (fuera de lo que se sirve, y que se conserve entre
+   despliegues), o `flask --app app edgefolio restore-scripts` desde un clon con la historia.
+6. **Arrancar**: `gunicorn -c gunicorn.conf.py "app:create_app()"` (el `Procfile`). Las tablas se crean
+   solas.
+7. **Los trabajos diarios**: `flask --app app edgefolio send-alerts` y `fx-update`, con cron.
+8. **Los datos de la versión FastAPI** (`private/shop.db`) no se traen solos: sus pedidos no tienen cuenta
+   del núcleo, así que pasarían a ser pedidos sin cuenta (que cada comprador ve al demostrar su correo).
+   Si hace falta, se copian a `edgefolio_order` / `edgefolio_download` con un guion de una vez.
+
+## Antes de volver a vender
+
+Las estrategias se generaron el 2024-10-18 y llevan una «caducidad recomendada» del 2025-06-18. Una
+revisión del generador encontró que un tercio calcula sus indicadores en TradingView de forma distinta
+que el Python que las entrenó, y que la familia Ichimoku usó precios futuros al entrenar. Hay que
+regenerar el catálogo con eso corregido antes de relanzarla. Sin hacer, porque necesitan datos o
+trabajos que la tienda no tiene: el trabajo diario que mide cada estrategia desde su publicación
+(`catalogue/since_release.csv`), las versiones de pago más allá de la v1 y las descripciones de los
+valores de los indicadores que el árbol aún no conoce (`static/trees/features.json`).
+
+## Qué cambió desde la versión FastAPI
+
+- **Una herramienta zlecitool**: Flask sobre el núcleo (`app.py` como el de la plantilla, `tool.json`,
+  el paquete `edgefolio/`), con `testing.check_tool(app)` en las pruebas. FastAPI y uvicorn ya no están.
+- **La carcasa del núcleo**: la barra con la palabra Edgefolio, el menú de idioma, la cuenta («Entrar»),
+  la raya de colores, el pie y las páginas legales son los de la familia; lo de la tienda en la barra
+  (Lite | Pro, Mis estrategias, Ver tutorial, TradingView, la moneda) va en sus huecos, con el marcado
+  del diseño. La página se ve como antes; cambian «Entrar», «Preferencias de cookies» en el pie y el
+  aviso de cookies de la familia.
+- **Las cuentas del núcleo**: se fue el acceso por enlace de la tienda y su cookie `ef_session`. Lo de
+  una compra sin cuenta se ve al demostrar el correo (la tabla `edgefolio_email_proof`).
+- **La base de datos común** (SQLAlchemy, tablas `edgefolio_*`) en lugar de `private/shop.db`; los
+  ficheros privados, en la carpeta de datos de la herramienta.
+- **Los correos del núcleo** (`zlecitool_core.mail.send`): sin SMTP, en `<datos>/mail/`. Se fueron la
+  tabla `outbox`, `MAIL_MODE`, `SMTP_*`, `PUBLIC_URL` (ahora `ZLECITOOL_PUBLIC_URL`) y `tools/outbox.py`.
+  El núcleo los manda en segundo plano: un fallo de SMTP queda en su log (la descarga gratis ya está
+  apuntada y se puede pedir otra vez).
+- **Los textos** en `i18n/ui.json` con el diccionario y el idioma del núcleo; las claves que chocaban con
+  las suyas, renombradas; cada rechazo, una clave traducida.
+- **Los trabajos** son comandos: `restore-scripts`, `fx-update`, `send-alerts`, `subscribers` (antes
+  `tools/update_fx.py`, `tools/send_alerts.py`, `tools/outbox.py`).
+- **Los límites por dirección** se cuentan con la fila de la dirección bloqueada (también con varios
+  procesos y con Postgres); antes, con un candado del proceso.
+
+## Qué hay aquí
+
 ```
-
-behind HTTPS (any host that runs Python: a small VPS, Render, Railway, Fly.io), with `private/` on a
-disk that is not served and kept between deploys. `--proxy-headers` lets the server see the visitor's
-address (for the per-address limits on sign-in and free downloads) and https behind the proxy. Try
-`PAYPAL_MODE=sandbox` with sandbox credentials first; with `live`, the first real purchase is the test.
-
-Two daily jobs, with the same environment as the server (cron, or the host's scheduler):
-
-```bash
-python tools/send_alerts.py   # favourites' alerts: one email per person for a new version, a price drop
-                              # or a new bundle since the previous run (the first run only records)
-python tools/update_fx.py     # exchange rates from the ECB for the local-currency prices
+app.py, tool.json          el arranque y la ficha
+edgefolio/                 la tienda: routes.py (las rutas), models.py (las tablas), cli.py (los comandos);
+                           catalogue, search, pricing, paypal, orders, downloads, formats, free, mine,
+                           proofs, alerts, media, fx, settings, shop, web (el trabajo, sin Flask)
+templates/edgefolio/       shop.html, la página sobre zt/base.html
+static/                    la página tal cual (sin compilar): js/ (Preact + htm, las vistas del diseño),
+                           css/ (edgefolio.css y theme.css), vendor/, trees/, img/, assets/ (5.668
+                           gráficos, 2.834 vistas previas, iconos)
+i18n/ui.json               los textos de la tienda, en 8 idiomas
+catalogue/                 catalogue.csv, indicators.csv, bundles.json, fx.json; publish.py y previews.py
+tests/                     las pruebas (arriba)
+tools/screenshots.py       el recorrido en un navegador (las capturas de arriba)
+docs/                      IMPLEMENTATION-v7.md (el diseño), catalogue-updates.md, design/ (el diseño de
+                           referencia: python docs/design/serve.py lo abre), img/, notes/
 ```
-
-## Before selling again
-
-The strategies were generated on 2024-10-18 and carry a "recommended expiry" of 2025-06-18. A review of
-the generator found that about a third of the strategies compute their indicators differently in
-TradingView than in the Python that trained them, and that the Ichimoku family used future prices in
-training. Regenerate the catalogue with those fixed before relaunching.
-
-Also not built yet, because they need data or jobs the shop does not have: the daily job that measures
-each strategy since its release (`since_release.csv`), versions and update notices beyond v1 (the page and
-the alert emails show them once the catalogue has a `version` column above 1), and descriptions for the
-indicator values the tree view does not know yet (`storefront/trees/features.json` covers the most common
-ones).
-
-## What changed in the Edgefolio redesign
-
-- The page is the v7 design: Lite and Pro, the strategy page with *How it decides*, bundles and the
-  pack, the thank-you page with the install tutorial, My strategies, 8 languages. The old page (jQuery,
-  simpleCart, the CSV loaded and filtered in the browser) is gone.
-- Filtering, sorting, paging and the histograms run on the server; the browser no longer downloads
-  the whole catalogue.
-- New on the server: accounts by emailed link, free downloads for an email with recorded consent,
-  renewable links, favourites, the zip with the rules in Markdown, Python and JavaScript, WebP
-  thumbnails, exchange rates, and PayPal's redirect flow (the Checkout button of the design).
-- The 79 free strategies' public previews were their whole script; they are now cut like the paid ones.
-
-The previous redesign (server-side prices and discounts, links per paid order, scripts out of the
-repository) is described in the history of this file.
