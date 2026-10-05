@@ -89,7 +89,8 @@ class Strategy:
 
     @property
     def download_name(self) -> str:
-        return f"{self.ticker}_{self.interval}_{self.key_techs}_{self.id_model}_TW.pine"
+        """The .pine a buyer saves: named as the script inside TradingView, the tutorial and the zip."""
+        return f"{self.file}.pine"
 
     @property
     def file(self) -> str:

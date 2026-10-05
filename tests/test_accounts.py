@@ -1,25 +1,37 @@
-"""Passwordless accounts: the emailed sign-in link, the session cookie, the stored hashes, the outbox."""
+"""Passwordless accounts: the emailed sign-in link, the two-step sign-in, the session cookie, the stored
+hashes, the outbox and the emails' languages."""
+import json
 import re
 import smtplib
 import sqlite3
-from urllib.parse import urlsplit
+from urllib.parse import parse_qs, urlsplit
 
 import pytest
 from fastapi.testclient import TestClient
 
 from api.app import create_app
 from api.mail import Mailer
+from api.settings import ROOT
 from api.store import Store
+from api.texts import MAIL_KEYS
+from api.web import LANGS
+
+
+def emailed_token(client, email="ana@example.com") -> str:
+    """The token of the sign-in link in the last email to `email` (read here from the outbox)."""
+    body = client.app.state.store.outbox(email)[-1]["body"]
+    link = re.search(r"https?://\S+/mine\?signin=[\w-]+", body).group(0)
+    return parse_qs(urlsplit(link).query)["signin"][0]
 
 
 def sign_in(client, email="ana@example.com"):
-    """What a person does: ask for the link, open it from the email (read here from the outbox)."""
+    """What a person does: ask for the link, open it from the email (the page shows whose it is), confirm."""
     assert client.post("/api/auth/login", json={"email": email, "lang": "en"}).json() == {"sent": True}
-    body = client.app.state.store.outbox(email.strip().lower())[-1]["body"]
-    link = re.search(r"https?://\S+/api/auth/verify\?token=\S+", body).group(0)
-    url = urlsplit(link)
-    r = client.get(f"{url.path}?{url.query}", follow_redirects=False)
-    assert r.status_code == 303 and r.headers["location"] == "/mine"
+    clean = email.strip().lower()
+    token = emailed_token(client, clean)
+    assert client.post("/api/auth/peek", json={"token": token}).json() == {"email": clean}
+    r = client.post("/api/auth/verify", json={"token": token})
+    assert r.status_code == 200 and r.json() == {"email": clean}
     return r
 
 
@@ -40,21 +52,63 @@ def test_cookie_is_secure_over_https(settings, paypal):
 
 def test_link_works_once(client):
     client.post("/api/auth/login", json={"email": "ana@example.com"})
-    token = re.search(r"token=(\S+)", client.app.state.store.outbox()[-1]["body"]).group(1)
-    assert client.get(f"/api/auth/verify?token={token}", follow_redirects=False).headers["location"] == "/mine"
+    token = emailed_token(client)
+    assert client.post("/api/auth/verify", json={"token": token}).json() == {"email": "ana@example.com"}
     client.cookies.clear()
-    again = client.get(f"/api/auth/verify?token={token}", follow_redirects=False)
-    assert again.status_code == 303 and again.headers["location"] == "/mine?signin=expired"
+    for path in ("/api/auth/peek", "/api/auth/verify"):
+        again = client.post(path, json={"token": token})
+        assert again.status_code == 400 and again.json() == {"detail": {"error": "expired"}}, path
     assert client.get("/api/me").json() == {"email": None}
 
 
 def test_expired_or_made_up_link(client, settings):
     settings.login_minutes = -1
     client.post("/api/auth/login", json={"email": "ana@example.com"})
-    token = re.search(r"token=(\S+)", client.app.state.store.outbox()[-1]["body"]).group(1)
+    token = emailed_token(client)
     for t in (token, "made-up", ""):
-        r = client.get(f"/api/auth/verify?token={t}", follow_redirects=False)
-        assert r.headers["location"] == "/mine?signin=expired"
+        for path in ("/api/auth/peek", "/api/auth/verify"):
+            r = client.post(path, json={"token": t})
+            assert r.status_code == 400 and r.json()["detail"] == {"error": "expired"}, (path, t)
+    assert "set-cookie" not in r.headers and client.get("/api/me").json() == {"email": None}
+
+
+def test_opening_the_link_signs_nobody_in(client):
+    """A mail scanner that opens (or even renders) the link uses nothing up: only the person's click signs in."""
+    client.post("/api/auth/login", json={"email": "ana@example.com", "lang": "en"})
+    body = client.app.state.store.outbox()[-1]["body"]
+    token = emailed_token(client)
+    assert f"http://testserver/mine?signin={token}" in body and "/api/auth/" not in body
+    assert client.get(f"/mine?signin={token}").status_code == 200       # the page itself
+    for _ in range(3):
+        assert client.post("/api/auth/peek", json={"token": token}).json() == {"email": "ana@example.com"}
+    assert client.get("/api/me").json() == {"email": None} and "ef_session" not in client.cookies
+    # links in emails sent before: GET /api/auth/verify only leads to the page that asks
+    old = client.get(f"/api/auth/verify?token={token}", follow_redirects=False)
+    assert old.status_code == 303 and old.headers["location"] == f"/mine?signin={token}"
+    assert "set-cookie" not in old.headers and client.get("/api/me").json() == {"email": None}
+    assert client.get("/api/auth/verify", follow_redirects=False).headers["location"] == "/mine?signin=expired"
+    assert client.post("/api/auth/verify", json={"token": token}).json() == {"email": "ana@example.com"}
+    assert client.get("/api/me").json() == {"email": "ana@example.com"}
+
+
+def test_another_site_cannot_post_a_token(client):
+    """Login CSRF: a form elsewhere can only send form-encoded or text/plain bodies, never JSON."""
+    client.post("/api/auth/login", json={"email": "attacker@example.com"})
+    token = emailed_token(client, "attacker@example.com")
+    for headers, content in (({"content-type": "text/plain"}, json.dumps({"token": token})),
+                             ({"content-type": "application/x-www-form-urlencoded"}, f"token={token}")):
+        r = client.post("/api/auth/verify", content=content, headers=headers)
+        assert r.status_code == 422 and "set-cookie" not in r.headers
+    assert client.get("/api/me").json() == {"email": None}
+    assert client.post("/api/auth/peek", json={"token": token}).status_code == 200, "still unused"
+
+
+def test_signing_in_again_ends_the_old_session(client):
+    sign_in(client)
+    old = client.cookies.get("ef_session")
+    sign_in(client, "other@example.com")
+    assert client.app.state.store.session_email(old) is None
+    assert client.get("/api/me").json() == {"email": "other@example.com"}
 
 
 def test_only_hashes_are_stored(client):
@@ -63,7 +117,7 @@ def test_only_hashes_are_stored(client):
     sent = client.app.state.store.outbox()[-1]["body"]
     dump = "\n".join(client.app.state.store.db.iterdump())
     assert session not in dump
-    assert re.search(r"token=(\S+)", sent).group(1) not in dump.replace(sent, "")
+    assert re.search(r"signin=([\w-]+)", sent).group(1) not in dump.replace(sent, "")
 
 
 def test_logout(client):
@@ -98,11 +152,38 @@ def test_old_database_files_gain_the_new_columns(tmp_path):
     store = Store(path)
     order = store.order("OLD-1")
     assert order["email"] == "" and order["lines"] == [] and order["items"] == ["AAPL - 1Day - 1ADX - aaaa1111"]
+    assert order["buyer_hash"] == "", "an old order has no buyer cookie: only the payer's account sees its links"
     assert store.link("tok")["version"] == 1
     assert store.issue_links("OLD-1", ["AAPL - 1Day - 1ADX - aaaa1111"], 7) == {"AAPL - 1Day - 1ADX - aaaa1111": "tok"}
     store.add_order("NEW-1", ["k"], "", "1.00", "USD", email="B@x.com", lines=[{"id": "k"}])
     assert store.order("NEW-1")["email"] == "b@x.com" and store.order("NEW-1")["lines"] == [{"id": "k"}]
     Store(path)  # opening it again changes nothing
+
+
+def test_sign_in_email_in_the_visitors_language(client):
+    for i, (lang, subject, words) in enumerate((
+            ("es", "Tu enlace para entrar en Edgefolio", "Funciona una sola vez y durante 15 minutos"),
+            ("de", "Dein Anmeldelink für Edgefolio", "Er funktioniert einmal und 15 Minuten lang"),
+            ("zh", "你的 Edgefolio 登录链接", "15 分钟内有效"),
+            ("ar", "رابط تسجيل الدخول إلى Edgefolio", "ولمدة 15 دقيقة"),
+            ("pt-PT", "A tua ligação para entrar no Edgefolio", "durante 15 minutos"),
+            ("xx", "Your Edgefolio sign-in link", "It works once, for 15 minutes"),
+            ("", "Your Edgefolio sign-in link", "It works once, for 15 minutes"))):
+        assert client.post("/api/auth/login", json={"email": f"p{i}@example.com", "lang": lang}).status_code == 200
+        [mail] = client.app.state.store.outbox(f"p{i}@example.com")
+        assert mail["subject"] == subject and words in mail["body"], lang
+        assert re.search(r"\nhttp://testserver/mine\?signin=[\w-]+\n", mail["body"]), "the link on a line of its own"
+        assert "{" not in mail["body"], "every placeholder filled in"
+
+
+def test_every_email_text_is_in_every_language():
+    data = json.loads((ROOT / "storefront" / "i18n" / "storefront.ui.json").read_text(encoding="utf-8"))
+    for key in MAIL_KEYS:
+        names = sorted(re.findall(r"\{(\w+)\}", data[key]["en"]))
+        for lang in LANGS:
+            text = data[key][lang]
+            assert text.strip() and sorted(re.findall(r"\{(\w+)\}", text)) == names, (key, lang)
+            assert text != data[key]["en"] or lang == "en", (key, lang)
 
 
 class FakeSMTP:

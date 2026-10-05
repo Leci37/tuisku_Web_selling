@@ -7,7 +7,7 @@ from fastapi.testclient import TestClient
 from api.app import create_app
 from api.catalogue import Catalogue
 from api.settings import ROOT
-from tests.conftest import ROWS, strategy_id
+from tests.conftest import BUNDLES, ROWS, strategy_id
 
 AAPL, MSFT, NVDA, TSLA = (strategy_id(r) for r in ROWS)
 
@@ -83,8 +83,9 @@ def test_unknown_bundle_and_empty_cart(client):
 
 
 def test_buying_a_bundle_and_a_pack(client, settings):
-    settings.pack_size, settings.pack_price = 2, Decimal("80")
-    order = client.post("/api/orders", json={"bundles": ["duo"], "pack": [TSLA, AAPL]})
+    # (this cart was duo + a pack of TSLA and AAPL: AAPL is in duo, so that cart is now refused, see below)
+    settings.pack_size, settings.pack_price = 1, Decimal("80")
+    order = client.post("/api/orders", json={"bundles": ["duo"], "pack": [TSLA]})
     assert order.status_code == 200, order.text
     o = order.json()
     assert o["total"] == "195.50"  # 150 + 80 = 230, 15% tier
@@ -94,3 +95,37 @@ def test_buying_a_bundle_and_a_pack(client, settings):
     assert stored["lines"]["bundles"] == [{"key": "duo", "price": "127.50"}]
     receipt = client.post(f"/api/orders/{o['id']}/capture").json()
     assert {d["id"] for d in receipt["downloads"]} == {AAPL, MSFT, TSLA}
+
+
+TWICE = {"error": "a strategy is in two of the chosen bundles", "items": [AAPL]}
+
+
+def test_a_bundle_and_a_pack_never_charge_a_strategy_twice(client, settings):
+    settings.pack_size, settings.pack_price = 2, Decimal("80")
+    for path in ("/api/quote", "/api/orders"):
+        r = client.post(path, json={"bundles": ["duo"], "pack": [TSLA, AAPL]})
+        assert r.status_code == 400 and r.json()["detail"] == TWICE, path
+    assert client.app.state.store.db.execute("SELECT COUNT(*) FROM orders").fetchone()[0] == 0
+    assert quote(client, items=[AAPL], pack=[TSLA, AAPL]).status_code == 200, "a loose item is just dropped"
+
+
+def test_two_bundles_never_charge_a_strategy_twice(settings):
+    settings.bundles.write_text(json.dumps(BUNDLES + [{"key": "apple", "ids": [AAPL, TSLA], "price": 110}]))
+    client = TestClient(create_app(settings))
+    for path in ("/api/quote", "/api/orders"):
+        r = client.post(path, json={"bundles": ["duo", "apple"]})
+        assert r.status_code == 400 and r.json()["detail"] == TWICE, path
+    assert quote(client, bundles=["duo", "duo"]).status_code == 200, "the same bundle twice counts once"
+    assert quote(client, bundles=["apple"], items=[AAPL, MSFT]).json()["total"] == "172.55"  # 110 + 93, 15%
+
+
+def test_the_shipped_top5_and_amzn_bundles_cannot_be_combined(real_client):
+    bundles = {b["key"]: b for b in real_client.get("/api/bundles").json()["bundles"]}
+    shared = set(bundles["top5"]["ids"]) & set(bundles["amzn"]["ids"])
+    assert shared == {"AMZN_1Day_1T00_912096cc"}
+    r = real_client.post("/api/quote", json={"bundles": ["top5", "amzn"]})
+    assert r.status_code == 400 and r.json()["detail"] == {"error": "a strategy is in two of the chosen bundles",
+                                                           "items": ["AMZN_1Day_1T00_912096cc"]}
+    assert real_client.post("/api/orders", json={"bundles": ["amzn", "top5"]}).status_code == 400
+    for alone in (["top5"], ["amzn"], ["top5", "crypto"]):
+        assert real_client.post("/api/quote", json={"bundles": alone}).status_code == 200, alone

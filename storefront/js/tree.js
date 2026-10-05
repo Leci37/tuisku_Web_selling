@@ -38,6 +38,7 @@ const TEXT = {
     cta1: '1 branch of this tree is in the paid part.', ctaN: '{n} branches of this tree are in the paid part.',
     ctaRest: ' Buying the strategy shows the complete tree and every tree of its forest, and lets you download the .pine.',
     ownSignIn: 'Owner view: sign in to My strategies with the email you bought this strategy with to see its complete tree and download the script. Not yours yet? Buy it to unlock everything.',
+    ownNotYours: 'Owner view: this strategy is not among the purchases of the email you are signed in with. Buy it to see its complete tree and download the script.',
     ownFull: 'Owner view: this is the complete first tree. Download the script to use it in TradingView.'
   },
   es: {
@@ -68,6 +69,7 @@ const TEXT = {
     cta1: '1 rama de este árbol está en la parte de pago.', ctaN: '{n} ramas de este árbol están en la parte de pago.',
     ctaRest: ' Al comprar la estrategia ves el árbol completo y todos los árboles de su bosque, y puedes descargar el .pine.',
     ownSignIn: 'Vista de propietario: entra en Mis estrategias con el email con el que compraste esta estrategia para ver su árbol completo y descargar el script. ¿Aún no es tuya? Cómprala para desbloquearlo todo.',
+    ownNotYours: 'Vista de propietario: esta estrategia no está entre las compras del email con el que has entrado. Cómprala para ver su árbol completo y descargar el script.',
     ownFull: 'Vista de propietario: este es el primer árbol completo. Descarga el script para usarlo en TradingView.'
   }
 };
@@ -502,7 +504,7 @@ export class StrategyTree extends Component {
       hasUnused: unusedList.length > 0, unused: unusedList.join(', '),
       isOwner: s.owner, ownerHas, showCta: !s.owner && tr.locked > 0,
       ctaText: rpl(tr.locked === 1 ? L.cta1 : L.ctaN, { n: tr.locked }) + L.ctaRest,
-      ownerText: !ownerHas ? L.ownSignIn : s.full ? L.ownFull : L.loading,
+      ownerText: !ownerHas ? (P.signedIn ? L.ownNotYours : L.ownSignIn) : s.full ? L.ownFull : L.loading, askSignIn: !P.signedIn,
       download: () => window.location.assign(P.ownerDownload || '/mine')
     };
   }

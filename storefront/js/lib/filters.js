@@ -53,7 +53,16 @@ export function parseNum(str, decimal) {
   return isNaN(v) ? null : v;
 }
 
-// 12 significant digits drop the float noise of the log mapping, so a typed 79 is sent as 79.
+// The decimals each label shows (fmt in vals_shop.js): the server gets the number the visitor reads
+// on the chip, the label and the min/max boxes, so "4 – 8" on Tree depth includes depth 8.
+const DECIMALS = { money0: () => 0, round: () => 0, pct0: () => 0, pct2: () => 2, dec1: () => 1, pctAuto: v => (v < 10 ? 2 : 0) };
+
+export function snap(dd, v) {
+  const m = Math.pow(10, (DECIMALS[dd.f] || (() => 6))(v));
+  return Math.round(v * m) / m;
+}
+
+// 12 significant digits drop the float noise of the rounding, so 0.07 is sent as 0.07.
 const plain = v => String(Number(v.toPrecision(12)));
 
 export function proQuery(s, served) {
@@ -72,8 +81,8 @@ export function proQuery(s, served) {
     const r = s.rg[k];
     if (!isOn(r)) return;
     const dd = track(k, served);
-    if (!isOpenLo(r[0])) p.set(k + '_min', plain(val(dd, r[0])));
-    if (!isOpenHi(r[1])) p.set(k + '_max', plain(val(dd, r[1])));
+    if (!isOpenLo(r[0])) p.set(k + '_min', plain(snap(dd, val(dd, r[0]))));
+    if (!isOpenHi(r[1])) p.set(k + '_max', plain(snap(dd, val(dd, r[1]))));
   });
   return p.toString();
 }

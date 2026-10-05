@@ -20,7 +20,8 @@ CREATE TABLE IF NOT EXISTS orders (
     payer     TEXT NOT NULL DEFAULT '',
     created   REAL NOT NULL,
     email     TEXT NOT NULL DEFAULT '',    -- the signed-in buyer, or the payer's email once paid
-    lines     TEXT NOT NULL DEFAULT '[]'   -- JSON: what was charged, line by line
+    lines     TEXT NOT NULL DEFAULT '[]',  -- JSON: what was charged, line by line
+    buyer_hash TEXT NOT NULL DEFAULT ''    -- SHA-256 of the ef_buyer cookie of the browser that made it
 );
 CREATE TABLE IF NOT EXISTS downloads (
     token     TEXT PRIMARY KEY,
@@ -43,12 +44,15 @@ CREATE TABLE IF NOT EXISTS free_claims (
 );
 CREATE INDEX IF NOT EXISTS free_claims_email ON free_claims(email);
 CREATE TABLE IF NOT EXISTS subscribers (
-    email      TEXT PRIMARY KEY,
-    news       INTEGER NOT NULL,
-    consent_at REAL NOT NULL,
-    source     TEXT NOT NULL,
-    lang       TEXT NOT NULL DEFAULT ''
+    email        TEXT PRIMARY KEY,
+    news         INTEGER NOT NULL,
+    consent_at   REAL NOT NULL,          -- when the box was ticked
+    source       TEXT NOT NULL,
+    lang         TEXT NOT NULL DEFAULT '',
+    token_hash   TEXT NOT NULL DEFAULT '',  -- of the emailed confirmation link, until it is used
+    confirmed_at REAL                    -- NULL until confirmed: only confirmed rows are subscribers
 );
+CREATE INDEX IF NOT EXISTS subscribers_token ON subscribers(token_hash);
 CREATE TABLE IF NOT EXISTS login_tokens (
     token_hash TEXT PRIMARY KEY,
     email      TEXT NOT NULL,
@@ -84,13 +88,18 @@ MIGRATIONS = (
     ("orders", "email", "TEXT NOT NULL DEFAULT ''"),
     ("orders", "lines", "TEXT NOT NULL DEFAULT '[]'"),
     ("downloads", "version", "INTEGER NOT NULL DEFAULT 1"),
+    ("orders", "buyer_hash", "TEXT NOT NULL DEFAULT ''"),
+    # rows from before the double opt-in stay unconfirmed: they never clicked a confirmation link
+    ("subscribers", "token_hash", "TEXT NOT NULL DEFAULT ''"),
+    ("subscribers", "confirmed_at", "REAL"),
 )
 
 DAY = 86400
+NEWS_CONFIRM_DAYS = 30  # how long the emailed news confirmation link works
 
 
 def digest(token: str) -> str:
-    """Sign-in and session tokens are kept only as hashes: a copy of the file opens no account."""
+    """Sign-in, session, buyer and news tokens are kept only as hashes: a copy of the file opens nothing."""
     return hashlib.sha256(token.encode()).hexdigest()
 
 
@@ -121,11 +130,12 @@ class Store:
     # Orders and paid links: the interface the order and capture code use.
 
     def add_order(self, paypal_id: str, keys: list, code: str, total: Decimal, currency: str,
-                  email: str = "", lines: list = None):
+                  email: str = "", lines: list = None, buyer: str = ""):
+        """`buyer`: the ef_buyer cookie of the browser placing the order; only its hash is kept."""
         self._write("INSERT INTO orders (paypal_id, items, code, total, currency, status, payer, created, "
-                    "email, lines) VALUES (?,?,?,?,?,'CREATED','',?,?,?)",
+                    "email, lines, buyer_hash) VALUES (?,?,?,?,?,'CREATED','',?,?,?,?)",
                     (paypal_id, json.dumps(keys), code, str(total), currency, time.time(), norm(email),
-                     json.dumps(lines or [])))
+                     json.dumps(lines or []), digest(buyer) if buyer else ""))
 
     def order(self, paypal_id: str):
         row = self.db.execute("SELECT * FROM orders WHERE paypal_id=?", (paypal_id,)).fetchone()
@@ -163,6 +173,20 @@ class Store:
             self.db.execute("UPDATE downloads SET count = count + 1 WHERE token=?", (token,))
             self.db.execute("UPDATE free_claims SET count = count + 1 WHERE token=?", (token,))
 
+    def claim_download(self, token: str, max_downloads: int) -> bool:
+        """Spend one download of a usable link (paid or free) in a single conditional UPDATE: of two requests
+        racing for the last download only one gets it, where a read followed by a write lets both through."""
+        now = time.time()
+        with self.lock, self.db:
+            done = self.db.execute(
+                "UPDATE downloads SET count = count + 1 WHERE token=? AND count<? AND expires>? "
+                "AND paypal_id IN (SELECT paypal_id FROM orders WHERE status='PAID')",
+                (token, max_downloads, now)).rowcount
+            if not done:
+                done = self.db.execute("UPDATE free_claims SET count = count + 1 WHERE token=? AND count<? "
+                                       "AND expires>?", (token, max_downloads, now)).rowcount
+        return done == 1
+
     # Free strategies for an email.
 
     def add_free_claim(self, email: str, key: str, news: bool, lang: str, days: int, version: int = 1,
@@ -180,11 +204,39 @@ class Store:
         return self.db.execute("SELECT COUNT(*) FROM free_claims WHERE email=? AND consent_at>=?",
                                (norm(email), since)).fetchone()[0]
 
-    def subscribe(self, email: str, source: str, lang: str):
-        """Only called when the person ticked the news box: the row is the record of that consent."""
-        self._write("INSERT INTO subscribers VALUES (?,1,?,?,?) ON CONFLICT(email) DO UPDATE SET "
-                    "news=1, consent_at=excluded.consent_at, source=excluded.source, lang=excluded.lang",
-                    (norm(email), time.time(), source, lang))
+    def request_news(self, email: str, source: str, lang: str):
+        """Only called when the person ticked the news box. The row stays pending (confirmed_at NULL) until
+        the emailed link is opened, so nobody is subscribed by someone typing their address (double opt-in).
+        Returns the token of that link, or None if the address is already a confirmed subscriber.
+        A newer request replaces the token: the latest email's link is the one that works."""
+        e, now, token = norm(email), time.time(), secrets.token_urlsafe(24)
+        with self.lock, self.db:
+            row = self.db.execute("SELECT confirmed_at FROM subscribers WHERE email=? AND news=1", (e,)).fetchone()
+            if row and row[0] is not None:
+                return None
+            self.db.execute(
+                "INSERT INTO subscribers (email, news, consent_at, source, lang, token_hash, confirmed_at) "
+                "VALUES (?,1,?,?,?,?,NULL) ON CONFLICT(email) DO UPDATE SET news=1, "
+                "consent_at=excluded.consent_at, source=excluded.source, lang=excluded.lang, "
+                "token_hash=excluded.token_hash, confirmed_at=NULL", (e, now, source, lang, digest(token)))
+        return token
+
+    def confirm_news(self, token: str, days: int = NEWS_CONFIRM_DAYS):
+        """The email whose pending subscription the link confirms, once; None for a used, old or made-up link."""
+        h, now = digest(token), time.time()
+        with self.lock, self.db:
+            row = self.db.execute("SELECT email FROM subscribers WHERE token_hash=? AND news=1 AND "
+                                  "confirmed_at IS NULL AND consent_at>?", (h, now - days * DAY)).fetchone()
+            if not row:
+                return None
+            self.db.execute("UPDATE subscribers SET confirmed_at=?, token_hash='' WHERE email=?", (now, row[0]))
+            return row[0]
+
+    def subscribers(self) -> list:
+        """Who may be sent news: confirmed rows only."""
+        return [dict(r) for r in self.db.execute(
+            "SELECT email, lang, source, consent_at, confirmed_at FROM subscribers "
+            "WHERE news=1 AND confirmed_at IS NOT NULL ORDER BY confirmed_at")]
 
     # Passwordless accounts.
 
@@ -196,6 +248,12 @@ class Store:
     def pending_logins(self, email: str) -> int:
         return self.db.execute("SELECT COUNT(*) FROM login_tokens WHERE email=? AND used=0 AND expires>?",
                                (norm(email), time.time())).fetchone()[0]
+
+    def peek_login_token(self, token: str):
+        """The email of a usable sign-in link, without using it up (the page asks before signing in)."""
+        row = self.db.execute("SELECT email FROM login_tokens WHERE token_hash=? AND used=0 AND expires>?",
+                              (digest(token), time.time())).fetchone()
+        return row[0] if row else None
 
     def use_login_token(self, token: str):
         """The email the link was sent to, once: a second click or an expired link gives None."""

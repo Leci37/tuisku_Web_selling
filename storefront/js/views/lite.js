@@ -15,7 +15,7 @@ export default function Lite(v) {
       <div style="position:relative;max-width:1320px;margin:0 auto;padding:44px 28px 28px;display:flex;flex-direction:column;gap:14px">
         <h1 style="margin:0;font-size:40px;font-weight:700;letter-spacing:-.6px;line-height:1.1;max-width:640px;text-wrap:balance">${v.tx?.liteTitle}</h1>
         <p style="margin:0;font-size:16px;color:#5a6b80;max-width:540px;text-wrap:pretty">${v.tx?.liteSub}</p>
-        <label style="margin-top:8px;max-width:640px;display:flex;align-items:center;gap:10px;background:#fff;border:1px solid #e2e9f0;border-radius:14px;padding:12px 16px;box-shadow:0 12px 32px rgba(22,38,58,.08)"><i class="fa-solid fa-magnifying-glass" style="color:#8d9cae"></i><input value=${v.q ?? ''} onInput=${v.onQ} placeholder=${v.tx?.searchPh} style="flex:1;min-width:0;border:none;outline:none;font-family:inherit;font-size:15px;color:#16263a;background:transparent" /></label>
+        <label style="margin-top:8px;max-width:640px;display:flex;align-items:center;gap:10px;background:#fff;border:1px solid #e2e9f0;border-radius:14px;padding:12px 16px;box-shadow:0 12px 32px rgba(22,38,58,.08)"><i class="fa-solid fa-magnifying-glass" style="color:#8d9cae"></i><input data-sf-search value=${v.q ?? ''} onInput=${v.onQ} placeholder=${v.tx?.searchPh} style="flex:1;min-width:0;border:none;outline:none;font-family:inherit;font-size:15px;color:#16263a;background:transparent" /></label>
         </div>
       </section>
     <section style="width:100%;max-width:1320px;margin:0 auto;padding:12px 28px 0;display:flex;flex-direction:column;gap:16px">
@@ -23,7 +23,7 @@ export default function Lite(v) {
         ${(v.liteTabs || []).map((lt, $index) => html`<button role="tab" aria-selected=${lt?.sel} onClick=${lt?.go} style="font-family:inherit;border:none;background:none;padding:12px 0 10px;margin-bottom:-1px;font-size:14.5px;font-weight:600;cursor:pointer;white-space:nowrap;color:${s(lt?.color)};border-bottom:2px solid ${s(lt?.line)}">${lt?.label}</button>`)}
         </div>
       <div role="note" style="display:flex;gap:12px;align-items:flex-start;border-radius:14px;padding:14px 16px;background:#fff7ec;border:1px solid #f6d9ae"><i class="fa-solid fa-triangle-exclamation" style="color:#f79009;font-size:18px;margin-top:1px"></i><div style="display:flex;flex-direction:column;gap:2px;font-size:13.5px;color:#16263a"><strong style="font-size:14.5px">${v.tx?.riskTitle}</strong><span style="text-wrap:pretty">${v.tx?.riskText}</span></div></div>
-      <div style="display:flex;flex-direction:column;gap:10px">
+      <div data-sf-bundles style="display:flex;flex-direction:column;gap:10px">
         <span style="font-size:12px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#5a6b80">${v.tx?.bundles}</span>
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:16px">
           ${(v.bundles || []).map((bd, $index) => html`
@@ -75,7 +75,7 @@ export default function Lite(v) {
       <div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:6px 0"><span style="font-size:12.5px;color:#5a6b80">${v.liteShowing}</span>${v.liteMore ? html`<button onClick=${v.loadMoreLite} style="font-family:inherit;background:#fff;border:1px solid #e2e9f0;color:#16263a;font-weight:600;border-radius:12px;padding:10px 20px;font-size:13.5px;cursor:pointer">${v.tx?.loadMore}</button>` : null}</div>
       </section>
     ${v.cartHas ? html`
-      <div style="position:sticky;bottom:16px;z-index:10;width:calc(100% - 32px);max-width:780px;margin:24px auto 0">
+      <div data-sf-cart style="position:sticky;bottom:16px;z-index:10;width:calc(100% - 32px);max-width:780px;margin:24px auto 0">
         <div style="background:#fff;border:1px solid #e2e9f0;border-radius:16px;box-shadow:0 18px 48px rgba(26,35,56,.2);padding-block:10px;padding-inline:16px 12px;display:flex;align-items:center;gap:12px 14px;flex-wrap:wrap">
           <span style="display:flex;align-items:center;gap:8px;font-weight:700;white-space:nowrap"><span style="width:34px;height:34px;border-radius:10px;background:#e9f0fd;color:#0950e3;display:grid;place-items:center"><i class="fa-solid fa-cart-shopping"></i></span>${T(v.tx?.cart)} · ${T(v.cartCount)}</span>
           ${v.hasDiscount ? html`<span style="font-size:12px;font-weight:700;color:#15603c;background:#e8f7ef;border-radius:999px;padding:3px 9px">${v.liteOff}</span>` : null}

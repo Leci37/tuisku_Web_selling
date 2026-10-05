@@ -11,15 +11,22 @@ export function pageVals(c) {
   Object.keys(LEGAL).forEach(k => { legal[k] = base + LEGAL[k]; });
   const TS = s.tourStep;
   const closeTour = () => app.closeTour();
+  // above the Lite cart bar when it shows, so the toast never hides the total or Checkout
+  const errBottom = (s.vw < 640 ? 76 : 16) + (s.page === 'shop' && s.mode !== 'pro' && (s.cart.length + s.bundles.length > 0) ? 84 : 0);
   return {
     ...detailVals(c), ...compareVals(c), ...mineVals(c), ...thanksVals(c), ...installVals(c), ...freeVals(c),
     ...legal, contactUrl: c.contact ? 'mailto:' + c.contact : '',
-    errOpen: !!s.error, errText: s.error, errTitle: tx.errServer, closeErr: () => app.setState({ error: '' }),
+    errOpen: !!s.error, errTitle: tx.errServer, closeErr: () => app.setState({ error: '' }),
+    errText: t(s.error) + (s.error === 'errPayment' || s.error === 'errLater' ? ' ' + t('contactProblems', { e: s.cfg?.contact_email || 'sales@tuisku.eu' }) : ''),
+    errBottom: errBottom + 'px',
     cmpBottom: (s.vw < 640 ? 76 : 16) + 'px',
+    // a short notice (the news opt-in confirmed or its link expired): the toast's look, not an error;
+    // over the error toast when both show
+    ...noticeVals(c, errBottom + (s.error ? 76 : 0)),
     navItems: [
       ['shop', t('navShop'), 'fa-solid fa-house', () => app.go({ page: 'shop' })],
-      ['search', t('searchSmall'), 'fa-solid fa-magnifying-glass', () => { app.go({ page: 'shop' }); setTimeout(() => { const i = document.querySelector('input[placeholder]'); if (i) i.focus(); }, 60); }],
-      ['cart', tx.cart, 'fa-solid fa-cart-shopping', () => { try { window.scrollTo(0, document.body.scrollHeight); } catch (e) { /* nothing to scroll */ } }],
+      ['search', t('searchSmall'), 'fa-solid fa-magnifying-glass', () => app.focusSearch()],
+      ['cart', tx.cart, 'fa-solid fa-cart-shopping', () => app.showCart()],
       ['mine', t('navMine'), 'fa-regular fa-folder-open', () => app.go({ page: 'mine' })]
     ].map(([k, label, icon, go]) => ({ label, icon, go, color: (k === 'shop' && s.page === 'shop') || (k === 'mine' && s.page === 'mine') ? '#0950e3' : '#5a6b80',
       hasBadge: k === 'cart' && c.cartN > 0, badge: f.int(c.cartN) })),
@@ -34,6 +41,22 @@ export function pageVals(c) {
     tourDots: [0, 1, 2].map(i => ({ w: i === TS ? '22px' : '8px', bg: i === TS ? '#0950e3' : '#cfd8e3' })),
     tourIcons: ['AAPL', 'NVDA', 'AMZN', 'ADBE', 'BTC+USDT', 'ETH+USDT'].map(k => ({ src: '/assets/icons/' + k + '_big.svg' })),
     tourPD: e => app.swDown(e), tourPU: e => app.swUp(e, 'tourStep')
+  };
+}
+
+const NOTICES = {
+  newsConfirmed: ['fa-solid fa-circle-check', '#12b76a'],
+  newsExpired: ['fa-solid fa-circle-info', '#9fb8ef']
+};
+
+function noticeVals(c, bottom) {
+  const { app, s, t } = c;
+  const n = NOTICES[s.notice];
+  if (!n) return { noticeOpen: false };
+  return {
+    noticeOpen: true, noticeIcon: n[0], noticeColor: n[1],
+    noticeTitle: t(s.notice + 'Title'), noticeText: t(s.notice + 'Text'), noticeBottom: bottom + 'px',
+    closeNotice: () => app.setState({ notice: '' })
   };
 }
 
@@ -73,7 +96,7 @@ function detailVals(c) {
     hwBg: tree ? '#0e7c98' : '#e3f4f8', hwColor: tree ? '#ffffff' : '#0e7c98', hwLine: '#0e7c98',
     backToSheet: () => app.go({ detTab: 'overview' }),
     detMaxW: tree ? '1320px' : '1120px', treeLang: c.lang,
-    Tree: s.Tree, treeRow: r, treeOwned: !!owned, treeDownload: (owned && owned.url) || null, treeBuy: () => { if (r.price === 0) app.setState({ freeFor: r.id, freeSent: false }); else if (!c.inCart(r.id)) c.toggleCart(r.id); },
+    Tree: s.Tree, treeRow: r, treeOwned: !!owned, treeSignedIn: !!(s.me && s.me.email), treeDownload: (owned && owned.url) || null, treeBuy: () => { if (r.price === 0) app.openFree(r.id); else if (!c.inCart(r.id)) c.toggleCart(r.id); },
     pineLines, pineFile: (r.file || 'strategy') + '.pine',
     formats: [
       { name: 'Pine Script', desc: tx.fmtPineDesc, ext: '.pine', ic: 'fa-solid fa-chart-line', icBg: '#0950e3', bg: '#f5f8ff', bd: '#c5d6f8', beta: false },
@@ -126,11 +149,16 @@ function mineVals(c) {
   const { app, s, t, tx, f } = c;
   const email = (s.me && s.me.email) || '';
   const items = (s.mine && s.mine.items) || [];
+  const confirm = !!s.signAs && s.signAs !== email;
+  const asText = t('signInAs', { e: '\u0001' }).split('\u0001');
   return {
-    isMine: s.page === 'mine', signedIn: !!email, signedOut: !!s.me && !email,
+    isMine: s.page === 'mine', signedIn: !!email, signedOut: !!s.me && !email && !confirm,
+    // the emailed link, opened: who it signs in, and the click that does it
+    signConfirm: confirm, confirmSignIn: () => app.confirmSignIn(),
+    signAsBefore: asText[0], signAsEmail: s.signAs, signAsAfter: asText.slice(1).join(''),
     signedAs: t('signedAs', { e: email }), avatar: email.slice(0, 1).toUpperCase(),
     signEmail: s.signEmail, onSignEmail: e => app.setState({ signEmail: e.target.value }),
-    signIn: () => app.signIn(), signSent: s.signSent, signNotSent: !s.signSent, signExpired: s.signExpired && !s.signSent,
+    signIn: () => app.signIn(), signKey: e => { if (e.key === 'Enter') app.signIn(); }, signSent: s.signSent, signNotSent: !s.signSent, signExpired: s.signExpired && !s.signSent,
     signOut: () => app.signOut(),
     mineHas: items.length > 0,
     mineRows: items.map(it => ({ ...c.mk(it.row),
@@ -156,8 +184,10 @@ function thanksVals(c) {
   const rc = s.receipt;
   const tips = { tyZip: t('zipTitle'), tyNewTab: t('newTab') };
   if (!rc) return { isThanks: false, orderRows: [], ...tips };
+  // links only for the browser that paid or the signed-in owner; anyone else is sent to My strategies
+  const shown = (rc.downloads || []).length > 0;
   return { ...tips,
-    isThanks: s.page === 'thanks',
+    isThanks: s.page === 'thanks', linksShown: shown, linksHidden: !shown,
     orderRows: (rc.downloads || []).map(d => ({ ...c.mk(d), pineUrl: d.url, zipUrl: d.zip })),
     orderTotal: f.money(Number(rc.total)), orderLabel: t('orderN', { id: rc.order_id }),
     downloadAllUrl: rc.download_all,
@@ -201,7 +231,7 @@ function freeVals(c) {
     freeSentNow: s.freeSent, freeNotSent: !s.freeSent, newsOn: String(s.freeNews),
     newsBg: s.freeNews ? '#0950e3' : '#ffffff', newsBorder: s.freeNews ? '#0950e3' : '#cfd6e6', newsCheck: s.freeNews ? '✓' : '',
     toggleNews: () => app.setState(st => ({ freeNews: !st.freeNews })),
-    sendFree: () => app.sendFree(),
-    closeFree: () => app.setState({ freeFor: '', freeSent: false })
+    sendFree: () => app.sendFree(), freeKey: e => { if (e.key === 'Enter') app.sendFree(); },
+    closeFree: () => app.closeFree()
   };
 }

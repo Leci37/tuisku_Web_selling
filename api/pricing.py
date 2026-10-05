@@ -2,7 +2,8 @@
 
 A cart is loose strategies, bundles (catalogue/bundles.json) and at most one "Build your pack"
 (PACK_SIZE paid strategies for PACK_PRICE). A strategy inside a chosen bundle or the pack is not
-charged again as a loose item.
+charged again as a loose item, and a cart whose bundles (or a bundle and the pack) share a strategy
+is refused (see overlap): each of them would charge for it.
 """
 from dataclasses import dataclass, field
 from decimal import ROUND_HALF_UP, Decimal
@@ -65,6 +66,18 @@ def tier_rate(subtotal: Decimal, settings: Settings) -> Decimal:
         if subtotal > over:
             return rate
     return ZERO
+
+
+def overlap(bundles: list, pack: list = ()) -> list:
+    """The strategies that two of the chosen bundles, or a bundle and the pack, both contain."""
+    groups = [{s.key for s in b.items} for b in {b.key: b for b in bundles}.values()]
+    groups.append({s.key for s in pack})
+    seen, twice = set(), set()
+    for keys in groups:
+        twice |= seen & keys
+        seen |= keys
+    every = {s.key: s for b in bundles for s in b.items} | {s.key: s for s in pack}
+    return [every[k] for k in sorted(twice)]
 
 
 def quote(strategies: list, code: str, settings: Settings, bundles: list = (), pack: list = ()) -> Quote:

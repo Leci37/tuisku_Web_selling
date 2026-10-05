@@ -3,7 +3,9 @@
 PAYPAL_MODE           fake (default: no PayPal, for local runs and tests) | sandbox | live
 PAYPAL_CLIENT_ID      public id of the PayPal REST app
 PAYPAL_CLIENT_SECRET  server only
-PUBLIC_URL            the shop's address, for PayPal's return link and the emails (default: the request's)
+PUBLIC_URL            the shop's address (https://...), for PayPal's return link, the emails' links and the
+                      cookies' Secure flag. Required with PAYPAL_MODE sandbox/live or MAIL_MODE=smtp; only a
+                      local run (fake PayPal, console mail) may leave it out and use the request's address
 STRATEGIES_DIR        private folder with the paid .pine files (default: private/strategies)
 DATABASE              SQLite file: orders, links, accounts, favourites, outbox (default: private/shop.db)
 DISCOUNT_CODES        code=rate pairs, e.g. "spring20=0.20,partner40=0.40"
@@ -26,6 +28,7 @@ import os
 from dataclasses import dataclass, field
 from decimal import Decimal
 from pathlib import Path
+from urllib.parse import urlsplit
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -124,4 +127,14 @@ class Settings:
             raise ValueError(f"MAIL_MODE must be console or smtp, not {s.mail_mode!r}")
         if s.mail_mode == "smtp" and not s.smtp_host:
             raise ValueError("SMTP_HOST is required with MAIL_MODE=smtp")
+        if (s.paypal_mode != "fake" or s.mail_mode == "smtp") and not s.public_url:
+            # Without it the links in emails and PayPal's return address would be built from the Host
+            # header, which the visitor chooses: a sign-in link could then point at someone else's server.
+            raise ValueError("PUBLIC_URL is required with PAYPAL_MODE=sandbox/live or MAIL_MODE=smtp: the shop's "
+                             "address, e.g. PUBLIC_URL=https://shop.example.com")
+        if s.public_url:
+            u = urlsplit(s.public_url)
+            if u.scheme not in ("http", "https") or not u.hostname or u.query or u.fragment:
+                raise ValueError(f"PUBLIC_URL must be the shop's address, like https://shop.example.com, "
+                                 f"not {s.public_url!r}")
         return s

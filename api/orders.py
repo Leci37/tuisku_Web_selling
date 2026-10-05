@@ -1,11 +1,22 @@
-"""POST /api/quote and POST /api/orders: the price of a cart, computed here, never in the browser."""
-from fastapi import APIRouter, HTTPException, Request
+"""POST /api/quote and POST /api/orders: the price of a cart, computed here, never in the browser.
+
+Placing an order gives the browser an ef_buyer cookie (HttpOnly, 30 days, the same one for its later
+orders); the order keeps its hash, and only that browser (or the owner's session) sees the receipt's links.
+"""
+import re
+import secrets
+
+from fastapi import APIRouter, HTTPException, Request, Response
 from pydantic import BaseModel, Field
 
 from api import auth, pricing
 from api.paypal import PayPalError
+from api.web import base_url, set_cookie
 
 router = APIRouter()
+
+BUYER, BUYER_DAYS = "ef_buyer", 30
+BUYER_TOKEN = re.compile(r"^[A-Za-z0-9_-]{32,64}$")  # what secrets.token_urlsafe(32) gives
 
 
 class Cart(BaseModel):
@@ -34,15 +45,15 @@ def priced(request: Request, cart: Cart) -> pricing.Quote:
     pack = strategies(catalogue, cart.pack)
     if pack and (len({s.key for s in pack}) != settings.pack_size or any(s.price <= 0 for s in pack)):
         raise HTTPException(400, {"error": f"a pack needs exactly {settings.pack_size} different paid strategies"})
+    bundles = [catalogue.bundles[k] for k in cart.bundles]
+    twice = pricing.overlap(bundles, pack)
+    if twice:
+        raise HTTPException(400, {"error": "a strategy is in two of the chosen bundles",
+                                  "items": [s.id for s in twice][:20]})
     items = strategies(catalogue, cart.items)
     if not (items or cart.bundles or pack):
         raise HTTPException(400, {"error": "the cart is empty"})
-    return pricing.quote(items, cart.code, settings, [catalogue.bundles[k] for k in cart.bundles], pack)
-
-
-def base_url(request: Request) -> str:
-    """PayPal sends the buyer back here: the configured address, else the one the browser used."""
-    return request.app.state.settings.public_url or str(request.base_url).rstrip("/")
+    return pricing.quote(items, cart.code, settings, bundles, pack)
 
 
 @router.post("/api/quote")
@@ -51,7 +62,7 @@ def quote(cart: Cart, request: Request):
 
 
 @router.post("/api/orders")
-def create_order(cart: Cart, request: Request):
+def create_order(cart: Cart, request: Request, response: Response):
     state = request.app.state
     q = priced(request, cart)
     if q.total <= 0:
@@ -63,8 +74,11 @@ def create_order(cart: Cart, request: Request):
                                             return_url=f"{base}/thanks", cancel_url=f"{base}/?checkout=cancel")
     except PayPalError as e:
         raise HTTPException(502, {"error": str(e)})
-    current_email = getattr(auth, "current_email", None)  # accounts are optional: no session, no email
-    email = (current_email(request) if current_email else "") or ""
+    buyer = request.cookies.get(BUYER, "")
+    if not BUYER_TOKEN.match(buyer):
+        buyer = secrets.token_urlsafe(32)
     state.store.add_order(created.id, keys, q.code if q.code_status == "applied" else "", q.total,
-                          state.settings.currency, email=email, lines=q.lines())
+                          state.settings.currency, email=auth.current_email(request) or "", lines=q.lines(),
+                          buyer=buyer)
+    set_cookie(response, request, BUYER, buyer, BUYER_DAYS)
     return {"id": created.id, "approve_url": created.approve_url, **q.as_dict()}

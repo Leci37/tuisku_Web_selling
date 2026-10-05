@@ -2,7 +2,9 @@
 and the one-zip download of a whole order."""
 import csv
 import io
+import time
 import zipfile
+from concurrent.futures import ThreadPoolExecutor
 
 from fastapi.testclient import TestClient
 
@@ -141,9 +143,41 @@ def test_download_all_in_one_zip(client, settings):
     r = client.get(url + "&t=made-up")
     assert r.status_code == 200 and r.headers["content-type"] == "application/zip"
     z = zipfile.ZipFile(io.BytesIO(r.content))
-    assert sorted(z.namelist()) == ["AAPL_1Day_1ADX_aaaa1111_TW.pine", "MSFT_1Hour_2BB0_bbbb2222_TW.pine"]
+    assert sorted(z.namelist()) == ["Tuisku_AAPL_1Day_1ADX_aaaa1111.pine", "Tuisku_MSFT_1Hour_2BB0_bbbb2222.pine"]
     assert client.get("/api/download/all?t=made-up").status_code == 404
     assert client.get("/api/download/all").status_code == 404
     settings.max_downloads = 2
     client.get(url)
     assert client.get(url).status_code == 429, "each file counts one download"
+
+
+def test_parallel_download_all_never_passes_the_limit(client, settings, monkeypatch):
+    settings.max_downloads = 2
+    receipt = buy(client, [AAPL, MSFT])
+    store = client.app.state.store
+    read = store.link
+
+    def slow(token):  # every request reads the counts before any of them adds to them
+        row = read(token)
+        time.sleep(0.1)
+        return row
+    monkeypatch.setattr(store, "link", slow)
+    with ThreadPoolExecutor(8) as pool:
+        answers = list(pool.map(lambda _: client.get(receipt["download_all"]), range(8)))
+    sent = [n for r in answers if r.status_code == 200 for n in zipfile.ZipFile(io.BytesIO(r.content)).namelist()]
+    assert sorted(sent) == sorted([f"Tuisku_{AAPL}.pine", f"Tuisku_{MSFT}.pine"] * 2), "each file twice at most"
+    assert {r.status_code for r in answers} <= {200, 429}
+    assert [read(d["url"].rsplit("/", 1)[1])["count"] for d in receipt["downloads"]] == [2, 2]
+
+
+def test_one_script_through_two_links_is_sent_and_counted_once(client, settings):
+    sign_in(client)
+    settings.download_days = -1
+    old = buy(client, [AAPL])["downloads"][0]["url"].rsplit("/", 1)[1]
+    settings.download_days = 7
+    new = client.post("/api/mine/renew", json={"id": AAPL}).json()["url"].rsplit("/", 1)[1]
+    other = client.app.state.store.renew({**client.app.state.store.link(new), "kind": "paid"}, 7, 1, "")
+    r = client.get(f"/api/download/all?t={old}&t={new}&t={other}")
+    assert zipfile.ZipFile(io.BytesIO(r.content)).namelist() == [f"Tuisku_{AAPL}.pine"]
+    store = client.app.state.store
+    assert (store.link(new)["count"], store.link(other)["count"]) == (1, 0)

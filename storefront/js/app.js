@@ -9,6 +9,7 @@ import { parseLocation, pathOf } from './lib/route.js';
 import { proQuery } from './lib/filters.js';
 import { renderVals } from './lib/vals.js';
 import { PRO_SIZE } from './lib/vals_shop.js';
+import { withoutOverlap } from './lib/vals_cart.js';
 
 const LANGS = ['es', 'en', 'pt', 'fr', 'de', 'zh', 'ar', 'hi'];
 const LITE_SIZE = 24;
@@ -16,6 +17,14 @@ const PACK_FIND = 40;
 const CART_KEY = 'edgefolio-cart-v1';
 const FAVS_KEY = 'edgefolio-favs-v1';
 const list = x => (Array.isArray(x) ? x.filter(v => typeof v === 'string') : []);
+
+// Takes one-off parameters (a sign-in token, a notice) out of the address bar, keeping the rest.
+function dropParams(...keys) {
+  const qs = new URLSearchParams(location.search);
+  keys.forEach(k => qs.delete(k));
+  const rest = qs.toString();
+  history.replaceState(history.state, '', location.pathname + (rest ? '?' + rest : '') + location.hash);
+}
 
 function startLang() {
   const saved = read('tuisku-sf-lang');
@@ -50,10 +59,10 @@ export class App extends Component {
       favs: list(favs.favs), alerts: favs.alerts && typeof favs.alerts === 'object' ? favs.alerts : {},
       compare: [], cmpOpen: false, packOpen: false, packQ: '', packFound: [],
       freeFor: '', freeEmail: '', freeNews: false, freeSent: false,
-      me: null, mine: null, signEmail: '', signSent: false, signExpired: false,
+      me: null, mine: null, signEmail: '', signSent: false, signExpired: false, signToken: '', signAs: '',
       receipt: null, instStep: -1, instFor: '',
       tourStep: route.page === 'shop' && !read('edgefolio-tour-v1') ? 0 : -1,
-      error: '', rowsV: 0, Tree: null, pine: {}
+      error: '', notice: '', rowsV: 0, Tree: null, pine: {}
     };
   }
 
@@ -70,17 +79,24 @@ export class App extends Component {
     Promise.all([api('/i18n/storefront.ui.json'), api('/i18n/common.json')])
       .then(([dict, common]) => this.setState({ dict, common })).catch(e => this.fail(e));
     api('/api/config').then(cfg => this.setState({ cfg })).catch(e => this.fail(e));
-    api('/api/bundles').then(bundleDefs => this.setState({ bundleDefs })).catch(e => this.fail(e));
+    api('/api/bundles').then(bundleDefs => this.setState(st => ({ bundleDefs, ...withoutOverlap(st, bundleDefs) }))).catch(e => this.fail(e));
     api('/api/fx').then(fx => this.setState({ fx })).catch(() => { /* prices then stay in USD */ });
-    api('/api/strategies?paid=1&sort=npp&size=12').then(d => { this.keep(d.rows); this.setState({ tape: d.rows }); }).catch(e => this.fail(e));
+    api('/api/strategies?paid=1&sort=hot&size=12').then(d => { this.keep(d.rows); this.setState({ tape: d.rows }); }).catch(e => this.fail(e));
     api('/api/me').then(me => { this.setState({ me }); if (me.email) this.afterSignIn(); }).catch(() => this.setState({ me: { email: null } }));
 
     const qs = new URLSearchParams(location.search);
     if (this.state.page === 'thanks') this.capture(qs.get('token'));
     if (qs.get('checkout') === 'cancel') history.replaceState(null, '', '/'); // back from PayPal: the cart is still here
-    if (this.state.page === 'mine' && qs.get('signin') === 'expired') {
+    const signin = this.state.page === 'mine' ? qs.get('signin') : null;
+    if (signin === 'expired') {
       this.setState({ signExpired: true });
-      history.replaceState(null, '', '/mine');
+      dropParams('signin');
+    } else if (signin) this.peekSignIn(signin);
+    // back from the link that confirms the news opt-in
+    const news = qs.get('news');
+    if (news) {
+      if (news === 'confirmed' || news === 'expired') this.setState({ notice: news === 'confirmed' ? 'newsConfirmed' : 'newsExpired' });
+      dropParams('news');
     }
     this.sync(null);
   }
@@ -104,9 +120,12 @@ export class App extends Component {
       writeJSON(CART_KEY, { cart: s.cart, bundles: s.bundles, packIds: s.packIds, code: s.code, applied: s.applied });
     }
     if (!(s.me && s.me.email) && changed('favs', 'alerts')) writeJSON(FAVS_KEY, { favs: s.favs, alerts: s.alerts });
-    if (changed('lang') && s.common) {
+    // from the first render, so screen readers, fonts and the browser's translate offer get the
+    // visitor's language and Arabic flips at once; again when the core's list of RTL languages is in
+    if (changed('lang', 'common')) {
+      const rtl = (s.common && s.common._rtl_languages) || ['ar'];
       document.documentElement.lang = s.lang;
-      document.documentElement.dir = (s.common._rtl_languages || ['ar']).includes(s.lang) ? 'rtl' : 'ltr';
+      document.documentElement.dir = rtl.includes(s.lang) ? 'rtl' : 'ltr';
     }
 
     if (s.page === 'shop' && s.mode === 'pro') {
@@ -140,6 +159,11 @@ export class App extends Component {
     }
 
     if (s.me && s.me.email && s.page === 'mine' && !s.mine && !this.mineLoading) this.loadMine();
+    // a sign-in link for the address already signed in: nothing to confirm
+    if (s.signAs && s.me && s.me.email === s.signAs) {
+      dropParams('signin');
+      this.setState({ signAs: '', signToken: '' });
+    }
     if (s.packOpen && s.packQ.trim() !== this.packKey) {
       const first = this.packKey == null;
       this.packKey = s.packQ.trim();
@@ -159,8 +183,13 @@ export class App extends Component {
     return () => this.seq[name] === n;
   }
 
+  // What went wrong, said in the visitor's language: the server's own messages are English and
+  // meant for the logs, so the page picks a text by what kind of failure it was.
   fail(e) {
-    this.setState({ error: (e && e.message) || String(e) });
+    const st = e && e.status;
+    const key = !st ? 'errNetwork' : st === 402 ? 'errPayment' : st === 404 || st === 410 ? 'errNotFound'
+      : st === 429 ? 'errTooMany' : st >= 500 ? 'errLater' : 'errRequest';
+    this.setState({ error: key });
   }
 
   // ---- rows ------------------------------------------------------------------------------------
@@ -248,7 +277,7 @@ export class App extends Component {
 
   loadPack() {
     const fresh = this.ticket('pack'), q = this.packKey;
-    api('/api/strategies?paid=1&sort=npp&size=' + PACK_FIND + (q ? '&q=' + encodeURIComponent(q) : '')).then(d => {
+    api('/api/strategies?paid=1&sort=hot&size=' + PACK_FIND + (q ? '&q=' + encodeURIComponent(q) : '')).then(d => {
       if (!fresh()) return;
       this.keep(d.rows);
       this.setState({ packFound: d.rows });
@@ -272,8 +301,9 @@ export class App extends Component {
       this.setState(patch);
     }).catch(e => {
       if (this.quoteKey !== key) return;
-      // ids or bundles the server no longer sells (an old cart in this browser): take them out
-      const gone = (e.detail && (e.detail.items || e.detail.bundles)) || [];
+      // ids or bundles the server no longer sells (an old cart in this browser): take them out. Any
+      // other refusal (a strategy twice, a pack that is not valid) is shown, never retried.
+      const d = e.detail || {}, gone = /^unknown/.test(d.error || '') ? d.items || d.bundles || [] : [];
       if (e.status === 400 && gone.length) {
         this.setState(st => ({ cart: st.cart.filter(x => !gone.includes(x)), bundles: st.bundles.filter(x => !gone.includes(x)), packIds: st.packIds.filter(x => !gone.includes(x)) }));
       } else this.fail(e);
@@ -297,8 +327,10 @@ export class App extends Component {
     post('/api/orders/' + encodeURIComponent(token) + '/capture').then(rc => {
       this.keep(rc.downloads);
       const first = (rc.downloads || [])[0];
+      // another browser than the one that paid gets no links (they are in My strategies): the
+      // tutorial waits until there is a script to install
       this.setState({ receipt: rc, cart: [], bundles: [], packIds: [], instFor: first ? first.id : '', mine: null,
-        instStep: read('edgefolio-install-v1') ? -1 : 0 });
+        instStep: !first || read('edgefolio-install-v1') ? -1 : 0 });
     }).catch(e => { this.fail(e); this.go({ page: 'shop' }, { replace: true }); });
   }
 
@@ -316,6 +348,31 @@ export class App extends Component {
     const email = this.state.signEmail.trim();
     if (!/.+@.+\..+/.test(email)) return;
     post('/api/auth/login', { email, lang: this.state.lang }).then(() => this.setState({ signSent: true })).catch(e => this.fail(e));
+  }
+
+  // The emailed link opens /mine?signin=<token>. Opening it only shows who it signs in (mail
+  // scanners open links too); the visitor's own click spends it.
+  peekSignIn(token) {
+    post('/api/auth/peek', { token }).then(r => {
+      const me = this.state.me;
+      if (me && me.email && r.email === me.email) { dropParams('signin'); return; } // already in, as that address
+      this.setState({ signToken: token, signAs: r.email || '', signExpired: false });
+    }).catch(e => {
+      if (e.status === 400) { this.setState({ signExpired: true, signToken: '', signAs: '' }); dropParams('signin'); } else this.fail(e);
+    });
+  }
+
+  confirmSignIn() {
+    const token = this.state.signToken;
+    if (!token || this.signBusy) return;
+    this.signBusy = true;
+    post('/api/auth/verify', { token }).then(r => {
+      dropParams('signin');
+      this.setState({ me: { email: r.email }, mine: null, signToken: '', signAs: '', signSent: false, signExpired: false });
+      this.afterSignIn();
+    }).catch(e => {
+      if (e.status === 400) { this.setState({ signExpired: true, signToken: '', signAs: '' }); dropParams('signin'); } else this.fail(e);
+    }).then(() => { this.signBusy = false; });
   }
 
   signOut() {
@@ -368,6 +425,15 @@ export class App extends Component {
     this.saveFav(id, next);
   }
 
+  // Every way into the free-download dialog starts with news unticked (GDPR: consent is asked each time).
+  openFree(id) {
+    this.setState({ freeFor: id, freeSent: false, freeNews: false });
+  }
+
+  closeFree() {
+    this.setState({ freeFor: '', freeSent: false, freeNews: false });
+  }
+
   sendFree() {
     const s = this.state, email = s.freeEmail.trim();
     if (!/.+@.+\..+/.test(email) || this.freeBusy) return;
@@ -395,7 +461,61 @@ export class App extends Component {
 
   setPview(pview) {
     write('tuisku-sf-pview5', pview);
-    this.setState({ pview });
+    const s = this.state;
+    // "Load more" leaves several pages in the list; the table shows one: the last one loaded, so the
+    // pager and "a–b of N" point at it. Its rows are already here; the reload keeps them fresh.
+    if (pview === 'table' && s.pro.length > PRO_SIZE && s.proPage > s.proFirst) {
+      this.setState({ pview, pro: s.pro.slice((s.proPage - s.proFirst) * PRO_SIZE), proFirst: s.proPage });
+      this.loadPro(s.proPage, false);
+    } else this.setState({ pview });
+  }
+
+  // ---- phone bar ---------------------------------------------------------------------------------
+
+  // Puts an element just under the sticky header (it covers the top of the page).
+  scrollUnderHeader(el) {
+    const header = document.querySelector('header');
+    const top = el.getBoundingClientRect().top + window.scrollY - (header ? header.offsetHeight : 0) - 12;
+    try { window.scrollTo(0, Math.max(0, top)); } catch (e) { /* not scrollable */ }
+  }
+
+  // Runs fn once the shop is on screen (the bar's buttons work from every page).
+  onShop(fn) {
+    if (this.state.page !== 'shop') this.go({ page: 'shop' });
+    let tries = 0;
+    const run = () => { if (!fn() && ++tries < 20) setTimeout(run, 50); };
+    setTimeout(run, 0);
+  }
+
+  // Search: the strategy search of the list on screen, Lite's or Pro's (never the discount code).
+  focusSearch() {
+    this.onShop(() => {
+      const input = document.querySelector('input[data-sf-search]');
+      if (!input) return false;
+      input.focus({ preventScroll: true });
+      this.scrollUnderHeader(input);
+      return true;
+    });
+  }
+
+  // Cart: Pro's cart strip at the top; Lite's cart bar where it sits after the list, clear of the
+  // phone bar (stuck to the bottom it slides under it); with nothing in the cart, the bundles.
+  showCart() {
+    this.onShop(() => {
+      const cart = document.querySelector('[data-sf-cart]');
+      if (cart && this.state.mode === 'pro') { this.scrollUnderHeader(cart); return true; }
+      const list = cart && cart.previousElementSibling;
+      if (list) {
+        const end = list.getBoundingClientRect().bottom + window.scrollY + 24 + cart.offsetHeight;
+        const below = this.state.vw < 640 ? 76 : 16;
+        try { window.scrollTo(0, Math.max(0, end + below - window.innerHeight)); } catch (e) { /* not scrollable */ }
+        return true;
+      }
+      const bundles = document.querySelector('[data-sf-bundles]');
+      if (!bundles) return false;
+      this.scrollUnderHeader(bundles);
+      return true;
+    });
   }
 
   setLang(lang) {

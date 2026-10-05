@@ -12,6 +12,8 @@ from api.mail import Mailer
 from api.paypal import FakePayPal, PayPalREST
 from api.settings import Settings
 from api.store import Store
+from api.texts import Texts
+from api.web import RateLimit
 
 CSP = ("default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; "
        "font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'")
@@ -22,12 +24,17 @@ PAGES = ("/", "/mine", "/thanks", "/s/{strategy_id}", "/s/{strategy_id}/tree")
 
 def create_app(settings: Settings = None, paypal=None) -> FastAPI:
     settings = settings or Settings.from_env()
-    app = FastAPI(title="Edgefolio shop", docs_url="/api/docs", openapi_url="/api/openapi.json")
+    docs = settings.paypal_mode == "fake"  # the map of the API is for local runs, not for the public shop
+    app = FastAPI(title="Edgefolio shop", docs_url="/api/docs" if docs else None,
+                  openapi_url="/api/openapi.json" if docs else None, redoc_url=None)
     app.state.settings = settings
     app.state.catalogue = Catalogue(settings)
     search.index_of(app.state.catalogue)  # built now, so the first visitor does not wait for it
     app.state.store = Store(settings.database)
     app.state.mailer = Mailer(settings, app.state.store)
+    app.state.texts = Texts(settings.storefront / "i18n" / "storefront.ui.json")
+    app.state.limits = {"login": RateLimit(auth.LOGIN_LIMIT, auth.LOGIN_WINDOW),
+                        "free": RateLimit(free.FREE_LIMIT, free.FREE_WINDOW)}
     app.state.paypal = paypal or (FakePayPal() if settings.paypal_mode == "fake" else
                                   PayPalREST(settings.paypal_mode, settings.paypal_client_id,
                                              settings.paypal_client_secret))

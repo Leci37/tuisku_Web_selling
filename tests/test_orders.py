@@ -1,7 +1,14 @@
-"""Paying and downloading: a file only leaves the server through a link issued for a paid order."""
+"""Paying and downloading: a file only leaves the server through a link issued for a paid order, and the
+receipt's links only go to the browser that placed it (or the owner's account)."""
+import time
+from concurrent.futures import ThreadPoolExecutor
 from decimal import Decimal
 
+from fastapi.testclient import TestClient
+
 from api.paypal import Capture
+from api.store import digest
+from test_accounts import sign_in
 
 
 def buy(client, items, code=""):
@@ -18,7 +25,8 @@ def test_full_purchase(client, ids):
     assert {d["ticker"] for d in body["downloads"]} == {"AAPL", "MSFT"}
     f = client.get(body["downloads"][0]["url"])
     assert f.status_code == 200 and f.text.startswith("//@version=5")
-    assert "AAPL_1Day_1ADX_aaaa1111_TW.pine" in f.headers["content-disposition"]
+    # named as the script inside TradingView, the install tutorial and the zip (it was <id>_TW.pine)
+    assert 'filename="Tuisku_AAPL_1Day_1ADX_aaaa1111.pine"' in f.headers["content-disposition"]
 
 
 def test_capture_twice_returns_the_same_links(client, ids):
@@ -112,3 +120,80 @@ def test_paypal_rest_order(monkeypatch):
     assert ctx == {"brand_name": "Edgefolio", "user_action": "PAY_NOW", "shipping_preference": "NO_SHIPPING",
                    "return_url": "https://s/thanks", "cancel_url": "https://s/?checkout=cancel"}
     assert sent[-1][1]["purchase_units"][0]["amount"] == {"currency_code": "USD", "value": "12.50"}
+
+
+def test_parallel_downloads_never_pass_the_limit(client, ids, settings, monkeypatch):
+    settings.max_downloads = 3
+    url = buy(client, [ids[0]]).json()["downloads"][0]["url"]
+    store = client.app.state.store
+    read = store.link
+
+    def slow(token):  # every request reads the count before any of them adds to it
+        row = read(token)
+        time.sleep(0.2)
+        return row
+    monkeypatch.setattr(store, "link", slow)
+    with ThreadPoolExecutor(12) as pool:
+        codes = sorted(pool.map(lambda _: client.get(url).status_code, range(12)))
+    assert codes == [200] * 3 + [429] * 9
+    assert read(url.rsplit("/", 1)[1])["count"] == 3
+    with ThreadPoolExecutor(4) as pool:
+        assert set(pool.map(lambda _: client.get(url + "?format=zip").status_code, range(4))) == {429}
+
+
+def receipt_for(client, order_id):
+    r = client.post(f"/api/orders/{order_id}/capture")
+    assert r.status_code == 200, r.text
+    return r.json()
+
+
+def test_the_receipt_links_go_only_to_the_buyers_browser(client, ids):
+    order = client.post("/api/orders", json={"items": ids[:2]})
+    cookie = order.headers["set-cookie"]
+    assert cookie.startswith("ef_buyer=") and "HttpOnly" in cookie and "samesite=lax" in cookie.lower()
+    assert "Max-Age=2592000" in cookie and "Secure" not in cookie, "30 days; plain http (local runs) would drop it"
+    order_id, buyer = order.json()["id"], client.cookies.get("ef_buyer")
+    stranger = TestClient(client.app)  # someone who only has the order id (it is in the PayPal return URL)
+    hidden = receipt_for(stranger, order_id)
+    assert hidden == {"order_id": order_id, "status": "PAID", "total": "146.20", "currency": "USD",
+                      "payer": "b•••@example.com", "valid_days": 7, "max_downloads": 10, "download_all": None,
+                      "downloads": [], "links_hidden": True}
+    assert client.app.state.store.order(order_id)["status"] == "PAID", "capturing works for anyone"
+    mine = receipt_for(client, order_id)
+    assert mine["links_hidden"] is False and len(mine["downloads"]) == 2 and mine["download_all"]
+    assert mine["payer"] == "b•••@example.com", "never the payer's whole address"
+    assert client.get(mine["downloads"][0]["url"]).status_code == 200
+    stored = client.app.state.store.order(order_id)
+    assert stored["buyer_hash"] == digest(buyer) and buyer not in "\n".join(client.app.state.store.db.iterdump())
+
+
+def test_a_browser_keeps_its_buyer_cookie(client, ids):
+    first = client.post("/api/orders", json={"items": [ids[0]]}).json()["id"]
+    buyer = client.cookies.get("ef_buyer")
+    second = client.post("/api/orders", json={"items": [ids[1]]})
+    assert second.headers["set-cookie"].startswith(f"ef_buyer={buyer};"), "the same one, for 30 more days"
+    store = client.app.state.store
+    assert store.order(first)["buyer_hash"] == store.order(second.json()["id"])["buyer_hash"] == digest(buyer)
+    forged = TestClient(client.app, cookies={"ef_buyer": "x"})
+    given = forged.post("/api/orders", json={"items": [ids[0]]}).headers["set-cookie"].split(";")[0]
+    assert given.startswith("ef_buyer=") and len(given) > 40 and given != f"ef_buyer={buyer}", "malformed: replaced"
+
+
+def test_the_owners_account_sees_the_links(client, ids):
+    order_id = client.post("/api/orders", json={"items": [ids[0]]}).json()["id"]
+    receipt_for(client, order_id)                       # paid by buyer@example.com (FakePayPal)
+    other = TestClient(client.app)
+    sign_in(other, "someone@example.com")
+    assert receipt_for(other, order_id)["links_hidden"] is True
+    sign_in(other, "buyer@example.com")                 # the PayPal address: My strategies has it too
+    r = receipt_for(other, order_id)
+    assert r["links_hidden"] is False and [d["id"] for d in r["downloads"]] == ["AAPL_1Day_1ADX_aaaa1111"]
+
+
+def test_signed_in_buyer_on_another_browser(client, ids):
+    sign_in(client, "ana@example.com")
+    order_id = client.post("/api/orders", json={"items": [ids[0]]}).json()["id"]
+    phone = TestClient(client.app)
+    assert receipt_for(phone, order_id)["links_hidden"] is True
+    sign_in(phone, "ana@example.com")                   # the order's email (signed in when ordering)
+    assert receipt_for(phone, order_id)["links_hidden"] is False

@@ -8,7 +8,8 @@ import { cartVals } from './vals_cart.js';
 import { pageVals } from './vals_pages.js';
 
 const TX_KEYS = ['toolName', 'tvConnect', 'tvConnected', 'tvDisconnect', 'language', 'cart', 'emptyCart', 'codePh', 'apply', 'checkout', 'shown', 'reset', 'onlyFree', 'strategies', 'sortNp', 'sortWin', 'sortPrice', 'sortTrades', 'npPct', 'avgProfit', 'monthsTrained', 'view', 'viewRows', 'viewCards', 'viewTable', 'addToCart', 'inCartBtn', 'download', 'riskTitle', 'riskText', 'riskShort', 'legalPrivacy', 'legalCookies', 'legalTerms', 'legalNotice', 'contactMenu', 'proView', 'liteTitle', 'liteSub', 'searchPh', 'loadMore', 'haveCode', 'noMatch', 'tradesWord', 'rowsPerPage', 'addFilter', 'colBacktest', 'strategyChart', 'candleChart', 'openTv', 'fSymbol', 'fTimeframe', 'fIndicators', 'any', 'tourOpen', 'tourBack', 'tourClose', 'email', 'bundles', 'freeTitle', 'freeText', 'newsOpt', 'sendLink', 'freeSent', 'myStrategies', 'mineSub', 'newLink', 'backShop', 'thanksTitle', 'thanksSub', 'downloadAll', 'totalPaid', 'paidWith', 'installTitle', 'goMine', 'selAll', 'selNone', 'searchSmall', 'clearAll', 'openPage', 'newTab', 'allResults', 'aboutInd', 'seeInd', 'scriptPreview', 'lockedNote', 'sinceRelease', 'liveVsBacktest', 'demoFigures', 'compare', 'compareTitle', 'compareMax', 'grade', 'packTitle', 'done', 'favourites', 'favEmpty', 'versions', 'v2note', 'v1note', 'updateAvail', 'getUpdate', 'trustPaypal', 'trustLinks', 'trustInvoice', 'currencyLabel', 'howItDecides', 'overviewTab', 'howTeaserTitle', 'howTeaserText', 'toSheet', 'scriptRest', 'buyScriptTitle', 'buyScriptText', 'formatsNote', 'fmtPineDesc', 'fmtMd', 'fmtMdDesc', 'fmtPyDesc', 'fmtJsDesc',
-  'liveUnknown', 'signInTitle', 'signInText', 'signInSent', 'signInExpired', 'signOut', 'errServer'];
+  'liveUnknown', 'signInTitle', 'signInText', 'signInSent', 'signInExpired', 'signOut', 'errServer',
+  'signInConfirm', 'linksHiddenTitle', 'linksHiddenText', 'signInToDownload'];
 const GRADE_BG = { A: '#15803d', B: '#0e7c98', C: '#5a6b80', D: '#c0392b' };
 const stop = e => { if (e && e.stopPropagation) e.stopPropagation(); };
 
@@ -92,7 +93,7 @@ function rowVals(c, r) {
     onOpen: openAt('overview'), onTree: openAt('tree'),
     tabHref: strategyPath(id), treeHref: strategyPath(id, true),
     indUrl: r.ind_url || 'https://www.tradingview.com/scripts/',
-    onFree: e => { stop(e); app.setState({ freeFor: id, freeSent: false }); },
+    onFree: e => { stop(e); app.openFree(id); },
     tipOpen: s.tip.startsWith(id + ':'),
     tipText: s.tip === id + ':npp' ? t('expNpp') : s.tip === id + ':win' ? t('expWin') : t('expTrades'),
     tipNpp: tipFor('npp'), tipWin: tipFor('win'), tipTrades: tipFor('trades'), tipClose: () => app.setState({ tip: '' })

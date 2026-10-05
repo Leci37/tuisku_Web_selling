@@ -2,6 +2,28 @@
 // the server's (POST /api/quote); the browser only knows what is in the cart.
 const num = x => (x == null || x === '' ? 0 : Number(x));
 
+// The strategies a chosen bundle key stands for ('custom' is the pack being built).
+const idsOf = (st, defs, key) => key === 'custom' ? st.packIds : ((defs.bundles.find(b => b.key === key) || {}).ids || []);
+const shares = (a, b) => a.some(id => b.includes(id));
+
+// A strategy is paid once: adding a bundle or the pack drops the loose items, the bundles and the
+// pack that share a strategy with it (the server refuses a cart that holds one twice).
+function addBundle(st, defs, key) {
+  const ids = idsOf(st, defs, key);
+  return { bundles: [...st.bundles.filter(b => b !== key && !shares(idsOf(st, defs, b), ids)), key], cart: st.cart.filter(id => !ids.includes(id)) };
+}
+
+// The same rule on a cart saved by an older version of the page: the first bundle chosen wins.
+export function withoutOverlap(st, defs) {
+  const taken = [], bundles = [];
+  st.bundles.forEach(b => {
+    const ids = idsOf(st, defs, b);
+    if (!shares(ids, taken)) { bundles.push(b); taken.push(...ids); }
+  });
+  const cart = st.cart.filter(id => !taken.includes(id));
+  return bundles.length === st.bundles.length && cart.length === st.cart.length ? {} : { bundles, cart };
+}
+
 export function cartVals(c) {
   const { app, s, t, tx, f } = c;
   const defs = s.bundleDefs || { bundles: [], pack: { size: 5, price: 0 } };
@@ -63,7 +85,7 @@ export function cartVals(c) {
         icons: tick.map(tk => ({ src: iconOf(rowsB.find(r => r.ticker === tk)) })),
         was: f.pmoney(b.was), price: f.pmoney(b.price), save: saveOf(b.price, b.was),
         label: on ? tx.inCartBtn : t('addBundle'), btnIcon: on ? 'fa-solid fa-check' : 'fa-solid fa-cart-plus',
-        go: () => app.setState(st => on ? { bundles: st.bundles.filter(x => x !== b.key) } : { bundles: [...st.bundles, b.key], cart: st.cart.filter(id => !b.ids.includes(id)) }) };
+        go: () => app.setState(st => on ? { bundles: st.bundles.filter(x => x !== b.key) } : addBundle(st, defs, b.key)) };
     }),
     packSlots: Array.from({ length: pack.size }, (_, i) => { const r = packRows[i]; return { filled: !!r, empty: !r, icon: iconOf(r), border: r ? '1px solid #e2e9f0' : '2px dashed #9fb8ef' }; }),
     packSave: saveOf(pack.price, packWas),
@@ -71,23 +93,30 @@ export function cartVals(c) {
     packBtnLabel: s.bundles.includes('custom') ? tx.inCartBtn : t('addPack'), packBtnBg: full ? '#0950e3' : '#9aa7b8',
     addPack: () => {
       if (!full) { app.setState({ packOpen: true }); return; }
-      app.setState(st => st.bundles.includes('custom') ? { bundles: st.bundles.filter(b => b !== 'custom') } : { bundles: [...st.bundles, 'custom'], cart: st.cart.filter(id => !st.packIds.includes(id)) });
+      app.setState(st => st.bundles.includes('custom') ? { bundles: st.bundles.filter(b => b !== 'custom') } : addBundle(st, defs, 'custom'));
     },
     openPack: () => app.setState({ packOpen: true }), closePack: () => app.setState({ packOpen: false }), packOpen: s.packOpen,
     packCount: f.int(s.packIds.length), packSize: f.int(pack.size),
     packQ: s.packQ, onPackQ: e => app.setState({ packQ: e.target.value }),
-    packList: packChoices(c, pack.size)
+    packList: packChoices(c, defs)
   };
 }
 
-// The picker: what is picked first, then the paid strategies the search found.
-function packChoices(c, size) {
-  const { app, s } = c;
+// The picker: what is picked first, then the paid strategies the search found. A strategy that is
+// already in a chosen bundle shows as in the cart and cannot be ticked (it can be unticked).
+function packChoices(c, defs) {
+  const { app, s } = c, size = defs.pack.size;
   const picked = s.packIds.map(id => app.row(id)).filter(Boolean);
   const rest = s.packFound.filter(r => !s.packIds.includes(r.id));
+  const inBundle = id => s.bundles.some(b => b !== 'custom' && idsOf(s, defs, b).includes(id));
   return [...picked, ...rest].map(r => {
-    const on = s.packIds.includes(r.id);
-    return { ...c.mk(r), check: on ? '✓' : '', ck: on ? '#0950e3' : '#cfd6e6', ckBg: on ? '#0950e3' : '#ffffff', bd: on ? '#c5d6f8' : '#e2e9f0', bg: on ? '#f5f8ff' : '#ffffff',
-      toggle: () => app.setState(st => ({ packIds: st.packIds.includes(r.id) ? st.packIds.filter(x => x !== r.id) : st.packIds.length >= size ? st.packIds : [...st.packIds, r.id], bundles: st.bundles.filter(b => b !== 'custom') })) };
+    const on = s.packIds.includes(r.id), held = inBundle(r.id), locked = held && !on;
+    return { ...c.mk(r), check: on ? '✓' : '', ck: on ? '#0950e3' : '#cfd6e6', ckBg: on ? '#0950e3' : locked ? '#e9eef4' : '#ffffff',
+      bd: on ? '#c5d6f8' : '#e2e9f0', bg: on ? '#f5f8ff' : locked ? '#f4f8fb' : '#ffffff', held, locked, cursor: locked ? 'default' : 'pointer',
+      toggle: () => app.setState(st => {
+        if (st.packIds.includes(r.id)) return { packIds: st.packIds.filter(x => x !== r.id), bundles: st.bundles.filter(b => b !== 'custom') };
+        if (st.packIds.length >= size || st.bundles.some(b => b !== 'custom' && idsOf(st, defs, b).includes(r.id))) return null;
+        return { packIds: [...st.packIds, r.id], bundles: st.bundles.filter(b => b !== 'custom') };
+      }) };
   });
 }

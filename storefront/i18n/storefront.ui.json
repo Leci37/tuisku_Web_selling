@@ -2059,5 +2059,205 @@
   "zh": "操作未成功",
   "ar": "تعذّر ذلك",
   "hi": "यह नहीं हो सका"
+ },
+ "errNetwork": {
+  "es": "No hay conexión con la tienda. Comprueba tu internet e inténtalo de nuevo.",
+  "en": "Could not reach the shop. Check your connection and try again.",
+  "pt": "Não foi possível contactar a loja. Verifica a tua ligação e tenta de novo.",
+  "fr": "Impossible de joindre la boutique. Vérifiez votre connexion et réessayez.",
+  "de": "Der Shop ist nicht erreichbar. Prüfe deine Verbindung und versuche es noch einmal.",
+  "zh": "无法连接到商店。请检查网络后重试。",
+  "ar": "تعذّر الوصول إلى المتجر. تحقّق من اتصالك وحاول مرة أخرى.",
+  "hi": "दुकान तक नहीं पहुँच सके। अपना कनेक्शन जाँचें और फिर से कोशिश करें।"
+ },
+ "errRequest": {
+  "es": "Algo de esta petición no es válido. Recarga la página e inténtalo de nuevo.",
+  "en": "Something in this request is not valid. Reload the page and try again.",
+  "pt": "Algo neste pedido não é válido. Recarrega a página e tenta de novo.",
+  "fr": "Quelque chose dans cette demande n’est pas valide. Rechargez la page et réessayez.",
+  "de": "Etwas an dieser Anfrage ist ungültig. Lade die Seite neu und versuche es noch einmal.",
+  "zh": "此请求中有无效内容。请刷新页面后重试。",
+  "ar": "هناك شيء غير صالح في هذا الطلب. أعد تحميل الصفحة وحاول مرة أخرى.",
+  "hi": "इस अनुरोध में कुछ मान्य नहीं है। पेज फिर से लोड करें और दोबारा कोशिश करें।"
+ },
+ "errPayment": {
+  "es": "PayPal no confirmó el pago de este pedido, así que no se te ha cobrado nada por él.",
+  "en": "PayPal did not confirm the payment for this order, so nothing was charged for it.",
+  "pt": "O PayPal não confirmou o pagamento desta encomenda, por isso nada foi cobrado.",
+  "fr": "PayPal n’a pas confirmé le paiement de cette commande ; rien n’a donc été débité.",
+  "de": "PayPal hat die Zahlung für diese Bestellung nicht bestätigt, daher wurde nichts abgebucht.",
+  "zh": "PayPal 未确认此订单的付款，因此没有扣款。",
+  "ar": "لم يؤكّد PayPal دفع هذا الطلب، لذلك لم يُخصم أي مبلغ.",
+  "hi": "PayPal ने इस ऑर्डर के भुगतान की पुष्टि नहीं की, इसलिए इसके लिए कुछ नहीं लिया गया।"
+ },
+ "errNotFound": {
+  "es": "No lo encontramos. Puede que el enlace sea antiguo o que ya no exista.",
+  "en": "We could not find it. The link may be old or no longer exist.",
+  "pt": "Não o encontrámos. A ligação pode ser antiga ou já não existir.",
+  "fr": "Introuvable. Le lien est peut-être ancien ou n’existe plus.",
+  "de": "Nicht gefunden. Der Link ist vielleicht alt oder existiert nicht mehr.",
+  "zh": "未找到。链接可能已过时或不再存在。",
+  "ar": "لم نعثر عليه. ربما يكون الرابط قديمًا أو لم يعد موجودًا.",
+  "hi": "हमें यह नहीं मिला। लिंक पुराना हो सकता है या अब मौजूद नहीं है।"
+ },
+ "errTooMany": {
+  "es": "Demasiados intentos. Inténtalo más tarde.",
+  "en": "Too many attempts. Try again later.",
+  "pt": "Demasiadas tentativas. Tenta mais tarde.",
+  "fr": "Trop de tentatives. Réessayez plus tard.",
+  "de": "Zu viele Versuche. Versuche es später noch einmal.",
+  "zh": "尝试次数过多。请稍后再试。",
+  "ar": "محاولات كثيرة جدًا. حاول لاحقًا.",
+  "hi": "बहुत अधिक प्रयास। बाद में फिर कोशिश करें।"
+ },
+ "errLater": {
+  "es": "El servicio no respondió. Inténtalo dentro de unos minutos.",
+  "en": "The service did not answer. Try again in a few minutes.",
+  "pt": "O serviço não respondeu. Tenta daqui a uns minutos.",
+  "fr": "Le service n’a pas répondu. Réessayez dans quelques minutes.",
+  "de": "Der Dienst hat nicht geantwortet. Versuche es in ein paar Minuten noch einmal.",
+  "zh": "服务没有响应。请几分钟后再试。",
+  "ar": "لم تستجب الخدمة. حاول بعد بضع دقائق.",
+  "hi": "सेवा ने जवाब नहीं दिया। कुछ मिनट बाद फिर कोशिश करें।"
+ },
+ "signInAs": {
+  "es": "Entrar como {e}",
+  "en": "Sign in as {e}",
+  "pt": "Entrar como {e}",
+  "fr": "Se connecter en tant que {e}",
+  "de": "Anmelden als {e}",
+  "zh": "以 {e} 登录",
+  "ar": "تسجيل الدخول باسم {e}",
+  "hi": "{e} के रूप में साइन इन करें"
+ },
+ "signInConfirm": {
+  "es": "Confirma para abrir Mis estrategias en este navegador.",
+  "en": "Confirm to open My strategies in this browser.",
+  "pt": "Confirma para abrir As minhas estratégias neste navegador.",
+  "fr": "Confirmez pour ouvrir Mes stratégies dans ce navigateur.",
+  "de": "Bestätige, um Meine Strategien in diesem Browser zu öffnen.",
+  "zh": "确认后即可在此浏览器中打开“我的策略”。",
+  "ar": "أكّد لفتح استراتيجياتي في هذا المتصفح.",
+  "hi": "इस ब्राउज़र में मेरी रणनीतियाँ खोलने के लिए पुष्टि करें।"
+ },
+ "linksHiddenTitle": {
+  "es": "Tus enlaces están en Mis estrategias",
+  "en": "Your links are in My strategies",
+  "pt": "As tuas ligações estão em As minhas estratégias",
+  "fr": "Vos liens sont dans Mes stratégies",
+  "de": "Deine Links findest du unter Meine Strategien",
+  "zh": "你的下载链接在“我的策略”中",
+  "ar": "روابطك موجودة في استراتيجياتي",
+  "hi": "आपके लिंक मेरी रणनीतियाँ में हैं"
+ },
+ "linksHiddenText": {
+  "es": "Entra con el correo con el que pagaste para descargar tus estrategias.",
+  "en": "Sign in with the email you paid with to download your strategies.",
+  "pt": "Entra com o e-mail com que pagaste para descarregares as tuas estratégias.",
+  "fr": "Connectez-vous avec l’e-mail utilisé pour payer afin de télécharger vos stratégies.",
+  "de": "Melde dich mit der E-Mail an, mit der du bezahlt hast, um deine Strategien herunterzuladen.",
+  "zh": "使用付款时的邮箱登录，即可下载你的策略。",
+  "ar": "سجّل الدخول بالبريد الإلكتروني الذي دفعت به لتنزيل استراتيجياتك.",
+  "hi": "अपनी रणनीतियाँ डाउनलोड करने के लिए उसी ईमेल से साइन इन करें जिससे आपने भुगतान किया था।"
+ },
+ "signInToDownload": {
+  "es": "Entrar para descargar",
+  "en": "Sign in to download",
+  "pt": "Entrar para descarregar",
+  "fr": "Se connecter pour télécharger",
+  "de": "Anmelden zum Herunterladen",
+  "zh": "登录后下载",
+  "ar": "سجّل الدخول للتنزيل",
+  "hi": "डाउनलोड के लिए साइन इन करें"
+ },
+ "newsConfirmedTitle": {
+  "es": "Suscripción confirmada",
+  "en": "Subscription confirmed",
+  "pt": "Subscrição confirmada",
+  "fr": "Abonnement confirmé",
+  "de": "Anmeldung bestätigt",
+  "zh": "订阅已确认",
+  "ar": "تم تأكيد الاشتراك",
+  "hi": "सदस्यता की पुष्टि हो गई"
+ },
+ "newsConfirmedText": {
+  "es": "Te escribiremos cuando haya estrategias nuevas.",
+  "en": "We'll email you when there are new strategies.",
+  "pt": "Vamos escrever-te quando houver novas estratégias.",
+  "fr": "Nous vous écrirons quand il y aura de nouvelles stratégies.",
+  "de": "Wir schreiben dir, wenn es neue Strategien gibt.",
+  "zh": "有新策略时，我们会发邮件通知你。",
+  "ar": "سنراسلك عندما تتوفر استراتيجيات جديدة.",
+  "hi": "नई रणनीतियाँ आने पर हम आपको ईमेल करेंगे।"
+ },
+ "newsExpiredTitle": {
+  "es": "Ese enlace de confirmación ha caducado",
+  "en": "That confirmation link has expired",
+  "pt": "Essa ligação de confirmação expirou",
+  "fr": "Ce lien de confirmation a expiré",
+  "de": "Dieser Bestätigungslink ist abgelaufen",
+  "zh": "该确认链接已失效",
+  "ar": "انتهت صلاحية رابط التأكيد هذا",
+  "hi": "पुष्टि का वह लिंक समाप्त हो गया है"
+ },
+ "newsExpiredText": {
+  "es": "O ya se usó. Para recibir novedades, marca la casilla la próxima vez que descargues una estrategia gratis.",
+  "en": "Or it was already used. To get news, tick the box the next time you download a free strategy.",
+  "pt": "Ou já foi usada. Para receberes novidades, marca a caixa da próxima vez que descarregares uma estratégia grátis.",
+  "fr": "Ou il a déjà servi. Pour recevoir les nouveautés, cochez la case la prochaine fois que vous téléchargerez une stratégie gratuite.",
+  "de": "Oder er wurde schon benutzt. Wenn du Neuigkeiten möchtest, setze das Häkchen beim nächsten kostenlosen Download.",
+  "zh": "也可能已被使用。如需接收新策略通知，请在下次下载免费策略时勾选该选项。",
+  "ar": "أو ربما استُخدم من قبل. لتصلك الأخبار، حدّد المربع في المرة القادمة التي تنزّل فيها استراتيجية مجانية.",
+  "hi": "या वह पहले ही इस्तेमाल हो चुका है। खबरें पाने के लिए, अगली बार मुफ़्त रणनीति डाउनलोड करते समय बॉक्स पर टिक करें।"
+ },
+ "mailSignInSubject": {
+  "es": "Tu enlace para entrar en Edgefolio",
+  "en": "Your Edgefolio sign-in link",
+  "pt": "A tua ligação para entrar no Edgefolio",
+  "fr": "Votre lien de connexion à Edgefolio",
+  "de": "Dein Anmeldelink für Edgefolio",
+  "zh": "你的 Edgefolio 登录链接",
+  "ar": "رابط تسجيل الدخول إلى Edgefolio",
+  "hi": "आपका Edgefolio साइन-इन लिंक"
+ },
+ "mailSignInBody": {
+  "es": "Abre este enlace para entrar en Mis estrategias de Edgefolio:\n\n{link}\n\nFunciona una sola vez y durante {minutes} minutos. Si no lo has pedido tú, ignora este correo.\n",
+  "en": "Open this link to sign in to My strategies on Edgefolio:\n\n{link}\n\nIt works once, for {minutes} minutes. If you did not ask for it, ignore this email.\n",
+  "pt": "Abre esta ligação para entrares em As minhas estratégias no Edgefolio:\n\n{link}\n\nFunciona uma única vez, durante {minutes} minutos. Se não foste tu que a pediste, ignora este e-mail.\n",
+  "fr": "Ouvrez ce lien pour vous connecter à Mes stratégies sur Edgefolio :\n\n{link}\n\nIl ne fonctionne qu’une fois, pendant {minutes} minutes. Si vous ne l’avez pas demandé, ignorez cet e-mail.\n",
+  "de": "Öffne diesen Link, um dich bei Meine Strategien auf Edgefolio anzumelden:\n\n{link}\n\nEr funktioniert einmal und {minutes} Minuten lang. Wenn du ihn nicht angefordert hast, ignoriere diese E-Mail.\n",
+  "zh": "打开此链接，登录 Edgefolio 的“我的策略”：\n\n{link}\n\n链接只能使用一次，{minutes} 分钟内有效。如果不是你本人申请的，请忽略这封邮件。\n",
+  "ar": "افتح هذا الرابط لتسجيل الدخول إلى «استراتيجياتي» في Edgefolio:\n\n{link}\n\nيعمل الرابط مرة واحدة فقط، ولمدة {minutes} دقيقة. إذا لم تطلبه، فتجاهل هذه الرسالة.\n",
+  "hi": "Edgefolio पर मेरी रणनीतियाँ में साइन इन करने के लिए यह लिंक खोलें:\n\n{link}\n\nयह लिंक सिर्फ़ एक बार और {minutes} मिनट तक काम करेगा। अगर आपने इसे नहीं माँगा था, तो इस ईमेल को अनदेखा करें।\n"
+ },
+ "mailFreeSubject": {
+  "es": "Tu estrategia gratis: {name} ({ticker}, {interval})",
+  "en": "Your free strategy: {name} ({ticker}, {interval})",
+  "pt": "A tua estratégia grátis: {name} ({ticker}, {interval})",
+  "fr": "Votre stratégie gratuite : {name} ({ticker}, {interval})",
+  "de": "Deine kostenlose Strategie: {name} ({ticker}, {interval})",
+  "zh": "你的免费策略：{name}（{ticker}，{interval}）",
+  "ar": "استراتيجيتك المجانية: {name} ({ticker}، {interval})",
+  "hi": "आपकी मुफ़्त रणनीति: {name} ({ticker}, {interval})"
+ },
+ "mailFreeBody": {
+  "es": "Aquí tienes tu estrategia gratis de Edgefolio para TradingView: {name} ({ticker}, {interval}).\n\nScript de Pine: {pine}\nScript + reglas en palabras sencillas + Python/JavaScript (zip): {zip}\n\nLos enlaces valen {days} días y hasta {n} descargas. Entra con este correo en {mine} para ver tus estrategias y pedir enlaces nuevos.\n\nCómo usarla: copia el script, abre el Editor de Pine en TradingView, pégalo y pulsa «Guardar» y después «Añadir al gráfico».\n",
+  "en": "Here is your free Edgefolio strategy for TradingView: {name} ({ticker}, {interval}).\n\nPine script: {pine}\nScript + rules in plain words + Python/JavaScript (zip): {zip}\n\nThe links work for {days} days and up to {n} downloads. Sign in with this email at {mine} to see your strategies and get new links.\n\nTo use it: copy the script, open the Pine Editor in TradingView, paste it, click \"Save\" and then \"Add to chart\".\n",
+  "pt": "Aqui tens a tua estratégia grátis do Edgefolio para o TradingView: {name} ({ticker}, {interval}).\n\nScript Pine: {pine}\nScript + regras em palavras simples + Python/JavaScript (zip): {zip}\n\nAs ligações valem {days} dias e até {n} transferências. Entra com este e-mail em {mine} para veres as tuas estratégias e pedires ligações novas.\n\nComo usar: copia o script, abre o Pine Editor no TradingView, cola-o e clica em «Guardar» e depois em «Adicionar ao gráfico».\n",
+  "fr": "Voici votre stratégie Edgefolio gratuite pour TradingView : {name} ({ticker}, {interval}).\n\nScript Pine : {pine}\nScript + règles expliquées simplement + Python/JavaScript (zip) : {zip}\n\nLes liens sont valables {days} jours et pour {n} téléchargements au maximum. Connectez-vous avec cette adresse sur {mine} pour retrouver vos stratégies et obtenir de nouveaux liens.\n\nPour l’utiliser : copiez le script, ouvrez l’éditeur Pine dans TradingView, collez-le, puis cliquez sur « Enregistrer » et ensuite sur « Ajouter au graphique ».\n",
+  "de": "Hier ist deine kostenlose Edgefolio-Strategie für TradingView: {name} ({ticker}, {interval}).\n\nPine-Skript: {pine}\nSkript + Regeln in einfachen Worten + Python/JavaScript (ZIP): {zip}\n\nDie Links gelten {days} Tage und für bis zu {n} Downloads. Melde dich mit dieser E-Mail-Adresse unter {mine} an, um deine Strategien zu sehen und neue Links zu holen.\n\nSo nutzt du sie: Kopiere das Skript, öffne in TradingView den Pine Editor, füge es ein und klicke auf „Speichern“ und dann auf „Zum Chart hinzufügen“.\n",
+  "zh": "这是你在 Edgefolio 领取的免费 TradingView 策略：{name}（{ticker}，{interval}）。\n\nPine 脚本：{pine}\n脚本 + 通俗易懂的规则说明 + Python/JavaScript（zip）：{zip}\n\n链接 {days} 天内有效，最多可下载 {n} 次。用这个邮箱在 {mine} 登录，即可查看你的策略并获取新链接。\n\n使用方法：复制脚本，在 TradingView 中打开 Pine 编辑器，粘贴后点击“保存”，再点击“添加到图表”。\n",
+  "ar": "إليك استراتيجيتك المجانية من Edgefolio لمنصة TradingView: {name} ({ticker}، {interval}).\n\nسكربت Pine: {pine}\nالسكربت + القواعد بكلمات بسيطة + Python/JavaScript (ملف zip): {zip}\n\nتبقى الروابط صالحة لعدد {days} من الأيام ولعدد {n} من التنزيلات كحد أقصى. سجّل الدخول بهذا البريد الإلكتروني في {mine} لرؤية استراتيجياتك والحصول على روابط جديدة.\n\nطريقة الاستخدام: انسخ السكربت، وافتح محرر Pine في TradingView، والصقه، ثم انقر على «حفظ» ثم على «إضافة إلى الرسم البياني».\n",
+  "hi": "TradingView के लिए आपकी मुफ़्त Edgefolio रणनीति यह रही: {name} ({ticker}, {interval})।\n\nPine स्क्रिप्ट: {pine}\nस्क्रिप्ट + आसान शब्दों में नियम + Python/JavaScript (zip): {zip}\n\nये लिंक {days} दिन तक और ज़्यादा से ज़्यादा {n} डाउनलोड तक चलेंगे। अपनी रणनीतियाँ देखने और नए लिंक पाने के लिए इसी ईमेल से {mine} पर साइन इन करें।\n\nइस्तेमाल कैसे करें: स्क्रिप्ट कॉपी करें, TradingView में Pine Editor खोलें, स्क्रिप्ट पेस्ट करें, फिर \"Save\" और उसके बाद \"Add to chart\" पर क्लिक करें।\n"
+ },
+ "mailNewsConfirm": {
+  "es": "Has pedido que te avisemos de estrategias nuevas. Confírmalo con este enlace (hasta entonces no te enviaremos nada):\n{link}\nSi no lo has pedido tú, ignóralo.\n",
+  "en": "You asked us to tell you about new strategies. Confirm it with this link (until you do, we will send you nothing):\n{link}\nIf it was not you, just ignore it.\n",
+  "pt": "Pediste que te avisássemos de novas estratégias. Confirma-o com esta ligação (até lá não te enviamos nada):\n{link}\nSe não foste tu, ignora-a.\n",
+  "fr": "Vous avez demandé à être prévenu des nouvelles stratégies. Confirmez-le avec ce lien (d’ici là, nous ne vous enverrons rien) :\n{link}\nSi ce n’était pas vous, ignorez-le.\n",
+  "de": "Du möchtest über neue Strategien informiert werden. Bestätige das mit diesem Link (bis dahin schicken wir dir nichts):\n{link}\nWenn du das nicht warst, ignoriere ihn einfach.\n",
+  "zh": "你申请了在有新策略时收到通知。请点击此链接确认（确认之前我们不会给你发送任何邮件）：\n{link}\n如果不是你本人操作，请忽略。\n",
+  "ar": "طلبت أن نُعلمك بالاستراتيجيات الجديدة. أكّد ذلك عبر هذا الرابط (لن نرسل إليك شيئًا قبل التأكيد):\n{link}\nإذا لم تكن أنت من طلب ذلك، فتجاهله.\n",
+  "hi": "आपने नई रणनीतियों की जानकारी पाने का अनुरोध किया है। इस लिंक से इसकी पुष्टि करें (पुष्टि होने तक हम आपको कुछ नहीं भेजेंगे):\n{link}\nअगर यह अनुरोध आपने नहीं किया था, तो इसे अनदेखा करें।\n"
  }
 }

@@ -5,7 +5,7 @@ import { s, T } from '../lib/tpl.js';
 export default function Pro(v) {
   return html`
   ${v.isPro ? html`
-    <div style="background:#fff;border-bottom:1px solid #e2e9f0">
+    <div data-sf-cart style="background:#fff;border-bottom:1px solid #e2e9f0">
       <div style="max-width:1320px;margin:0 auto;padding:12px 28px 10px;display:flex;flex-wrap:wrap;gap:12px 28px;align-items:center">
         <div style="display:flex;align-items:center;gap:10px;flex:0 0 auto"><span style="width:36px;height:36px;border-radius:10px;background:#e9f0fd;color:#0950e3;display:grid;place-items:center"><i class="fa-solid fa-cart-shopping"></i></span><div style="line-height:1.25"><div style="font-weight:700">${T(v.tx?.cart)} · ${T(v.cartCount)}</div><button onClick=${v.emptyCart} style="font-family:inherit;border:none;background:none;padding:0;color:#c0392b;font-weight:600;font-size:12px;cursor:pointer">${v.tx?.emptyCart}</button></div></div>
         <div style="flex:1 1 360px;display:flex;flex-direction:column;gap:7px;min-width:0">
@@ -76,7 +76,7 @@ export default function Pro(v) {
           <div style="display:flex;background:#e9eef4;border-radius:10px;padding:3px;flex-wrap:wrap">
             ${(v.sortTabs || []).map((st, $index) => html`<button onClick=${st?.go} style="font-family:inherit;border:none;border-radius:8px;padding:5px 10px;font-size:12px;font-weight:600;cursor:pointer;background:${s(st?.bg)};color:${s(st?.color)};box-shadow:${s(st?.shadow)}">${st?.label}</button>`)}
             </div>
-          <label style="margin-inline-start:auto;width:240px;max-width:100%;display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #e2e9f0;border-radius:10px;padding:6px 10px"><i class="fa-solid fa-magnifying-glass" style="color:#8d9cae;font-size:12px"></i><input value=${v.q ?? ''} onInput=${v.onQ} placeholder=${v.tx?.searchSmall} title=${v.tx?.searchPh} style="flex:1;min-width:0;border:none;outline:none;font-family:inherit;font-size:13px;color:#16263a;background:transparent" /></label>
+          <label style="margin-inline-start:auto;width:240px;max-width:100%;display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #e2e9f0;border-radius:10px;padding:6px 10px"><i class="fa-solid fa-magnifying-glass" style="color:#8d9cae;font-size:12px"></i><input data-sf-search value=${v.q ?? ''} onInput=${v.onQ} placeholder=${v.tx?.searchSmall} title=${v.tx?.searchPh} style="flex:1;min-width:0;border:none;outline:none;font-family:inherit;font-size:13px;color:#16263a;background:transparent" /></label>
           <div role="group" aria-label=${v.tx?.view} style="display:flex;background:#e9eef4;border-radius:10px;padding:3px">
             ${(v.viewTabs || []).map((vt, $index) => html`<button onClick=${vt?.go} aria-pressed=${vt?.pressed} style="font-family:inherit;border:none;border-radius:8px;padding:5px 11px;font-size:12.5px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:7px;background:${s(vt?.bg)};color:${s(vt?.color)};box-shadow:${s(vt?.shadow)}"><i class=${vt?.icon}></i>${T(vt?.label)}</button>`)}
             </div>

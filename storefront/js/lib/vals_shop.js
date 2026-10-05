@@ -1,6 +1,6 @@
 // The shop: Lite (ticker strip, tabs, cards, Load more) and Pro (filters with histograms, chips,
 // rows / cards / table, pager). Lists, counts, histograms and options come from /api/strategies.
-import { RANGES, TOP_RANGES, MORE_RANGES, SELECTS, track, val, fracOf, isOn, parseNum } from './filters.js';
+import { RANGES, TOP_RANGES, MORE_RANGES, SELECTS, track, val, snap, fracOf, isOn, parseNum } from './filters.js';
 
 export const PRO_SIZE = 25;
 
@@ -34,7 +34,8 @@ function proVals(c, seg) {
   };
   const rgOf = k => s.rg[k] || [0, 1];
   const slider = k => {
-    const dd = track(k, s.ranges), fm = fmt[dd.f], [a, b] = rgOf(k), on = isOn(s.rg[k]);
+    // labels show the snapped value, the one the query sends (filters.js)
+    const dd = track(k, s.ranges), fm = v => fmt[dd.f](snap(dd, v)), [a, b] = rgOf(k), on = isOn(s.rg[k]);
     const cnt = (s.hist && s.hist[k]) || [], hl = cnt.length, mx = Math.max(1, ...cnt), dr = s.draft || {};
     const setD = (i, v) => app.setState(st => ({ draft: { ...(st.draft || {}), [k + i]: v } }));
     const commit = i => app.setState(st => {

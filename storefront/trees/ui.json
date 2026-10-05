@@ -183,7 +183,8 @@
    "d_k": "%D vs. %K",
    "smoothK_k": "Suavização de %K",
    "smoothD_d": "Suavização de %D"
-  }
+  },
+  "ownNotYours": "Vista de proprietário: esta estratégia não está entre as compras do email com que iniciaste sessão. Compra-a para veres a árvore completa e descarregares o script."
  },
  "fr": {
   "locale": "fr-FR",
@@ -319,7 +320,8 @@
    "d_k": "%D vs %K",
    "smoothK_k": "Lissage de %K",
    "smoothD_d": "Lissage de %D"
-  }
+  },
+  "ownNotYours": "Vue propriétaire : cette stratégie ne figure pas parmi les achats de l’e-mail avec lequel vous êtes connecté. Achetez-la pour voir son arbre complet et télécharger le script."
  },
  "de": {
   "locale": "de-DE",
@@ -455,7 +457,8 @@
    "d_k": "%D vs. %K",
    "smoothK_k": "Glättung von %K",
    "smoothD_d": "Glättung von %D"
-  }
+  },
+  "ownNotYours": "Besitzeransicht: Diese Strategie gehört nicht zu den Käufen der E-Mail, mit der du angemeldet bist. Kaufe sie, um den vollständigen Baum zu sehen und das Skript herunterzuladen."
  },
  "zh": {
   "locale": "zh-CN",
@@ -591,7 +594,8 @@
    "d_k": "%D 对比 %K",
    "smoothK_k": "%K 平滑",
    "smoothD_d": "%D 平滑"
-  }
+  },
+  "ownNotYours": "所有者视图：您当前登录的邮箱没有购买过此策略。购买后即可查看完整的树并下载脚本。"
  },
  "ar": {
   "locale": "ar-u-nu-latn",
@@ -727,7 +731,8 @@
    "d_k": "%D مقابل %K",
    "smoothK_k": "تنعيم %K",
    "smoothD_d": "تنعيم %D"
-  }
+  },
+  "ownNotYours": "عرض المالك: هذه الاستراتيجية ليست ضمن مشتريات البريد الإلكتروني الذي سجّلت الدخول به. اشترِها لترى شجرتها الكاملة وتنزّل السكربت."
  },
  "hi": {
   "locale": "hi-IN",
@@ -863,6 +868,7 @@
    "d_k": "%D बनाम %K",
    "smoothK_k": "%K का स्मूदिंग",
    "smoothD_d": "%D का स्मूदिंग"
-  }
+  },
+  "ownNotYours": "मालिक का दृश्य: यह रणनीति उस ईमेल की खरीदारी में नहीं है जिससे आपने साइन इन किया है। पूरा पेड़ देखने और स्क्रिप्ट डाउनलोड करने के लिए इसे खरीदें।"
  }
 }

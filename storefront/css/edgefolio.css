@@ -34,3 +34,7 @@ a:hover{text-decoration:underline}
 /* On a phone the code, totals and Checkout of the Pro cart strip need a line of their own; with
    flex:0 0 auto (as designed) they could not wrap and pushed the page sideways. */
 @media (max-width:560px){.sf-cartend{flex:1 1 100% !important}}
+
+/* In Arabic a Latin name cut with an ellipsis would lose its first word ("…oldings Corporation"):
+   let each truncated line take the direction of its own text, so it is cut at its own end. */
+[dir="rtl"] [style*="text-overflow:ellipsis"]{unicode-bidi:plaintext}
