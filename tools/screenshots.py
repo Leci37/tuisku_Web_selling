@@ -1,34 +1,43 @@
-"""Walk the shop in a real browser and save the README screenshots to docs/img/.
+# -*- coding: utf-8 -*-
+"""Recorre la tienda en un navegador de verdad y guarda las capturas del README en docs/img/.
 
-    DATABASE=/tmp/shop.db PAYPAL_MODE=fake DISCOUNT_CODES=demo20=0.20 \\
-        uvicorn --factory api.app:create_app --port 8000          # in one terminal
-    pip install playwright && DATABASE=/tmp/shop.db python tools/screenshots.py
+    PORT=5105 python app.py                 # en una terminal, con el .env de desarrollo (PAYPAL_MODE=fake,
+                                            # DISCOUNT_CODES=demo20=0.20, sin SMTP: los correos, a <datos>/mail)
+    python tools/screenshots.py             # en otra; lee el mismo .env para encontrar los correos
 
-Lite → three strategies and a discount code in the cart → Pro, with filters and as a table → a strategy
-page and How it decides → Checkout (fake PayPal) → install tutorial → thank-you page → download one paid
-file → sign in to My strategies with the emailed link (read from the outbox in DATABASE, so it must be
-the server's) → welcome tour, compare, Build your pack, a free download by email → Arabic and Spanish →
-the shop on a phone.
-It doubles as the end-to-end check: it stops at the first step that fails, and reports the browser's
-console errors. Downloads need the paid scripts in STRATEGIES_DIR (README: Private storage).
+Lite → tres estrategias y un código en el carrito → Pro, con filtros y en tabla → la página de una
+estrategia y «Cómo decide» → Pagar (PayPal de prueba) → el tutorial de instalación → la página de gracias
+→ descargar un script de pago → darse de alta en el núcleo, confirmar el correo con el que se pagó (el
+enlace, del correo que el servidor dejó en <datos>/mail) y Mis estrategias → el recorrido de bienvenida,
+comparar, «Crea tu pack», una gratis por correo → árabe y español → la tienda en un móvil.
+Es también la prueba de punta a punta: para en el primer paso que falla e informa de los errores de la
+consola del navegador (también de la CSP). Las descargas necesitan los scripts de pago
+(flask --app app edgefolio restore-scripts).
 
-SHOP_URL (default http://localhost:8000), CHROMIUM_PATH (a browser binary) and OUT (default docs/img).
+SHOP_URL (por defecto http://localhost:5105), CHROMIUM_PATH (un navegador) y OUT (por defecto docs/img).
 """
+import email
 import os
 import re
-import sqlite3
 import sys
 import time
+from email import policy
 from pathlib import Path
 
 from playwright.sync_api import sync_playwright
 
 ROOT = Path(__file__).resolve().parent.parent
-BASE = os.environ.get("SHOP_URL", "http://localhost:8000").rstrip("/")
+sys.path.insert(0, str(ROOT))
+from zlecitool_core.config import load_env_file  # noqa: E402
+
+load_env_file(ROOT / ".env")
+BASE = os.environ.get("SHOP_URL", "http://localhost:5105").rstrip("/")
 OUT = Path(os.environ.get("OUT") or ROOT / "docs" / "img")
-DATABASE = Path(os.environ.get("DATABASE") or ROOT / "private" / "shop.db")
-BUYER = "buyer@example.com"            # the payer the fake PayPal reports
-STRATEGY = "AAPL_1Day_2CT0_8a979adf"   # shown on the strategy page and in the tree
+MAIL = Path(os.environ.get("ZLECITOOL_DATA_DIR") or ROOT / "data") / "mail"
+BUYER = "buyer@example.com"            # quien paga en el PayPal de prueba
+ACCOUNT = "ana@example.com"            # la cuenta del núcleo con la que se entra después
+PASSWORD = "probando-la-tienda-1"
+STRATEGY = "AAPL_1Day_2CT0_8a979adf"   # la de la página de la estrategia y el árbol
 problems = []
 
 
@@ -37,8 +46,8 @@ def step(name):
 
 
 def shot(page, name, height=None, full=False):
-    """Load the lazy images first, then save the top `height` px (or the whole page)."""
-    # from the top: the bar is sticky, and a full-page shot taken scrolled down draws it mid-page
+    """Primero las imágenes perezosas; después, los ``height`` px de arriba (o la página entera)."""
+    # desde arriba: la barra es fija, y una captura entera hecha con la página bajada la pinta en medio
     page.evaluate("window.scrollTo(0, 0); document.querySelectorAll('img[loading=lazy]').forEach(i => i.loading = 'eager')")
     page.wait_for_load_state("networkidle")
     page.wait_for_timeout(700)
@@ -51,18 +60,19 @@ def shot(page, name, height=None, full=False):
     print(f"  saved {path.relative_to(ROOT) if path.is_relative_to(ROOT) else path}")
 
 
-def sign_in_link(after: float) -> str:
-    """The newest sign-in link the server wrote to BUYER's outbox after `after`."""
+def emailed_link(to: str, pattern: str, after: float) -> str:
+    """El enlace del correo más nuevo a ``to`` que el servidor dejó en <datos>/mail después de ``after``."""
     for _ in range(40):
-        with sqlite3.connect(f"file:{DATABASE}?mode=ro", uri=True) as con:
-            row = con.execute("SELECT body FROM outbox WHERE to_addr=? AND created>=? ORDER BY id DESC LIMIT 1",
-                              (BUYER, after)).fetchone()
-        if row:
-            m = re.search(r"https?://\S+/mine\?signin=\S+", row[0])
-            if m:
-                return m.group(0)
+        for path in sorted(MAIL.glob("*.eml"), key=lambda p: p.stat().st_mtime, reverse=True):
+            if path.stat().st_mtime < after:
+                break
+            msg = email.message_from_bytes(path.read_bytes(), policy=policy.default)
+            if msg["To"] == to:
+                found = re.search(r"https?://\S+" + pattern + r"\S*", msg.get_content())
+                if found:
+                    return found.group(0)
         time.sleep(0.25)
-    raise SystemExit(f"no sign-in email for {BUYER} in {DATABASE}: is it the server's DATABASE?")
+    raise SystemExit(f"ningún correo a {to} en {MAIL}: ¿es la carpeta de datos del servidor?")
 
 
 def button(page, text):
@@ -72,10 +82,12 @@ def button(page, text):
 
 
 def new_page(browser, width, height, lang="en", tour_seen=True):
-    ctx = browser.new_context(viewport={"width": width, "height": height}, accept_downloads=True)
-    # the welcome tour shows once per browser; every context here is a fresh browser
-    seen = "localStorage.setItem('edgefolio-tour-v1', '1');" if tour_seen else ""
-    ctx.add_init_script(f"try {{ {seen} localStorage.setItem('tuisku-sf-lang', '{lang}'); }} catch (e) {{}}")
+    ctx = browser.new_context(viewport={"width": width, "height": height}, accept_downloads=True, locale="en-US")
+    # el idioma es el de la carcasa (su cookie); el aviso de cookies, ya contestado
+    ctx.add_cookies([{"name": "zt_lang", "value": lang, "url": BASE}, {"name": "zt_consent", "value": "none", "url": BASE}])
+    # el recorrido de bienvenida sale una vez por navegador; cada contexto de aquí es un navegador nuevo
+    if tour_seen:
+        ctx.add_init_script("try { localStorage.setItem('edgefolio-tour-v1', '1'); } catch (e) {}")
     page = ctx.new_page()
     page.on("console", lambda m: problems.append(f"{m.type}: {m.text}") if m.type == "error" else None)
     page.on("pageerror", lambda e: problems.append(f"pageerror: {e}"))
@@ -154,14 +166,27 @@ def main():
         first = Path(d.path()).read_text(errors="replace").splitlines()[0][:60]
         print(f"  {d.suggested_filename}: {first}")
 
-        step("Sign in to My strategies with the emailed link")
+        step("My strategies: an account of the core, and the email paid with, confirmed")
         page.goto(BASE + "/mine", wait_until="networkidle")
-        asked = time.time() - 1
-        page.locator("input[type=email]").fill(BUYER)
-        button(page, "Send me the link").click()
-        page.goto(sign_in_link(asked), wait_until="networkidle")
-        page.get_by_role("button", name=re.compile(re.escape(BUYER))).click()
-        page.get_by_text(f"Signed in as {BUYER}").first.wait_for()
+        assert "/login?next=/mine" in page.url, page.url        # Mis estrategias pide la sesión del núcleo
+        for door in ("/register?next=/mine", "/login?next=/mine"):   # la cuenta, nueva o la de otra vuelta
+            page.goto(BASE + door, wait_until="networkidle")
+            page.locator("input[name=email]").fill(ACCOUNT)
+            page.locator("input[name=password]").fill(PASSWORD)
+            page.locator("form.account-form button[type=submit]").click()
+            page.wait_for_load_state("networkidle")
+            if page.url.rstrip("/").endswith("/mine"):
+                break
+        page.get_by_text(f"Signed in as {ACCOUNT}").first.wait_for()
+        offer = page.get_by_text("Bought without an account?")
+        if offer.count():                                   # se compró sin cuenta: confirmar ese correo
+            asked = time.time() - 1
+            page.locator("input[type=email]").fill(BUYER)
+            button(page, "Send me the link").click()
+            page.get_by_text("Check that inbox", exact=False).wait_for()
+            page.goto(emailed_link(BUYER, r"/mine\?proof=", asked), wait_until="networkidle")
+            page.get_by_role("button", name=f"Yes, {BUYER} is mine").click()
+        page.get_by_role("link", name=".pine").first.wait_for()
         shot(page, "mine", height=900)
 
         step("The welcome tour, the first time")
@@ -201,6 +226,7 @@ def main():
         button(lite, "Send me the link").click()
         lite.get_by_text("Check your inbox", exact=False).first.wait_for()
         shot(lite, "free")
+        print("  " + emailed_link("visitor@example.com", r"/api/download/", time.time() - 30)[:60])
 
         step("Arabic, right to left, and Spanish")
         ar = new_page(browser, 1366, 900, lang="ar")

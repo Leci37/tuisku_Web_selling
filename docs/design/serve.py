@@ -3,7 +3,8 @@
     python docs/design/serve.py          # then open http://localhost:8765/Storefront%20v7.dc.html
 
 The mock-up loads its charts, icons and previews from storefront/assets/... and its fonts from the
-core's path; this serves those two from the repository's storefront/ so nothing is copied here.
+core's path; this serves the first from the tool's static/ (where storefront/ went when the shop became a
+zlecitool tool) and the fonts from the installed zlecitool-core, so nothing is copied here.
 """
 import http.server
 import sys
@@ -12,8 +13,13 @@ from functools import partial
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-STOREFRONT = HERE.parent.parent / "storefront"
-ROUTES = {"/storefront/": STOREFRONT, "/zlecitool_core/ui/static/fonts/": STOREFRONT / "fonts"}
+STATIC = HERE.parent.parent / "static"
+try:
+    import zlecitool_core
+    FONTS = Path(zlecitool_core.__file__).resolve().parent / "ui" / "static" / "fonts"
+except ImportError:  # without the core the mock-up falls back to the system font
+    FONTS = HERE / "-"
+ROUTES = {"/storefront/": STATIC, "/zlecitool_core/ui/static/fonts/": FONTS}
 
 
 class Handler(http.server.SimpleHTTPRequestHandler):
