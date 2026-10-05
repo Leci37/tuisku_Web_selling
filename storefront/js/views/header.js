@@ -6,7 +6,7 @@ export default function Header(v) {
   return html`
   <header style="position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid #e2e9f0">
     <div style="max-width:1320px;margin:0 auto;padding:10px 28px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 16px">
-      <a onClick=${v.goShop} style="display:flex;align-items:center;gap:12px;color:#16263a;text-decoration:none;min-width:0;cursor:pointer">
+      <a href="/" onClick=${v.goHome} style="display:flex;align-items:center;gap:12px;color:#16263a;text-decoration:none;min-width:0;cursor:pointer">
         <span translate=${false} style="font-weight:700;font-size:21px;letter-spacing:-.5px;line-height:1;flex-shrink:0">Edge<span style="color:#0950e3">folio</span></span>
         <span style="width:1px;height:20px;background:#e2e9f0;flex-shrink:0"></span>
         <span style="font-weight:500;font-size:13px;color:#5a6b80;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${v.tx?.toolName}</span>

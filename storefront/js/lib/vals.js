@@ -44,6 +44,8 @@ export function renderVals(app) {
     isLocal: f.isLocal, curLabel: f.curLabel, toggleCur: () => app.setState(st => ({ cur: st.cur === 'local' ? 'usd' : 'local' })),
     isPhone: s.vw < 640,
     goShop: () => app.go({ page: 'shop' }),
+    // the brand is a real link to the shop (a new tab, keyboard); a plain click stays in the page
+    goHome: e => { if (e.button || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return; e.preventDefault(); app.go({ page: 'shop' }); },
     goMine: () => app.go({ page: 'mine' }),
     modeTabs: [['lite', 'Lite', 'fa-solid fa-bolt'], ['pro', 'Pro', 'fa-solid fa-chart-line']].map(([k, label, icon]) => {
       const on = (s.mode === 'pro' ? 'pro' : 'lite') === k;

@@ -36,3 +36,7 @@ a:hover{text-decoration:underline}
 /* On a phone the code, totals and Checkout of the Pro cart strip need a line of their own; with
    flex:0 0 auto (as designed) they could not wrap and pushed the page sideways. */
 @media (max-width:560px){.sf-cartend{flex:1 1 100% !important}}
+
+/* Latin names cut with an ellipsis carry dir="auto", so in Arabic they are cut at their own end;
+   they still line up with the page (right in Arabic), as the text around them does. */
+[dir="auto"]{text-align:match-parent}

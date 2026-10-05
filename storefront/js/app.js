@@ -63,7 +63,7 @@ export class App extends Component {
       me: null, mine: null, signEmail: '', signSent: false, signExpired: false, signToken: '', signAs: '',
       receipt: null, instStep: -1, instFor: '',
       tourStep: route.page === 'shop' && !read('edgefolio-tour-v1') ? 0 : -1,
-      error: '', notice: '', rowsV: 0, Tree: null, pine: {}
+      error: '', notice: '', paying: false, rowsV: 0, Tree: null, pine: {}
     };
   }
 
@@ -73,7 +73,9 @@ export class App extends Component {
     this.onResize = () => this.setState({ vw: window.innerWidth });
     this.onKeyDown = e => this.onKey(e);
     this.onPop = () => this.setState({ ...parseLocation(location), tip: '', langOpen: false });
+    this.onShow = e => { if (e.persisted) { this.paying = false; this.setState({ paying: false }); } };
     window.addEventListener('resize', this.onResize);
+    window.addEventListener('pageshow', this.onShow);
     window.addEventListener('keydown', this.onKeyDown);
     window.addEventListener('popstate', this.onPop);
 
@@ -106,6 +108,7 @@ export class App extends Component {
     window.removeEventListener('resize', this.onResize);
     window.removeEventListener('keydown', this.onKeyDown);
     window.removeEventListener('popstate', this.onPop);
+    window.removeEventListener('pageshow', this.onShow);
     Object.values(this.timers).forEach(clearTimeout);
   }
 
@@ -160,7 +163,7 @@ export class App extends Component {
       else if (s.quote) this.setState({ quote: null });
     }
 
-    if (s.me && s.me.email && s.page === 'mine' && !s.mine && !this.mineLoading) this.loadMine();
+    if (s.me && s.me.email && s.page === 'mine' && !s.mine && !this.mineLoading && !this.uploading) this.loadMine();
     // a sign-in link for the address already signed in: nothing to confirm
     if (s.signAs && s.me && s.me.email === s.signAs) {
       dropParams('signin');
@@ -250,7 +253,8 @@ export class App extends Component {
 
   loadTree() {
     this.treeAsked = true;
-    import('/js/tree.js').then(m => this.setState({ Tree: m.StrategyTree })).catch(e => this.fail(e));
+    // a module that could not be fetched is a network failure
+    import('/js/tree.js').then(m => this.setState({ Tree: m.StrategyTree })).catch(e => this.fail({ network: true, cause: e }));
   }
 
   // ---- lists -----------------------------------------------------------------------------------
@@ -320,10 +324,17 @@ export class App extends Component {
     this.setState({ applied: code, codeState: '' });
   }
 
+  // One POST /api/orders at a time: a double click would create two PayPal orders. The button stays
+  // busy while the browser leaves for PayPal; coming back with the back button (page cache) frees it.
   checkout() {
     const body = this.cartBody();
-    if (!body.items.length && !body.bundles.length && !body.pack.length) return;
-    post('/api/orders', body).then(o => window.location.assign(o.approve_url)).catch(e => this.fail(e));
+    // the flag, not the state: setState lands after the click handler, a second click in the same
+    // moment would still see paying: false
+    if (this.paying || (!body.items.length && !body.bundles.length && !body.pack.length)) return;
+    this.paying = true;
+    this.setState({ paying: true });
+    post('/api/orders', body).then(o => window.location.assign(o.approve_url))
+      .catch(e => { this.paying = false; this.setState({ paying: false }); this.fail(e); });
   }
 
   // Back from PayPal at /thanks?token=<order>: capturing again is harmless (the server makes it idempotent).
@@ -386,10 +397,24 @@ export class App extends Component {
   }
 
   // Favourites kept in this browser while signed out move to the account once signed in.
+  // Only the ones the server took leave this browser; the others stay for the next sign-in, with one
+  // error shown. /api/mine is read once, after the uploads (sync() waits for them).
   afterSignIn() {
     const local = readJSON(FAVS_KEY, {}), favs = list(local.favs), alerts = local.alerts || {};
-    Promise.all(favs.map(id => api('/api/favourites/' + encodeURIComponent(id), { method: 'PUT', body: { alerts: alerts[id] || {} } }).catch(() => null)))
-      .then(() => { write(FAVS_KEY, null); this.loadMine(); });
+    this.uploading = true;
+    Promise.all(favs.map(id => api('/api/favourites/' + encodeURIComponent(id), { method: 'PUT', body: { alerts: alerts[id] || {} } })
+      .then(() => null, e => ({ id, e }))))
+      .then(res => {
+        const failed = res.filter(Boolean), left = failed.map(x => x.id);
+        if (left.length) {
+          const keep = {};
+          left.forEach(id => { if (alerts[id]) keep[id] = alerts[id]; });
+          writeJSON(FAVS_KEY, { favs: left, alerts: keep });
+          this.fail(failed[0].e);
+        } else write(FAVS_KEY, null);
+        this.uploading = false;
+        this.loadMine();
+      });
   }
 
   loadMine() {
