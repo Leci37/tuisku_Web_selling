@@ -36,8 +36,55 @@ every cart, takes the payment, and hands out the paid files only through signed,
 </tr>
 </table>
 
-<sub>Screenshots from `tools/screenshots.py`, which walks a purchase, a sign-in and the pages in a real
-browser against a local server in test mode.</sub>
+### The shop working
+
+<table>
+<tr>
+<td width="50%"><img src="docs/img/edgefolio_pro_filters.png" alt="Pro with two symbols and a win rate of 90% or more: 14 strategies, the chips above the list and the histogram of the win rate"></td>
+<td width="50%"><img src="docs/img/edgefolio_table.png" alt="The same filters in the Table view, sortable, with the grade next to each ticker"></td>
+</tr>
+<tr>
+<td><sub><b>Filtering.</b> Apple and NVIDIA, win rate ≥ 90 %: the count, the chips, the histograms and the list come from the server.</sub></td>
+<td><sub>The same result as a sortable table.</sub></td>
+</tr>
+<tr>
+<td><img src="docs/img/edgefolio_install.png" alt="Right after paying: the install tutorial, step 1 of 5, over the thank-you page"></td>
+<td><img src="docs/img/edgefolio_tour.png" alt="The welcome tour, step 1 of 3, on the first visit"></td>
+</tr>
+<tr>
+<td><sub><b>After paying</b> (fake PayPal): the 5-step tutorial to add the script to TradingView opens once.</sub></td>
+<td><sub><b>First visit:</b> the 3-step welcome tour.</sub></td>
+</tr>
+<tr>
+<td><img src="docs/img/edgefolio_compare.png" alt="Three strategies compared side by side, the best value of each row marked in green"></td>
+<td><img src="docs/img/edgefolio_pack.png" alt="Build your pack: five strategies picked from the searchable list"></td>
+</tr>
+<tr>
+<td><sub><b>Compare</b> up to 3 strategies; the best value of each row in green.</sub></td>
+<td><sub><b>Build your pack:</b> 5 strategies for one price, searchable among all 2,834.</sub></td>
+</tr>
+<tr>
+<td><img src="docs/img/edgefolio_free.png" alt="A free strategy: the email was sent, check your inbox"></td>
+<td><img src="docs/img/edgefolio_arabic.png" alt="The shop in Arabic, laid out right to left"></td>
+</tr>
+<tr>
+<td><sub><b>Free strategies</b> are sent by email (news is a separate box, unticked).</sub></td>
+<td><sub><b>Arabic</b>, right to left, prices shown in riyals and charged in dollars.</sub></td>
+</tr>
+<tr>
+<td><img src="docs/img/edgefolio_spanish.png" alt="The strategy page in Spanish, prices in euros"></td>
+<td align="center"><img src="docs/img/edgefolio_phone_tree.png" alt="How it decides on a phone: the tree output and the bottom bar" width="260"></td>
+</tr>
+<tr>
+<td><sub><b>Spanish</b> strategy page, prices in euros; 8 languages in all.</sub></td>
+<td><sub><b>How it decides</b> on a phone.</sub></td>
+</tr>
+</table>
+
+<sub>All screenshots come from `tools/screenshots.py`, which walks the shop in a real browser against a
+local server in test mode: a cart with a code, filters, a purchase and a real download, the emailed
+sign-in, compare, the pack, a free download, three languages and a phone. It fails at the first step
+that does not work, and on any console error.</sub>
 
 ## Run it locally
 
