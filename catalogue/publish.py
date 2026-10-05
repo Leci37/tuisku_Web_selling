@@ -7,6 +7,8 @@ EXPORT.csv is the tab-separated file the factory writes (pine_TW_img_info_*_WEB.
   - rewrites every image and preview path to a relative storefront/assets/... path, whether the
     export gave a local path or an absolute raw.githubusercontent.com URL;
   - drops pine_path, the location of the full paid script, which must never be public;
+  - names a ticker the export calls by its exchange code (BINANCE:XRPUSD) as "XRP / US Dollar",
+    or by the name another row of the same ticker has;
   - keeps the shop's own optional columns (version) from the current catalogue.csv when the
     export does not bring them, so a re-publish does not reset every strategy to v1;
   - writes catalogue/catalogue.csv, the one file both the storefront and the API read
@@ -28,16 +30,14 @@ from pathlib import Path
 
 import pandas as pd
 
+from previews import cut_preview
+
 ROOT = Path(__file__).resolve().parent.parent
 ASSETS = ROOT / "storefront" / "assets"
 OUT = ROOT / "catalogue" / "catalogue.csv"
 KEY = ["ticker", "interval", "key_techs", "id_model"]
 # Columns the shop adds that the factory does not write (the API defaults them when missing).
 OPTIONAL = ["version"]
-
-# How the factory cuts a preview (checked against all 2,755 paid ones): 50 lines of the first tree.
-PREVIEW_TREE_LINES = 50
-PREVIEW_TAIL = "\n\t...\nThe rest of this Pine script is part of the paid version. Visit the website for more info.\n"
 
 # column -> (assets subfolder, the factory's folder name)
 PATH_COLUMNS = {
@@ -52,17 +52,6 @@ PATH_COLUMNS = {
 def file_name(value: str) -> str:
     """Last path component of a local path, a Windows path or a URL."""
     return posixpath.basename(str(value).replace("\\", "/"))
-
-
-def cut_preview(script: str) -> str:
-    """The public part of a script; a preview that is already cut comes back unchanged."""
-    if script.endswith(PREVIEW_TAIL):
-        return script
-    lines = script.replace("\r\n", "\n").split("\n")
-    start = next((i for i, line in enumerate(lines) if line.startswith("decision_tree_")), None)
-    if start is None:
-        raise ValueError("no decision_tree_ function: not a strategy script")
-    return "\n".join(lines[:start + PREVIEW_TREE_LINES]) + "\n" + PREVIEW_TAIL
 
 
 def cut_previews(names) -> int:
@@ -90,11 +79,25 @@ def keep_optional(df: pd.DataFrame, previous: Path) -> pd.DataFrame:
     return df.astype({k: str for k in KEY}).merge(old, on=KEY, how="left")
 
 
+def readable_names(df: pd.DataFrame) -> pd.DataFrame:
+    """The export names a few crypto rows by their exchange symbol; the page shows Name as is."""
+    coded = df["Name"].astype(str).str.contains(":")
+    good = df[~coded].drop_duplicates("ticker").set_index("ticker")["Name"]
+    def name(row):
+        if row["ticker"] in good:
+            return good[row["ticker"]]
+        base = row["ticker"][:-4] if row["ticker"].endswith("USDT") else row["ticker"]
+        return f"{base} / US Dollar"
+    df.loc[coded, "Name"] = df[coded].apply(name, axis=1)
+    return df
+
+
 def publish(export: Path, assets_src: Path = None) -> pd.DataFrame:
     df = pd.read_csv(export, sep="\t", dtype={k: str for k in KEY})
     before = len(df)
     df = df.drop_duplicates(subset=KEY, keep="first").drop(columns=["pine_path"], errors="ignore")
     df = keep_optional(df, OUT)
+    df = readable_names(df)
     for col, (sub, src_folder) in PATH_COLUMNS.items():
         names = df[col].map(file_name)
         df[col] = "assets/" + sub + "/" + names

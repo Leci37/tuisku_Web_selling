@@ -63,7 +63,7 @@ def test_every_public_preview_is_cut():
     # the free download's email step; every preview must stop 50 lines into its first tree.
     import sys
     sys.path.insert(0, str(ROOT / "catalogue"))
-    from publish import PREVIEW_TAIL, PREVIEW_TREE_LINES, cut_preview
+    from previews import PREVIEW_TAIL, PREVIEW_TREE_LINES, cut_preview
 
     previews = sorted((STOREFRONT / "assets" / "previews").glob("*.pine"))
     assert len(previews) > 2000
