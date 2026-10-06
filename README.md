@@ -40,7 +40,7 @@ entero y lo publica; lo que trae lo fija `catalogue/contract.json`, el contrato 
 <td><sub><b>Después de pagar:</b> las descargas y el tutorial para ponerla en TradingView.</sub></td>
 </tr>
 <tr>
-<td><img src="docs/img/edgefolio_mine.png" alt="Mis estrategias: cada compra con lo que dura su enlace, la tarjeta para confirmar un correo y las favoritas"></td>
+<td><img src="docs/img/edgefolio_mine.png" alt="Mis estrategias: cada compra con su .pine y su .zip, su ficha y cómo decide, lo que dura su enlace, la tarjeta para confirmar un correo y las favoritas"></td>
 <td align="center"><img src="docs/img/edgefolio_phone.png" alt="La tienda en un móvil, con la barra de abajo" width="260"></td>
 </tr>
 <tr>
@@ -92,13 +92,30 @@ entero y lo publica; lo que trae lo fija `catalogue/contract.json`, el contrato 
 <td><sub><b>En español</b>, con los precios en euros; 8 idiomas en total, los del menú del núcleo.</sub></td>
 <td><sub><b>Cómo decide</b>, en un móvil.</sub></td>
 </tr>
+<tr>
+<td><img src="docs/img/edgefolio_pro_es.png" alt="Pro en español con dos estrategias en el carrito: el total en euros y lo que se paga en dólares con PayPal"></td>
+<td align="center"><img src="docs/img/edgefolio_phone_cart.png" alt="Lite en un móvil con el carrito flotante y la píldora de Comparar encima, sobre la barra de abajo" width="260"></td>
+</tr>
+<tr>
+<td><sub><b>Pro en español:</b> el total en euros y, debajo, «Pagas … US$ con PayPal».</sub></td>
+<td><sub><b>El carrito en un móvil,</b> con Comparar encima, los dos sobre la barra de abajo.</sub></td>
+</tr>
+<tr>
+<td><img src="docs/img/edgefolio_free_error.png" alt="El diálogo de una gratis con un correo mal escrito: el aviso bajo el campo y el borde en rojo"></td>
+<td></td>
+</tr>
+<tr>
+<td><sub><b>Un correo mal escrito</b> se dice bajo el campo, con los textos del núcleo.</sub></td>
+<td></td>
+</tr>
 </table>
 
 <sub>Las capturas son de `tools/screenshots.py`, que recorre la tienda en un navegador de verdad contra el
 servidor local en modo de prueba: un carrito con un código, los filtros, una compra sin cuenta y una
 descarga de verdad, el alta en el núcleo y la confirmación del correo con el que se pagó, comparar, el
-pack, una gratis, tres idiomas y un móvil. Para en el primer paso que no funciona, y con cualquier error
-de la consola (también de la CSP).</sub>
+pack, una gratis, tres idiomas y un móvil; y cada cambio del diseño del 6 de octubre (el resultado del
+código, Esc, los errores del correo, la píldora de Comparar, el teclado). Para en el primer paso que no
+funciona, y con cualquier error de la consola (también de la CSP).</sub>
 
 ## Arrancar
 

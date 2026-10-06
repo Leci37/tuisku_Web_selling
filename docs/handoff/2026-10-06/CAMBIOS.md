@@ -37,7 +37,7 @@ Todo es de la herramienta salvo que se diga.
 | 2 | Fichas de Pro: «CLAVE · indicador» abre la página del indicador en TradingView | hecho | las filas de `/api/strategies` llevan `ind_url` e `ind_text` (`catalogue.row`); al pasar por encima, su explicación |
 | 2 | Esc cierra los desplegables de los filtros | hecho | `app.js` `onKey` (el menú de idioma es del núcleo y ya se cerraba) |
 | 2 | La vista Tabla usa la clave nueva `viewTableTab` | hecho | `vals.js`, `vals_shop.js`; `pviewTable` se quita de `i18n/ui.json` |
-| 3 | «Actualización disponible» sólo para quien tiene la v1 | hecho | `vals_pages.js` `detOwnOld` (de `/api/mine`: `update`); Mis estrategias se lee en silencio en la ficha. Para pagos y gratis: el diseño mira sólo los pagos |
+| 3 | «Actualización disponible» sólo para quien tiene la v1 | hecho | `vals_pages.js` `detOwnOld`: una compra (no una gratis, que al renovarse ya da la versión nueva) con `update` en `/api/mine`; Mis estrategias se lee en silencio en la ficha |
 | 3 | La dirección sigue a la página: Atrás, Adelante y recargar; un id que no existe lleva a la tienda | ya estaba | rutas de verdad `/s/<id>` y `/s/<id>/tree` (`route.js`), con un aviso «no encontramos esa estrategia» |
 | 4 | «Comprar para desbloquear» sólo añade; en una gratis, abre el diálogo de la gratis | ya estaba | `vals_pages.js` `treeBuy` |
 | 4 | La dirección mantiene `/tree` y Atrás vuelve a la ficha | ya estaba | — |
@@ -53,8 +53,8 @@ Todo es de la herramienta salvo que se diga.
 | 8 | «Conseguir un enlace nuevo» conserva la fecha, el pedido y la versión | en parte | fecha y pedido, sí; **versión, no**: hay un solo script por estrategia, así que el enlace nuevo da la versión de hoy (pregunta abierta de STATUS: ¿la actualización se paga?) |
 | 8 | Cada fila: `.zip` y «Ficha técnica ↗» / «Cómo decide ↗» | hecho | `mine.js` (los `.pine` y `.zip` son los enlaces contados de la tienda) |
 | 9 | Móvil: el carrito flotante y la píldora, 76 px arriba, sobre la barra de abajo | hecho | el carrito ya estaba; la píldora va ahora dentro del dock |
-| 9 | «Buscar» enfoca el buscador de la tienda | ya estaba | ahora con el atributo del diseño, `data-search` |
-| 9 | «Carrito» abre la tienda con el carrito a la vista | hecho | en Lite ya no salta al final de la lista; desde otra página, la tienda arriba |
+| 9 | «Buscar» enfoca el buscador de la tienda | ya estaba | ahora con el atributo del diseño, `data-search`; en Lite, la tienda arriba, como en el diseño; en Pro, el buscador justo bajo la barra (es fija y alta en el móvil) |
+| 9 | «Carrito» abre la tienda con el carrito a la vista | hecho | en Lite no mueve la página (ni con el carrito vacío); desde otra página, la tienda arriba; en Pro, la franja del carrito bajo la barra |
 | — | Imágenes y textos como recursos (`window.__resources`) | no se hace | es para empaquetar la maqueta; la tienda la sirve Flask |
 
 **Además, de paso** (de comparar `FLUJO_USUARIO.md` con la tienda):
@@ -67,6 +67,32 @@ Todo es de la herramienta salvo que se diga.
   Espacio llegan a ellos (`USER-FLOW-v7.md` §15).
 - Abrir otra vez la página de gracias de un pedido da el enlace más nuevo de cada estrategia, no el que
   caducó (`orders.issue_links`).
+- Una dirección `/s/<alias>` (el id de la primera tienda) lleva a `/s/<id>`, y una que no es de ninguna
+  estrategia, a la tienda, sin que la página pida nada que conteste 404.
+
+**Y de comprobar cada pantalla contra la maqueta** (cinco revisiones, a 1366, 768 y 390 px, la tienda al
+lado de la maqueta nueva; ninguna encontró algo que bloquee, y cada pantalla sale igual que la maqueta,
+elemento por elemento, salvo lo de aquí abajo y lo de «a propósito»):
+
+- **Gratis y las búsquedas:** los tickers por turnos dentro de lo que queda (el mejor de cada uno primero,
+  por % de beneficio). Con los turnos del catálogo entero, la pestaña Gratis ponía su mejor estrategia en
+  el noveno puesto.
+- **El selector del pack** deja marcar también una estrategia que ya está en un lote elegido (dice «En el
+  carrito»); al añadir el pack, ese lote sale, como en el diseño. Antes la bloqueaba.
+- **Los avisos** se ponen también encima de la píldora de Comparar cuando flota.
+- **Un enlace de descarga que ya no vale** (gastado, caducado), abierto en la pestaña (un clic, el enlace
+  del correo), vuelve a Mis estrategias (o a la tienda, sin sesión) con el porqué traducido, en vez de una
+  página con el JSON; Mis estrategias se lee otra vez y la fila ofrece «Conseguir un enlace nuevo».
+- **Mis estrategias:** lo último arriba, también el mismo día; la fecha y el pedido de una fila son los de
+  su primera compra (antes, la fecha de una y el pedido de otra si se compró dos veces).
+- **Árabe:** los tickers de un lote van en un bloque de izquierda a derecha (se partían con «··»); el
+  nombre y la explicación del indicador, y el título y el texto del árbol, con `dir="auto"`.
+- **Teclado:** las filas de los filtros de Pro y los 14 tramos plegados son botones (`aria-expanded`), las
+  cabeceras de la Tabla llevan un botón (`aria-sort`); el diálogo de la gratis pone el cursor en su campo
+  (no en una pantalla táctil) y lo devuelve al botón que lo abrió.
+- **Pequeño:** los botones que parecen enlaces («Restablecer filtros», «Seleccionar todo») con el alto de
+  línea del diseño; la escalera con el carrito vacío dice 160,01 US$, como cualquier presupuesto; el total
+  de la página de gracias se queda al final cuando baja de línea.
 
 ## Lo que la tienda hace distinto, a propósito
 
@@ -94,6 +120,17 @@ Se queda como está; el diseño no lo enseña o lo simula:
   a derecha.
 - **El carrito** se guarda en este navegador (`edgefolio-cart-v1`).
 - **Esc** no cierra el menú de idioma desde la tienda: es del núcleo, y lo cierra él.
+- **La escalera** dice «Añade 53,01 US$» donde el diseño dice 53,00: un tramo cuenta por encima de su
+  importe (la regla del propio diseño), así que falta un céntimo más. El ejemplo del diseño se queda corto.
+- **El árbol** colorea sus resultados con los niveles con que opera el script (comprar ≥ 0,55, cerrar
+  ≤ −0,9), no con los comentarios `// buy|sell` de la vista previa: algunos salen distintos que en la
+  maqueta (AMZN 1BOL: −0,78 y −0,90 «Esperar», +0,60 «Comprar»). Para hablarlo con el diseño.
+- **En una gratis, el árbol** dice «Script completo» y «Conseguirla gratis», no «Parte de pago» y «Comprar
+  para desbloquear»; el clic abre el diálogo de la gratis, como en el diseño.
+- **«CLAVE · indicador»** de 1.402 estrategias (los 17 indicadores combinados: 2BB0, 2BT0…) lleva a la
+  lista de scripts de TradingView, la salida del propio diseño para lo que no tiene página:
+  `indicators.csv` no les da una dirección. Si se quiere otra, la pone el generador.
+- **Los avisos** (errores, novedades) son de la tienda: el diseño no los tiene.
 
 ## Correcciones a la exportación
 
@@ -148,15 +185,29 @@ Nada de esto se parchea en la tienda; si se quiere, entra en una versión del n�
    `header.app-topbar` para dejar un elemento justo debajo; serviría una variable `--zt-topbar-height` o
    un `scroll-padding-top` del núcleo) y un sitio para la barra fija de abajo de una herramienta (la
    tienda pone `body.app-shell{padding-bottom:64px}`; `app-shell` no está en CONTRATO.md).
-6. **Para las pruebas:** `zlecitool_core.testing` podría dar un servidor en marcha de la app y una página
+6. **La barra en dos filas con la sesión abierta.** Con una cuenta, el chip de la cuenta enseña el correo
+   entero (unos 210 px) y, con los chips de la herramienta, la barra no cabe en 1320 px: baja a dos filas
+   (88 px en vez de 59) a 1366, 1440 y 1600, y «Lite | Pro» pasa a la segunda. Como Mis estrategias pide
+   cuenta, esa pantalla nunca se ve como el diseño en un escritorio. Bastaría recortar el correo cuando
+   la barra lleva chips (`.app-topbar-actions-tools .app-account-email{max-width:140px;
+   overflow:hidden;text-overflow:ellipsis;white-space:nowrap}`) o enseñar sólo el avatar, con el correo
+   en el menú.
+7. **Para las pruebas:** `zlecitool_core.testing` podría dar un servidor en marcha de la app y una página
    de Playwright sobre el Chromium del núcleo (saltando sin Chromium), para que una herramienta pruebe su
    página en un navegador con `pytest` sin montarlo ella. Hoy la tienda lo hace en `tools/screenshots.py`.
 
 ## Pruebas
 
-- `pytest`: 220 pruebas en verde (antes 210). Nuevas: `tests/test_page_code.py` (sin marcas de conflicto;
+- `pytest`: 228 pruebas en verde (antes 210). Nuevas: `tests/test_page_code.py` (sin marcas de conflicto;
   cada valor, campo y texto que leen las vistas lo da `static/js`; los textos en los 8 idiomas con las
-  mismas variables y sin claves del núcleo; los ganchos `data-search`, `data-sf-cart`, `data-sf-bundles`),
-  el enlace del indicador en las filas (`test_search.py`), el enlace nuevo en una página de gracias
-  reabierta (`test_mine.py`), ningún script de pago entero en un zip archivado (`test_site.py`).
-- `tools/screenshots.py`, el recorrido en un navegador, comprueba cada cambio de esta exportación.
+  mismas variables y sin claves del núcleo; los ganchos `data-search` y `data-sf-cart`); en
+  `test_design_update.py`, la forma de octubre (`vendor/`, las notas nuevas, `versions/` fuera) y
+  `serve.py`; el enlace del indicador en las filas y los turnos de una pestaña o una búsqueda
+  (`test_search.py`); el enlace nuevo en una página de gracias reabierta, lo último arriba, la primera
+  compra de una fila y un enlace gastado abierto en el navegador (`test_mine.py`); un id que no existe y
+  un alias, y ningún script de pago entero en un zip archivado (`test_site.py`).
+- `tools/screenshots.py`, el recorrido en un navegador, comprueba cada cambio de esta exportación; pasa
+  entero, sobre una base de datos nueva, sin un error en la consola. Las 17 capturas del README, otra vez,
+  y tres nuevas: `edgefolio_free_error.png`, `edgefolio_pro_es.png` y `edgefolio_phone_cart.png`.
+- La «insignia Nuevo» no se ve en el catálogo de hoy (nada publicado en los últimos 30 días): se probó con
+  datos de prueba.
