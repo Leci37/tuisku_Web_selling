@@ -11,8 +11,8 @@ correo, el pie y las páginas legales son del núcleo; aquí sólo está la tien
 publicidad, y **vende con PayPal, no con créditos**.
 
 Esta aplicación es **la interfaz gráfica**: enseña, cobra y entrega. Los datos los fabrica su **aplicación
-gemela**, [**ML-Sklearn-strategy-stock-crypto-for-TraderView**](https://github.com/Leci37/ML-Sklearn-strategy-stock-crypto-for-TraderView/tree/claude/quirky-galileo-ka4mjn) (el generador de
-estrategias, rama `claude/quirky-galileo-ka4mjn`): baja las velas, entrena los bosques, escribe cada estrategia en Pine Script,
+gemela**, [**ML-Sklearn-strategy-stock-crypto-for-TraderView**](https://github.com/Leci37/ML-Sklearn-strategy-stock-crypto-for-TraderView/tree/_ztool_dev) (el generador de
+estrategias, rama `_ztool_dev`): baja las velas, entrena los bosques, escribe cada estrategia en Pine Script,
 hace su backtest y sus dos gráficos, y exporta el catálogo. Las dos se tocan en `catalogue/publish.py` y
 en la carpeta privada de los scripts: ver [La aplicación gemela](#la-aplicación-gemela-el-generador-de-estrategias).
 
@@ -342,7 +342,7 @@ servidor.
 
 | | |
 |---|---|
-| **Qué es** | [Leci37/ML-Sklearn-strategy-stock-crypto-for-TraderView](https://github.com/Leci37/ML-Sklearn-strategy-stock-crypto-for-TraderView/tree/claude/quirky-galileo-ka4mjn), rama `claude/quirky-galileo-ka4mjn`: el repo que genera los datos (privado). Su README cuenta los pasos, lo que tarda y lo que se arregló |
+| **Qué es** | [Leci37/ML-Sklearn-strategy-stock-crypto-for-TraderView](https://github.com/Leci37/ML-Sklearn-strategy-stock-crypto-for-TraderView/tree/_ztool_dev), rama `_ztool_dev` (lo estable, en `_ztool_main`): el repo que genera los datos (privado). Su README cuenta los pasos, lo que tarda y lo que se arregló; su `CLAUDE.md`, esta conexión desde su lado |
 | **Qué hace** | velas de Alpaca (acciones) y Binance (cripto) → indicadores → bosques de scikit-learn → un script de Pine por bosque → backtest (en TradingView, o en Python con las mismas reglas) con sus dos gráficos → el export |
 | **Esta** | la interfaz: nunca entrena ni hace backtests, sólo publica lo que el generador exporta |
 
@@ -401,7 +401,7 @@ cuenta la renovación mensual y la diaria.
 Las estrategias se generaron el 2024-10-18 y llevan una «caducidad recomendada» del 2025-06-18. Una
 revisión del generador encontró que un tercio calcula sus indicadores en TradingView de forma distinta
 que el Python que las entrenó, y que la familia Ichimoku usó precios futuros al entrenar. Hay que
-regenerar el catálogo con eso corregido antes de relanzarla. La rama `claude/quirky-galileo-ka4mjn` del
+regenerar el catálogo con eso corregido antes de relanzarla. La rama `_ztool_dev` del
 generador ya lo corrige; su README avisa de que, probadas con datos que no vieron, las estrategias pierden
 de media después de costes, y deja al dueño cómo listarlas. Sin hacer, porque necesitan datos o
 trabajos que la tienda no tiene: el trabajo diario que mide cada estrategia desde su publicación
