@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """catalogue/publish.py, el puente con la aplicación gemela que genera los datos
-(Leci37/ML-Sklearn-strategy-stock-crypto-for-TraderView): su paquete (o su export) pasa a ser
+(Leci37/tuisku_strategy_generator): su paquete (o su export) pasa a ser
 catalogue/catalogue.csv y sus gráficos, iconos y vistas previas van a static/assets/, de donde los sirve la
 tienda. catalogue/contract.json dice qué columnas y qué carpetas valen: lo que se sale, no se publica.
 
@@ -101,7 +101,7 @@ def package_of(d_result: Path, rows: list, leave_out=()) -> Path:
                 os.link(d_result / rel, package / rel)
     manifest = {
         "contract": CONTRACT["version"], "created": "2026-10-06T09:30:00Z",
-        "generator": {"repo": "Leci37/ML-Sklearn-strategy-stock-crypto-for-TraderView", "commit": "0123456789abcdef"},
+        "generator": {"repo": "Leci37/tuisku_strategy_generator", "commit": "0123456789abcdef"},
         "rows": len(rows),
         "files": {p.relative_to(package).as_posix(): sha(p) for p in sorted(package.rglob("*")) if p.is_file()},
         "private": {"folder": CONTRACT["private"]["folder"],
@@ -239,7 +239,7 @@ def test_a_package_is_published(publish, tmp_path, shop):
     assert chart.read_bytes() == (d_result / "pine_TW_img" / chart.name).read_bytes()
     release = json.loads((shop / "catalogue" / "release.json").read_text())
     assert release == {"contract": 1, "created": "2026-10-06T09:30:00Z", "rows": 4, "generator": {
-        "repo": "Leci37/ML-Sklearn-strategy-stock-crypto-for-TraderView", "commit": "0123456789abcdef"}}
+        "repo": "Leci37/tuisku_strategy_generator", "commit": "0123456789abcdef"}}
     assert df.attrs["published"]["copied"] == 4 * 2 + 4 * 2 + 4  # gráficos, iconos y vistas previas
 
     again = publish.publish_package(package, **into(shop))

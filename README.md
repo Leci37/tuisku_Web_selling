@@ -11,7 +11,7 @@ correo, el pie y las páginas legales son del núcleo; aquí sólo está la tien
 publicidad, y **vende con PayPal, no con créditos**.
 
 Esta aplicación es **la interfaz gráfica**: enseña, cobra y entrega. Los datos los fabrica su **aplicación
-gemela**, [**ML-Sklearn-strategy-stock-crypto-for-TraderView**](https://github.com/Leci37/ML-Sklearn-strategy-stock-crypto-for-TraderView/tree/_ztool_dev) (el generador de
+gemela**, [**tuisku_strategy_generator**](https://github.com/Leci37/tuisku_strategy_generator/tree/_ztool_dev) (el generador de
 estrategias, rama `_ztool_dev`): baja las velas, entrena los bosques, escribe cada estrategia en Pine Script,
 hace su backtest y sus dos gráficos, y deja el catálogo y sus ficheros en **un paquete versionado** (su
 `d_result/package/`; los scripts de pago, aparte). Aquí, `flask --app app edgefolio import` lo comprueba
@@ -105,7 +105,7 @@ de la consola (también de la CSP).</sub>
 ### Con el lanzador de la familia
 
 `arrancar.ps1` es el lanzador de todas las herramientas: **no está en ningún repo**, va en la carpeta
-que los tiene todos al lado (`zlecitool-core`, `linkedin-to-chatgpt-cv`, `tuisku_Web_selling`…). Desde
+que los tiene todos al lado (`zlecitool-core`, `tuisku_cv_builder`, `tuisku_strategy_store`…). Desde
 esa carpeta:
 
 ```
@@ -121,15 +121,15 @@ mismo `.env`** en todas (el mismo `FLASK_SECRET_KEY`, `ZLECITOOL_DATA_DIR`, `DAT
 tienda queda en http://localhost:5105**. Una sola cuenta vale para todas (en `localhost`, no en
 `127.0.0.1`).
 
-El generador (`ML-Sklearn-strategy-stock-crypto-for-TraderView`, rama `_ztool_dev`) va en esa misma
+El generador (`tuisku_strategy_generator`, rama `_ztool_dev`) va en esa misma
 carpeta, al lado de la tienda. No es una web y no se arranca: está ahí para que su prueba del puente
 encuentre la tienda y para que, al publicar, el paquete y sus scripts estén al lado.
 
 ### A mano
 
 ```
-git clone https://github.com/Leci37/tuisku_Web_selling     # al lado de zlecitool-core
-cd tuisku_Web_selling
+git clone https://github.com/Leci37/tuisku_strategy_store     # al lado de zlecitool-core
+cd tuisku_strategy_store
 python -m venv .venv && . .venv/bin/activate              # Python 3.10 o más (3.11 recomendado)
 pip install -r requirements-dev.txt                       # el núcleo, editable, desde ../zlecitool-core
 cp .env.example .env                                      # y un FLASK_SECRET_KEY dentro (48 caracteres)
@@ -352,7 +352,7 @@ de datos, con el resto del servidor.
 
 | | |
 |---|---|
-| **Qué es** | [Leci37/ML-Sklearn-strategy-stock-crypto-for-TraderView](https://github.com/Leci37/ML-Sklearn-strategy-stock-crypto-for-TraderView/tree/_ztool_dev), rama `_ztool_dev` (lo estable, en `_ztool_main`): el repo que genera los datos (privado). Su README cuenta los pasos, lo que tarda y lo que se arregló; su `CLAUDE.md`, esta conexión desde su lado |
+| **Qué es** | [Leci37/tuisku_strategy_generator](https://github.com/Leci37/tuisku_strategy_generator/tree/_ztool_dev), rama `_ztool_dev` (lo estable, en `_ztool_main`): el repo que genera los datos (privado). Su README cuenta los pasos, lo que tarda y lo que se arregló; su `CLAUDE.md`, esta conexión desde su lado |
 | **Qué hace** | velas de Alpaca (acciones) y Binance (cripto) → indicadores → bosques de scikit-learn → un script de Pine por bosque → backtest (en TradingView, o en Python con las mismas reglas) con sus dos gráficos → el export y el paquete para la tienda |
 | **Esta** | la interfaz: nunca entrena ni hace backtests, sólo publica el paquete del generador |
 
@@ -396,7 +396,7 @@ esta no los usa.
 
 La prueba que vigila el puente está en los dos lados: `tests/test_publish.py` y `tests/test_release.py`
 aquí, y `tests/test_export.py` allí, que comprueba que su contrato es este `contract.json` y publica un
-paquete (y un export) de verdad con este `publish.py` cuando `tuisku_Web_selling` está clonado al lado
+paquete (y un export) de verdad con este `publish.py` cuando `tuisku_strategy_store` está clonado al lado
 del generador. Su CI (`.github/workflows/pruebas.yml`, Python 3.11, 3.12 y 3.13) pone al lado la carpeta
 `catalogue/` de la tienda y los ficheros de su raíz, sin los assets (es pública: no hace falta ningún secreto), de `_ztool_dev`, o de
 `_ztool_main` cuando corre en `_ztool_main` o en un pull request a ella; con `REQUIRE_SHOP=1` esas pruebas

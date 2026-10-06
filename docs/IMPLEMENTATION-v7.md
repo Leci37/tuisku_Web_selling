@@ -1,6 +1,6 @@
 # Edgefolio storefront v7: implementation guide for Claude Code
 
-The design reference is `Storefront v7.dc.html`. This guide lists what to build in the real shop (`Leci37/tuisku_Web_selling`, branch `zlecitool_main`, folder `storefront/` + `api/`), in which order, and what each piece needs from the server.
+The design reference is `Storefront v7.dc.html`. This guide lists what to build in the real shop (`Leci37/tuisku_strategy_store`, branch `zlecitool_main`, folder `storefront/` + `api/`), in which order, and what each piece needs from the server.
 
 The mock-up uses 8 sample strategies, and some of its figures are examples (marked below).
 

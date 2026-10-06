@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Publicar un paquete del generador: ``flask --app app edgefolio import PAQUETE``.
 
-El paso 7 del generador (Leci37/ML-Sklearn-strategy-stock-crypto-for-TraderView) deja en su
+El paso 7 del generador (Leci37/tuisku_strategy_generator) deja en su
 d_result/package/ el catálogo, los gráficos, iconos y vistas previas que nombra y un manifest.json con el
 sha256 de cada fichero y de cada script completo (los scripts no van en el paquete: están en su
 d_result/pine_TW_b/). Importarlo es, por este orden:

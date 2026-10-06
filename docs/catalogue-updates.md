@@ -1,6 +1,6 @@
 # Keeping the Edgefolio catalogue up to date
 
-How the shop's 2,834 strategies get refreshed, and how often that is realistic. It is based on `catalogue/publish.py`, `edgefolio/release.py` and the README of `tuisku_Web_selling` (branch `_ztool_dev`).
+How the shop's 2,834 strategies get refreshed, and how often that is realistic. It is based on `catalogue/publish.py`, `edgefolio/release.py` and the README of `tuisku_strategy_store` (branch `_ztool_dev`).
 
 > **Status in this repository.** Written with the v7 handoff. What it plans is built, except the
 > daily "results since release" job (the page reads `catalogue/since_release.csv` when it exists) and
@@ -10,7 +10,7 @@ How the shop's 2,834 strategies get refreshed, and how often that is realistic. 
 
 | What | Where it comes from | Tool today |
 |---|---|---|
-| Strategies, results, charts | The strategy factory, the twin app that generates the data: [ML-Sklearn-strategy-stock-crypto-for-TraderView](https://github.com/Leci37/ML-Sklearn-strategy-stock-crypto-for-TraderView/tree/_ztool_dev) (private). Its step 7 writes a versioned package, `d_result/package/`, of contract `catalogue/contract.json` | `flask --app app edgefolio import`, into `catalogue/catalogue.csv`, `catalogue/release.json` and `static/assets/` |
+| Strategies, results, charts | The strategy factory, the twin app that generates the data: [tuisku_strategy_generator](https://github.com/Leci37/tuisku_strategy_generator/tree/_ztool_dev) (private). Its step 7 writes a versioned package, `d_result/package/`, of contract `catalogue/contract.json` | `flask --app app edgefolio import`, into `catalogue/catalogue.csv`, `catalogue/release.json` and `static/assets/` |
 | Paid `.pine` scripts | The factory's `d_result/pine_TW_b/` (never in the package: its manifest only has their sha256) | `edgefolio import --scripts`, hash-checked, into `STRATEGIES_DIR` (default `<ZLECITOOL_DATA_DIR>/edgefolio/strategies`) |
 | Prices | `catalogue/catalogue.csv` | Read by the API, never by the browser |
 | Discount tiers and codes | `edgefolio/settings.py` and environment variables | Restart the server |

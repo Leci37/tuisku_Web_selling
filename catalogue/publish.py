@@ -1,6 +1,6 @@
 """Turn the strategy factory's output into the shop's catalogue.
 
-The factory is the twin repository that generates the data, Leci37/ML-Sklearn-strategy-stock-crypto-for-TraderView:
+The factory is the twin repository that generates the data, Leci37/tuisku_strategy_generator:
 its step 7 (S_04_ladding_file_info_to_see_in_web.py) writes the export, d_result/ and a package of both,
 d_result/package/.
 

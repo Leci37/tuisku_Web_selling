@@ -78,7 +78,7 @@ README de aquí: la base de datos, las compras, la prueba de un correo.
 ## La aplicación gemela
 
 Esta es la interfaz gráfica. Los datos (estrategias, resultados, gráficos, scripts) los genera
-[Leci37/ML-Sklearn-strategy-stock-crypto-for-TraderView](https://github.com/Leci37/ML-Sklearn-strategy-stock-crypto-for-TraderView/tree/_ztool_dev) (rama `_ztool_dev`).
+[Leci37/tuisku_strategy_generator](https://github.com/Leci37/tuisku_strategy_generator/tree/_ztool_dev) (rama `_ztool_dev`).
 Se conectan por **un paquete versionado**: su paso 7 lo deja en su `d_result/package/` y aquí se publica
 con `flask --app app edgefolio import <generador>/d_result/package --scripts <generador>/d_result/pine_TW_b
 [--prune]` (`edgefolio/release.py`), que lo comprueba entero antes de escribir nada y copia los scripts de

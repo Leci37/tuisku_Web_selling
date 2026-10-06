@@ -1,5 +1,5 @@
 {
-  "_comment": "El contrato entre el generador (Leci37/ML-Sklearn-strategy-stock-crypto-for-TraderView) y la tienda: las columnas de catalogue.csv, en qué carpeta de su d_result/ está cada fichero que nombra una fila, a qué carpeta de static/assets/ va y cómo se llama el script completo de cada estrategia. Lo lee catalogue/publish.py (la única fuente de sus columnas y carpetas) y lo comprueba el generador en tests/test_export.py. Un cambio sube version y entra en los dos repos a la vez.",
+  "_comment": "El contrato entre el generador (Leci37/tuisku_strategy_generator) y la tienda: las columnas de catalogue.csv, en qué carpeta de su d_result/ está cada fichero que nombra una fila, a qué carpeta de static/assets/ va y cómo se llama el script completo de cada estrategia. Lo lee catalogue/publish.py (la única fuente de sus columnas y carpetas) y lo comprueba el generador en tests/test_export.py. Un cambio sube version y entra en los dos repos a la vez.",
   "version": 1,
   "columns": [
     "Price", "ticker", "interval", "path_stra", "path_candle", "Net Profit_usd", "Full Indicator Name",
