@@ -9,11 +9,7 @@
 <x-dc>
 <helmet>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <style>
-@font-face{font-family:"Ubuntu";font-weight:400;font-display:swap;src:url("zlecitool_core/ui/static/fonts/Ubuntu-400-latin.woff2") format("woff2")}
-@font-face{font-family:"Ubuntu";font-weight:500;font-display:swap;src:url("zlecitool_core/ui/static/fonts/Ubuntu-500-latin.woff2") format("woff2")}
-@font-face{font-family:"Ubuntu";font-weight:700;font-display:swap;src:url("zlecitool_core/ui/static/fonts/Ubuntu-700-latin.woff2") format("woff2")}
 *,*::before,*::after{box-sizing:border-box}
 body{margin:0;background:#f4f8fb}
 a{color:#0950e3;text-decoration:none}
@@ -277,6 +273,7 @@ class Component extends DCLogic {
   textW(list, font) { const c = this._mc || (this._mc = document.createElement('canvas').getContext('2d')); c.font = font; return list.reduce((m, t) => Math.max(m, c.measureText(t).width), 0); }
   componentWillUnmount() { clearInterval(this._ws); if (this._ro) this._ro.disconnect(); if (document.fonts && this._fl) document.fonts.removeEventListener('loadingdone', this._fl); this._fl = null; window.removeEventListener('resize', this._rs); window.removeEventListener('scroll', this._sc, true); }
   componentDidMount() {
+    if (!this.props.embedded) this.ensureAssets();
     this._rs = () => { this.setState({ vw: window.innerWidth }); if (this._measure) this._measure(); };
     window.addEventListener('resize', this._rs); this._rs(); this._ws = setInterval(() => { this.watchSec(); if (this._secEl) clearInterval(this._ws); }, 300);
     if (document.fonts) { this._fl = () => this.forceUpdate(); document.fonts.addEventListener('loadingdone', this._fl); document.fonts.ready.then(() => this._fl && this._fl()); }
@@ -286,14 +283,22 @@ class Component extends DCLogic {
   }
   componentDidUpdate(pp) { this.watchSec(); if (pp.strategy !== this.props.strategy) this.load(); }
 
+  R(p) { const id = 'r-' + String(p).replace(/^storefront\/assets\//, '').replace(/[^A-Za-z0-9]+/g, '-'); return (window.__resources && window.__resources[id]) || p; }
+  ensureAssets() {
+    try {
+      if (document.getElementById('st-assets')) return;
+      const l = document.createElement('link'); l.id = 'st-assets'; l.rel = 'stylesheet'; l.href = 'vendor/fontawesome/css/all.min.css'; document.head.appendChild(l);
+      const st = document.createElement('style'); st.textContent = [400, 500, 700].map(w => '@font-face{font-family:"Ubuntu";font-weight:' + w + ';font-display:swap;src:url("zlecitool_core/ui/static/fonts/Ubuntu-' + w + '-latin.woff2") format("woff2")}').join(''); document.head.appendChild(st);
+    } catch (e) {}
+  }
   load() {
     const k = this.props.strategy;
     this.setState({ trees: null, err: '', vals: {}, tip: null, added: false });
-    Promise.all([fetch('trees/previews.json').then(r => r.json()), fetch('trees/features.json').then(r => r.json()), fetch('trees/ui.json').then(r => r.json()).catch(() => ({}))])
+    Promise.all([fetch(this.R('trees/previews.json')).then(r => r.json()), fetch(this.R('trees/features.json')).then(r => r.json()), fetch(this.R('trees/ui.json')).then(r => r.json()).catch(() => ({}))])
       .then(([man, fx, ui]) => { this._ui = ui;
         const list = k ? man.filter(m => m.ticker + '_' + m.key === k) : man;
         if (!list.length) throw new Error('no tree for ' + k);
-        return Promise.all(list.map(m => fetch(m.source).then(r => { if (!r.ok) throw new Error(m.source); return r.text(); })
+        return Promise.all(list.map(m => fetch(this.R(m.source)).then(r => { if (!r.ok) throw new Error(m.source); return r.text(); })
           .then(src => ({ ...m, ...this.parse(src.replace(/\r/g, '')), created: (src.match(/Date Creation: (\d{4})\/(\d{2})\/(\d{2})/) || []).slice(1).join('-') }))))
           .then(trees => { if (k !== this.props.strategy) return; this._fx = fx; this.setState({ trees, sel: 0 }, () => this.example('buy')); });
       })
@@ -460,7 +465,7 @@ class Component extends DCLogic {
     const picks = s.trees.map((t, i) => {
       const on = i === s.sel;
       return {
-        icon: t.icon, ticker: t.ticker, key: t.key, pattern: t.pattern, status: t.locked ? L.statusPreview : L.statusComplete,
+        icon: this.R(t.icon), ticker: t.ticker, key: t.key, pattern: t.pattern, status: t.locked ? L.statusPreview : L.statusComplete,
         bg: on ? '#f5f8ff' : '#ffffff', bd: on ? '#0950e3' : '#e2e9f0', color: on ? '#0950e3' : '#16263a',
         pick: () => { if (i !== s.sel) this.setState({ sel: i, vals: {}, tip: null }, () => this.example('buy')); }
       };

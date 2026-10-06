@@ -41,7 +41,7 @@ SPLITS = {
         "prefix": "sf", "views": "static/js/views",
         "modules": {"header": ["header", "anyMenu"], "lite": ["isLite"], "pro": ["isPro"], "thanks": ["isThanks"],
                     "mine": ["isMine"], "detail": ["isDetail"], "footer": ["footer"],
-                    "dialogs": ["freeOpen", "tourOpen", "instOpen", "cmpHas", "cmpOpen", "packOpen"],
+                    "dialogs": ["freeOpen", "tourOpen", "instOpen", "cmpHas", "cmpFloat", "cmpOpen", "packOpen"],
                     "phonebar": ["isPhone"]},
         "fn": {"header": "Header", "lite": "Lite", "pro": "Pro", "thanks": "Thanks", "mine": "Mine", "detail": "Detail",
                "footer": "Footer", "dialogs": "Dialogs", "phonebar": "PhoneBar"},
