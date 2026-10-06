@@ -102,16 +102,27 @@ def thanks():
     return _page()
 
 
+def _strategy_page(strategy_id: str, tail: str = ""):
+    """La página de una estrategia. Un id que no existe va a la tienda (el navegador no pide nada que dé
+    404); un alias (el base64 de la tienda de antes), a la dirección de su id."""
+    s = shop().catalogue.resolve(strategy_id)
+    if s is None:
+        return redirect("/", code=302)
+    if s.id != strategy_id:
+        return redirect(f"/s/{s.id}{tail}", code=301)
+    return _page()
+
+
 @bp.get("/s/<strategy_id>")
 @public
 def strategy_page(strategy_id):
-    return _page()
+    return _strategy_page(strategy_id)
 
 
 @bp.get("/s/<strategy_id>/tree")
 @public
 def tree_page(strategy_id):
-    return _page()
+    return _strategy_page(strategy_id, "/tree")
 
 
 @bp.get("/mine")
@@ -224,18 +235,41 @@ def _attachment(data: bytes, mimetype: str, name: str) -> Response:
 
 
 # Antes que /<token>: "all" nunca es un token.
+def _opened_in_the_browser() -> bool:
+    """Un enlace de descarga abierto en la pestaña (un clic en la página, el enlace de un correo), no pedido
+    por un script: entonces un rechazo vuelve a la tienda, no a una página con el JSON."""
+    if request.headers.get("Sec-Fetch-Dest") == "document":
+        return True
+    return request.accept_mimetypes.best_match(["application/json", "text/html"]) == "text/html"
+
+
+def _download(make):
+    try:
+        return make()
+    except Refusal as refusal:
+        if not _opened_in_the_browser():
+            raise
+        # a Mis estrategias, que da un enlace nuevo; sin sesión, a la tienda: el aviso, traducido allí
+        where = "/mine" if signed_in() else "/"
+        return redirect(f"{where}?link={refusal.key}", code=303)
+
+
 @bp.get("/api/download/all")
 @public
 def download_all():
-    data, name = downloads.all_in_one(shop(), request.args.getlist("t"))
-    return _attachment(data, "application/zip", name)
+    def make():
+        data, name = downloads.all_in_one(shop(), request.args.getlist("t"))
+        return _attachment(data, "application/zip", name)
+    return _download(make)
 
 
 @bp.get("/api/download/<token>")
 @public
 def download(token):
-    data, mimetype, name = downloads.one(shop(), token, request.args.get("format", "pine"))
-    return _attachment(data, mimetype, name)
+    def make():
+        data, mimetype, name = downloads.one(shop(), token, request.args.get("format", "pine"))
+        return _attachment(data, mimetype, name)
+    return _download(make)
 
 
 # ── gratis, por correo ───────────────────────────────────────────────────────

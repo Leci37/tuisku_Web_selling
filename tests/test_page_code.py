@@ -82,8 +82,8 @@ def test_the_table_view_uses_its_own_key():
 
 
 def test_the_page_keeps_its_hooks():
-    """Lo que static/js busca en las vistas: el buscador (data-search, la barra del móvil lo enfoca), el
-    carrito (data-sf-cart: la barra del móvil, los avisos encima) y los lotes (data-sf-bundles)."""
+    """Lo que static/js busca en las vistas: el buscador (data-search, la barra del móvil lo enfoca) y el
+    carrito (data-sf-cart: la barra del móvil, los avisos encima)."""
     views = ROOT / "static" / "js" / "views"
     app = (ROOT / "static" / "js" / "app.js").read_text(encoding="utf-8")
     assert 'data-search="lite"' in (views / "lite.js").read_text(encoding="utf-8")
@@ -91,5 +91,4 @@ def test_the_page_keeps_its_hooks():
     assert "input[data-search]" in app
     for view in ("lite.js", "pro.js"):
         assert "data-sf-cart" in (views / view).read_text(encoding="utf-8")
-    assert "data-sf-bundles" in (views / "lite.js").read_text(encoding="utf-8")
-    assert app.count("[data-sf-cart]") >= 2 and "[data-sf-bundles]" in app
+    assert app.count("[data-sf-cart]") >= 2

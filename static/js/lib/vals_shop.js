@@ -117,7 +117,7 @@ function proVals(c, seg) {
   const pageCount = Math.max(1, Math.ceil(s.proTotal / PRO_SIZE)), cur = s.proPage || 1;
   const setPview = v => app.setPview(v);
   const numCols = [['np', tx.sortNp], ['npp', tx.npPct], ['win', tx.sortWin], ['trades', tx.sortTrades], ['avg', tx.avgProfit], ['months', tx.monthsTrained], ['price', tx.sortPrice]]
-    .map(([k, label]) => ({ label, arrow: s.sort === k ? '▼' : '', color: s.sort === k ? '#0950e3' : '#5a6b80', cursor: 'pointer', go: () => app.setState({ sort: k }) }));
+    .map(([k, label]) => ({ label, arrow: s.sort === k ? '▼' : '', color: s.sort === k ? '#0950e3' : '#5a6b80', cursor: 'pointer', ariaSort: s.sort === k ? 'descending' : null, go: () => app.setState({ sort: k }) }));
 
   return {
     proRows: rows.map(c.mk), proEmpty: !!s.proLoaded && rows.length === 0,

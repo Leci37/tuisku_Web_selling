@@ -48,7 +48,8 @@ export function cartVals(c) {
   const tiers = ((s.cfg && s.cfg.tiers) || []).map(x => [num(x.over), num(x.rate) * 100]).sort((a, b) => a[0] - b[0]);
   const steps = Math.max(1, tiers.length);
   const passed = q ? num(q.tier_index) : 0;
-  const nt = q ? q.next_tier : tiers.length ? { over: tiers[0][0], rate: tiers[0][1] / 100, missing: tiers[0][0] } : null;
+  // a tier counts strictly above its amount (the server's rule): an empty cart is a cent more away from it
+  const nt = q ? q.next_tier : tiers.length ? { over: tiers[0][0], rate: tiers[0][1] / 100, missing: tiers[0][0] + 0.01 } : null;
   // equal steps between tiers, filled in proportion inside the step the cart is in
   const from = passed > 0 && tiers[passed - 1] ? tiers[passed - 1][0] : 0, to = nt ? num(nt.over) : 0;
   const inStep = nt && to > from ? Math.min(1, Math.max(0, (to - num(nt.missing) - from) / (to - from))) : 0;
@@ -110,20 +111,21 @@ export function cartVals(c) {
   };
 }
 
-// The picker: what is picked first, then the paid strategies the search found. A strategy that is
-// already in a chosen bundle shows as in the cart and cannot be ticked (it can be unticked).
+// The picker: what is picked first, then the paid strategies the search found. Any of them can be
+// ticked, also one that a chosen bundle holds (it says so: «In cart»): adding the pack then replaces that
+// bundle (addBundle), so no strategy is paid twice.
 function packChoices(c, defs) {
   const { app, s } = c, size = defs.pack.size;
   const picked = s.packIds.map(id => app.row(id)).filter(Boolean);
   const rest = s.packFound.filter(r => !s.packIds.includes(r.id));
   const inBundle = id => s.bundles.some(b => b !== 'custom' && idsOf(s, defs, b).includes(id));
   return [...picked, ...rest].map(r => {
-    const on = s.packIds.includes(r.id), held = inBundle(r.id), locked = held && !on;
-    return { ...c.mk(r), check: on ? '✓' : '', ck: on ? '#0950e3' : '#cfd6e6', ckBg: on ? '#0950e3' : locked ? '#e9eef4' : '#ffffff',
-      bd: on ? '#c5d6f8' : '#e2e9f0', bg: on ? '#f5f8ff' : locked ? '#f4f8fb' : '#ffffff', held, locked, cursor: locked ? 'default' : 'pointer',
+    const on = s.packIds.includes(r.id), held = inBundle(r.id);
+    return { ...c.mk(r), check: on ? '✓' : '', ck: on ? '#0950e3' : '#cfd6e6', ckBg: on ? '#0950e3' : '#ffffff',
+      bd: on ? '#c5d6f8' : '#e2e9f0', bg: on ? '#f5f8ff' : '#ffffff', held, locked: false, cursor: 'pointer',
       toggle: () => app.setState(st => {
         if (st.packIds.includes(r.id)) return { packIds: st.packIds.filter(x => x !== r.id), bundles: st.bundles.filter(b => b !== 'custom') };
-        if (st.packIds.length >= size || st.bundles.some(b => b !== 'custom' && idsOf(st, defs, b).includes(r.id))) return null;
+        if (st.packIds.length >= size) return null;
         return { packIds: [...st.packIds, r.id], bundles: st.bundles.filter(b => b !== 'custom') };
       }) };
   });

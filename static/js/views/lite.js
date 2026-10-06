@@ -23,7 +23,7 @@ export default function Lite(v) {
         ${(v.liteTabs || []).map((lt, $index) => html`<button role="tab" aria-selected=${lt?.sel} onClick=${lt?.go} style="font-family:inherit;border:none;background:none;padding:12px 0 10px;margin-bottom:-1px;font-size:14.5px;font-weight:600;cursor:pointer;white-space:nowrap;color:${s(lt?.color)};border-bottom:2px solid ${s(lt?.line)}">${lt?.label}</button>`)}
         </div>
       <div role="note" style="display:flex;gap:12px;align-items:flex-start;border-radius:14px;padding:14px 16px;background:#fff7ec;border:1px solid #f6d9ae"><i class="fa-solid fa-triangle-exclamation" style="color:#f79009;font-size:18px;margin-top:1px"></i><div style="display:flex;flex-direction:column;gap:2px;font-size:13.5px;color:#16263a"><strong style="font-size:14.5px">${v.tx?.riskTitle}</strong><span style="text-wrap:pretty">${v.tx?.riskText}</span></div></div>
-      <div data-sf-bundles style="display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;flex-direction:column;gap:10px">
         <span style="font-size:12px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#5a6b80">${v.tx?.bundles}</span>
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:16px">
           ${(v.bundles || []).map((bd, $index) => html`
@@ -32,7 +32,7 @@ export default function Lite(v) {
                 <div style="display:flex;padding-inline-start:8px">${(bd?.icons || []).map((ic, $index) => html`<span role="img" aria-hidden="true" style="width:30px;height:30px;border-radius:9px;border:2px solid #fff;background:#fff;margin-inline-start:-8px;display:inline-block;flex-shrink:0;background-image:url('${s(ic?.src)}');background-size:cover;background-position:center"></span>`)}</div>
                 <span style="font-size:12px;font-weight:700;background:#fff;color:#0950e3;border-radius:999px;padding:3px 9px;white-space:nowrap">${bd?.save}</span>
                 </div>
-              <div style="line-height:1.3"><div style="font-weight:700;font-size:17px">${bd?.name}</div><div style="font-size:12.5px">${T(bd?.count)} · ${T(bd?.tickers)}</div></div>
+              <div style="line-height:1.3"><div style="font-weight:700;font-size:17px">${bd?.name}</div><div style="font-size:12.5px">${T(bd?.count)} · <span dir="ltr">${bd?.tickers}</span></div></div>
               <div style="display:flex;align-items:center;gap:10px"><div style="flex:1;line-height:1.15"><div style="font-size:12px;text-decoration:line-through">${bd?.was}</div><div style="font-size:22px;font-weight:700;letter-spacing:-.3px">${bd?.price}</div></div><button onClick=${bd?.go} style="font-family:inherit;border:none;border-radius:10px;padding:10px 16px;font-size:14px;font-weight:700;cursor:pointer;background:#fff;color:#0950e3;display:inline-flex;align-items:center;gap:7px;white-space:nowrap"><i class=${bd?.btnIcon}></i>${T(bd?.label)}</button></div>
               </div>
             `)}

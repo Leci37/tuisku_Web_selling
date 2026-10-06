@@ -79,10 +79,7 @@ class Index:
         self.crypto = to_mask(r["market"] == "crypto" for r in rows)
         self.order = {k: sorted(range(self.n), key=lambda i, f=field: (rows[i][f] is None, -(rows[i][f] or 0)))
                       for k, field in SORTS.items()}
-        turn, seen = [0] * self.n, {}
-        for i in self.order["npp"]:
-            turn[i] = seen[rows[i]["ticker"]] = seen.get(rows[i]["ticker"], -1) + 1
-        self.order["hot"] = sorted(self.order["npp"], key=lambda i: turn[i])
+        self.tickers = [r["ticker"] for r in rows]
         self.releases = [s.release_date for s in self.strategies]
         self._new = (None, 0)
 
@@ -239,7 +236,16 @@ def strategies(catalogue, settings, params) -> dict:
 
     order = sort or ("win" if tab == "win" else "hot" if tab else "np")
     bits = format(passing, f"0{ix.n}b")[::-1] if ix.n else ""
-    hits = [i for i in ix.order[order] if bits[i] == "1"]
+    if order == "hot":
+        # los tickers por turnos entre lo que queda (el mejor de cada uno primero, por % de beneficio): con
+        # los turnos del catálogo entero, una pestaña o una búsqueda salía en un orden sin sentido
+        turn, seen = {}, {}
+        for i in ix.order["npp"]:
+            if bits[i] == "1":
+                turn[i] = seen[ix.tickers[i]] = seen.get(ix.tickers[i], -1) + 1
+        hits = sorted(turn, key=turn.get)
+    else:
+        hits = [i for i in ix.order[order] if bits[i] == "1"]
     start = (page - 1) * size
     body = {"total": len(hits), "page": page, "size": size,
             "rows": [catalogue.row(ix.strategies[i]) for i in hits[start:start + size]],

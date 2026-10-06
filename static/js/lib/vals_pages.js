@@ -13,13 +13,16 @@ export function pageVals(c) {
   const liteDock = s.page === 'shop' && s.mode !== 'pro' && s.cart.length + s.bundles.length > 0;
   const base = s.vw < 640 ? 76 : 16;
   // above the dock when it shows, so the toast never hides the total or Checkout: the dock's measured
-  // height (app.measureDock), which grows with the pill, the code box and narrow screens
-  const errBottom = base + (liteDock ? (s.dockH || 84) + 8 : 0);
+  // height (app.measureDock), which grows with the pill, the code box and narrow screens; else above the
+  // floating Compare pill (38 px), when it shows
+  const pillFloats = s.compare.length > 0 && !liteDock;
+  const errBottom = base + (liteDock ? (s.dockH || 84) + 8 : pillFloats ? 38 + 8 : 0);
   return {
     ...detailVals(c), ...compareVals(c, liteDock), ...mineVals(c), ...thanksVals(c), ...installVals(c), ...freeVals(c),
     ...LEGAL, legalOn: true, contactOn: !!c.contact, contactUrl: c.contact ? 'mailto:' + c.contact : '', contactEmail: c.contact,
     errOpen: !!s.error, errTitle: tx.errServer, closeErr: () => app.setState({ error: '' }),
-    errText: t(s.error, s.errorVars || undefined) + ((s.error === 'errPayment' || s.error === 'errLater' || s.error === 'errPayPal') && c.contact ? ' ' + t('contactProblems', { e: c.contact }) : ''),
+    // the server's vars, or the contact address (a link that expired says where to write)
+    errText: t(s.error, s.errorVars || { e: c.contact }) + ((s.error === 'errPayment' || s.error === 'errLater' || s.error === 'errPayPal') && c.contact ? ' ' + t('contactProblems', { e: c.contact }) : ''),
     errBottom: errBottom + 'px',
     cmpBottom: base + 'px',
     // on a phone the bottom bar takes the last 60px: the floating cart sits above it, as the compare pill does
@@ -89,9 +92,9 @@ function detailVals(c) {
   if (!r) return { isDetail: false, det: {}, detOverview: !tree, detTreeTab: tree };
   const det = { ...c.mk(r), profit: r.profit, candle: r.candle };
   const owned = ((s.mine && s.mine.items) || []).find(x => x.id === r.id);
-  // «Update available» is for whoever owns an older version (My strategies says which: update), not for
-  // every visitor
-  const detOwnOld = !!(owned && owned.update);
+  // «Update available» is for whoever bought an older version (My strategies says which: update), not for
+  // every visitor; a free download is renewed with the new version anyway
+  const detOwnOld = !!(owned && owned.update && owned.kind === 'paid');
   // lines 5–16 sharp, 17–21 fading out, as the design's preview
   const pine = (s.pine[r.preview] || '').replace(/\r/g, '').split('\n').slice(4, 21);
   const pineLines = s.pine[r.preview] ? pine.map((l, i) => ({ no: String(i + 5), toks: tokens(l || ' '),

@@ -65,12 +65,14 @@ def owned(user_id: int, emails: Iterable[str]) -> dict:
 
 
 def entry(settings, s, links: list) -> dict:
+    """La fila de una estrategia: la compra es la primera (su fecha y su pedido, aunque se comprara otra
+    vez o se renovara el enlace); el enlace, el último."""
     now = utcnow()
-    latest = links[-1]
+    latest, first = links[-1], min(links, key=lambda x: x["date"])
     valid = latest["expires"] > now and latest["count"] < settings.max_downloads
     url = f"/api/download/{latest['token']}"
-    return {"id": s.id, "kind": latest["kind"], "date": iso(min(x["date"] for x in links), True),
-            "order": latest["paypal_id"] or None, "expires": iso(latest["expires"]),
+    return {"id": s.id, "kind": latest["kind"], "date": iso(first["date"], True), "at": iso(first["date"]),
+            "order": first["paypal_id"] or None, "expires": iso(latest["expires"]),
             "days_left": max(0, math.ceil((latest["expires"] - now).total_seconds() / 86400)), "valid": valid,
             "url": url if valid else None, "zip": f"{url}?format=zip" if valid else None,
             "version": latest["version"], "update": s.version if s.version > latest["version"] else None,
@@ -83,7 +85,7 @@ def listing(shop, user_id: int, email: str, emails: list, proof_needed: bool) ->
         s = catalogue.resolve(key)
         if s:  # una estrategia que salió del catálogo ya no tiene nada que enseñar ni que descargar
             items.append(entry(shop.settings, s, links))
-    items.sort(key=lambda e: e["date"], reverse=True)
+    items.sort(key=lambda e: e["at"], reverse=True)  # lo último, arriba (también del mismo día)
     favourites = []
     for fav in Favourite.query.filter_by(user_id=user_id).order_by(Favourite.created_at):
         s = catalogue.resolve(fav.item_key)

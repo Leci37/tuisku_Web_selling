@@ -50,6 +50,19 @@ def test_the_browser_no_longer_downloads_the_catalogue(client):
         assert client.get(path).status_code == 404, path
 
 
+def test_an_unknown_strategy_goes_to_the_shop_and_an_alias_to_its_id(client):
+    """Una dirección que no es de ninguna estrategia lleva a la tienda, sin que el navegador pida nada que
+    conteste 404; la de un alias (el id de la tienda de antes), a la de su id."""
+    from tests.conftest import ROWS, cart_id, strategy_id
+    for path in ("/s/NOPE_1Day_XXXX_00000000", "/s/NOPE_1Day_XXXX_00000000/tree"):
+        r = client.get(path)
+        assert r.status_code == 302 and r.headers["Location"] == "/", path
+    alias, sid = cart_id(ROWS[0]), strategy_id(ROWS[0])
+    for tail in ("", "/tree"):
+        r = client.get(f"/s/{alias}{tail}")
+        assert r.status_code == 301 and r.headers["Location"] == f"/s/{sid}{tail}"
+
+
 def test_no_codes_prices_or_paid_files_in_the_browser_code():
     js = "\n".join(p.read_text(errors="ignore") for p in STATIC.rglob("*.js") if "vendor" not in p.parts)
     html = "\n".join(p.read_text(errors="ignore") for p in TEMPLATES.rglob("*.html"))

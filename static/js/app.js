@@ -19,6 +19,8 @@ const PACK_FIND = 40;
 const CART_KEY = 'edgefolio-cart-v1';
 const FAVS_KEY = 'edgefolio-favs-v1';
 const list = x => (Array.isArray(x) ? x.filter(v => typeof v === 'string') : []);
+// what a download link opened in the tab can answer: the server sends the person back here with the key
+const LINK_ERRORS = ['errLinkNotFound', 'errLinkExpired', 'errDownloadLimit', 'errStrategyGone', 'errFileMissing'];
 
 // Quita de la barra de direcciones lo que sólo vale una vez (un enlace de confirmación, un aviso).
 function dropParams(...keys) {
@@ -96,6 +98,12 @@ export class App extends Component {
     // el enlace que confirma un correo: /mine?proof=<token> (sólo con la sesión abierta: /mine la pide)
     const proof = this.state.page === 'mine' && this.props.signedIn ? qs.get('proof') : null;
     if (proof) this.peekProof(proof);
+    // back from a download link that no longer works (spent, expired): why, and My strategies gives a new one
+    const link = qs.get('link');
+    if (link) {
+      if (LINK_ERRORS.includes(link)) this.setState({ error: link });
+      dropParams('link');
+    }
     // back from the link that confirms the news opt-in
     const news = qs.get('news');
     if (news) {
@@ -483,12 +491,22 @@ export class App extends Component {
   }
 
   // Every way into the free-download dialog starts with news unticked (GDPR: consent is asked each time).
+  // The dialog takes the keyboard: the cursor in its field (not on a touch screen, where it would open the
+  // keyboard over the dialog), and back on the button that opened it when it closes.
   openFree(id) {
-    this.setState({ freeFor: id, freeSent: false, freeNews: false, freeErr: '' });
+    this.freeOpener = document.activeElement;
+    this.setState({ freeFor: id, freeSent: false, freeNews: false, freeErr: '' }, () => {
+      const coarse = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+      const input = !coarse && document.querySelector('[role=dialog] input[type=email]');
+      if (input) input.focus();
+    });
   }
 
   closeFree() {
     this.setState({ freeFor: '', freeSent: false, freeNews: false, freeErr: '' });
+    const back = this.freeOpener;
+    this.freeOpener = null;
+    if (back && back.isConnected && back.focus) back.focus({ preventScroll: true });
   }
 
   // What is wrong with the address shows under the field (the core's texts): empty, or not an address.
@@ -558,30 +576,30 @@ export class App extends Component {
     setTimeout(run, 0);
   }
 
-  // Search: the strategy search of the list on screen, Lite's or Pro's (never the discount code).
+  // Search: the strategy search of the list on screen, Lite's or Pro's (never the discount code). Lite's
+  // is in the header: the shop at the top, as in the design; Pro's, just under the bar (it is sticky and
+  // tall on a phone: a plain focus() could leave the box behind it).
   focusSearch() {
     this.onShop(() => {
       const input = document.querySelector('input[data-search]');
       if (!input) return false;
       input.focus({ preventScroll: true });
-      this.scrollUnderHeader(input);
+      if (this.state.mode === 'pro') this.scrollUnderHeader(input);
+      else try { window.scrollTo(0, 0); } catch (e) { /* not scrollable */ }
       return true;
     });
   }
 
-  // Cart: Pro's cart strip, just under the bar; Lite's floating cart is already on screen above the
-  // phone bar (from another page the shop opens at the top, with it); with nothing in the cart, the bundles.
+  // Cart: Pro's cart strip, just under the bar. In Lite nothing moves: the floating cart is already on
+  // screen above the phone bar (from another page, go() opens the shop at the top), as in the design.
   showCart() {
     this.onShop(() => {
       const cart = document.querySelector('[data-sf-cart]');
-      if (cart && this.state.mode === 'pro') { this.scrollUnderHeader(cart); return true; }
-      if (cart) return true;
-      const bundles = document.querySelector('[data-sf-bundles]');
-      if (!bundles) return false;
-      this.scrollUnderHeader(bundles);
+      if (cart && this.state.mode === 'pro') this.scrollUnderHeader(cart);
       return true;
     });
   }
+
 
   // There is no TradingView API to connect to: the chip opens TradingView and remembers the choice.
   toggleTv() {

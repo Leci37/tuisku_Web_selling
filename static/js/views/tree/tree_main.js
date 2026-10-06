@@ -81,9 +81,9 @@ export default function TreeMain(v) {
         <section data-tree-sec="1" style="flex:999 1 480px;min-width:0;background:#fff;border:1px solid #e2e9f0;border-radius:18px;overflow:hidden;display:flex;flex-direction:column">
           <div style="padding:16px 18px 10px;display:flex;flex-wrap:wrap;gap:10px 16px;align-items:flex-start">
             <div style="flex:1 1 280px;min-width:0;display:flex;flex-direction:column;gap:2px">
-              <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><strong style="font-size:18px">${v.title}</strong>${v.hasForest ? (v.forestPicks || []).map(fp => html`<button onClick=${fp?.pick} style="font-family:inherit;border:none;cursor:pointer;font-size:11.5px;font-weight:700;color:${s(fp?.color)};background:${s(fp?.bg)};border-radius:999px;padding:2px 9px">${fp?.text}</button>`) : html`<span style="font-size:11.5px;font-weight:700;color:#0950e3;background:#e9f0fd;border-radius:999px;padding:2px 9px">${v.treeBadge}</span>`}</div>
+              <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><strong dir="auto" style="font-size:18px">${v.title}</strong>${v.hasForest ? (v.forestPicks || []).map(fp => html`<button onClick=${fp?.pick} style="font-family:inherit;border:none;cursor:pointer;font-size:11.5px;font-weight:700;color:${s(fp?.color)};background:${s(fp?.bg)};border-radius:999px;padding:2px 9px">${fp?.text}</button>`) : html`<span style="font-size:11.5px;font-weight:700;color:#0950e3;background:#e9f0fd;border-radius:999px;padding:2px 9px">${v.treeBadge}</span>`}</div>
               <span style="font-size:12.5px;color:#5a6b80">${v.summary}</span>
-              <span style="font-size:13px;color:#16263a;text-wrap:pretty;margin-top:4px;max-width:640px">${v.about}</span>
+              <span dir="auto" style="font-size:13px;color:#16263a;text-wrap:pretty;margin-top:4px;max-width:640px">${v.about}</span>
               <span style="font-size:11px;color:#8d9cae;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;overflow-wrap:anywhere">${v.params}</span>
               </div>
             <div role="tablist" style="display:flex;background:#e9eef4;border-radius:10px;padding:3px">

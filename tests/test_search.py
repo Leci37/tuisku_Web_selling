@@ -113,6 +113,25 @@ def test_free_paid_and_tabs(real_client, rows):
     assert by_price[0]["price"] == max(r["price"] for r in rows), "an explicit sort wins over the tab's"
 
 
+def test_every_tab_and_search_takes_the_tickers_in_turns_by_net_profit(real_client, rows):
+    """Los turnos son los de lo que queda tras la pestaña o la búsqueda: primero el mejor de cada ticker,
+    por % de beneficio; después el segundo de cada uno… (con los del catálogo entero, la pestaña Gratis
+    salía con su mejor estrategia en el noveno puesto)."""
+    for query in ("tab=free&size=100", "tab=stocks&size=100", "tab=hot&q=chaikin&size=100"):
+        got = get(real_client, query)["rows"]
+        assert got, query
+        turn, seen = [], {}
+        for r in got:
+            seen[r["ticker"]] = seen.get(r["ticker"], -1) + 1
+            turn.append(seen[r["ticker"]])
+        assert turn == sorted(turn), f"{query}: los turnos, en orden"
+        for t in set(turn):
+            npp = [r["npp"] for r, k in zip(got, turn) if k == t]
+            assert npp == sorted(npp, reverse=True), f"{query}: el turno {t} por % de beneficio"
+    free = get(real_client, "tab=free&size=1")["rows"][0]
+    assert free["npp"] == max(r["npp"] for r in rows if r["price"] == 0)
+
+
 def test_new_tab_and_count(client):
     body = get(client, "tab=new")
     assert body["counts"] == {"all": len(ROWS), "new": 1}

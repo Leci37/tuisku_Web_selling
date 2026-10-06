@@ -3,7 +3,9 @@
    La letra (Ubuntu), el fondo y la página los pone la carcasa del núcleo (shell.css). */
 a{color:#0950e3;text-decoration:none}
 a:hover{text-decoration:underline}
-/* un botón que se lee como un enlace (Salir): el subrayado del enlace */
+/* un botón que se lee como un enlace (Salir, Restablecer filtros, Seleccionar todo): el subrayado y el alto
+   de línea del enlace del diseño (un botón no hereda el 1.5 de la página) */
+.sf-link{line-height:inherit}
 .sf-link:hover{text-decoration:underline}
 
 /* los estados al pasar el ratón y con el foco (style-hover / style-focus en el diseño) */

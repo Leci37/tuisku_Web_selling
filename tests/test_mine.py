@@ -107,6 +107,38 @@ def test_a_new_link_keeps_the_purchase_and_the_thank_you_page_shows_it(app, sett
     assert again == renewed["url"] and ana.get(again).status_code == 200
 
 
+def test_a_spent_link_opened_in_the_browser_goes_back_to_the_shop(app, client, settings):
+    """Un enlace que ya no vale, abierto en la pestaña (un clic en la página, el enlace del correo), vuelve
+    a la tienda con el porqué (a Mis estrategias con la sesión abierta), no a una página con el JSON; un
+    script sigue recibiendo el JSON."""
+    settings.max_downloads = 1
+    url = buy(client, [AAPL])["downloads"][0]["url"]
+    assert client.get(url).status_code == 200
+    browser = {"Accept": "text/html,application/xhtml+xml,*/*;q=0.8", "Sec-Fetch-Dest": "document"}
+    r = client.get(url, headers=browser)
+    assert r.status_code == 303 and r.headers["Location"] == "/?link=errDownloadLimit"
+    assert client.get(url).status_code == 429 and client.get(url).json == {"error": "errDownloadLimit"}
+    ana = signed(app, "ana@example.com")
+    r = ana.get("/api/download/nope", headers=browser)
+    assert r.status_code == 303 and r.headers["Location"] == "/mine?link=errLinkNotFound"
+    r = ana.get("/api/download/all?t=nope", headers={"Accept": "text/html"})
+    assert r.status_code == 303 and r.headers["Location"].startswith("/mine?link=")
+
+
+def test_the_newest_purchase_comes_first_and_a_row_is_its_first_purchase(app):
+    """Lo último arriba, también el mismo día; y una estrategia comprada dos veces dice la fecha y el pedido
+    de la primera compra, no la fecha de una y el pedido de otra."""
+    ana = signed(app, "ana@example.com")
+    first = buy(ana, [AAPL])["order_id"]
+    time.sleep(1.1)  # los segundos de la hora de cada pedido
+    buy(ana, [MSFT])
+    assert [x["id"] for x in my(ana)["items"]] == [MSFT, AAPL]
+    time.sleep(1.1)
+    buy(ana, [AAPL])
+    aapl = next(x for x in my(ana)["items"] if x["id"] == AAPL)
+    assert aapl["order"] == first
+
+
 def test_a_link_that_ran_out_is_renewed(app, settings):
     ana = signed(app, "ana@example.com")
     settings.max_downloads = 1
