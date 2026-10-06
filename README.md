@@ -10,6 +10,12 @@ como `cv_lin` o `md_pdf`. La barra (con la palabra Edgefolio), el idioma, las cu
 correo, el pie y las páginas legales son del núcleo; aquí sólo está la tienda. Es pública, sin
 publicidad, y **vende con PayPal, no con créditos**.
 
+Esta aplicación es **la interfaz gráfica**: enseña, cobra y entrega. Los datos los fabrica su **aplicación
+gemela**, [**ML-Sklearn-strategy-stock-crypto-for-TraderView**](https://github.com/Leci37/ML-Sklearn-strategy-stock-crypto-for-TraderView/tree/claude/quirky-galileo-ka4mjn) (el generador de
+estrategias, rama `claude/quirky-galileo-ka4mjn`): baja las velas, entrena los bosques, escribe cada estrategia en Pine Script,
+hace su backtest y sus dos gráficos, y exporta el catálogo. Las dos se tocan en `catalogue/publish.py` y
+en la carpeta privada de los scripts: ver [La aplicación gemela](#la-aplicación-gemela-el-generador-de-estrategias).
+
 <p align="center">
   <img src="docs/img/edgefolio_lite.png" alt="Lite: la cinta de tickers, la búsqueda, las pestañas, el aviso de sobreajuste, tres lotes y Crea tu pack, y las fichas con su curva, su nota y su precio" width="900">
 </p>
@@ -151,6 +157,7 @@ repo; en un clon sin ella, se saltan.
 | `test_search.py` | los filtros, el orden, las páginas y los histogramas contra el catálogo de verdad; que sean rápidos |
 | `test_orders.py` | pagar y descargar; el importe de PayPal comprobado; los enlaces que caducan y se gastan (también a la vez); el recibo con enlaces sólo para el navegador que compró, la cuenta que compró o la que demostró el correo |
 | `test_receipt.py` | el recibo por correo: una vez por pedido, en el idioma de la página, línea a línea; sin dirección pública no sale y el pago sigue |
+| `test_publish.py` | el puente con el generador: su export pasa a `catalogue.csv` y sus ficheros a `static/assets/`, sin la ruta del script de pago y con las vistas previas cortadas |
 | `test_free.py` | las gratis por correo; el límite del día (también a la vez); las novedades con doble confirmación; el idioma del correo |
 | `test_mine.py` | Mis estrategias: lo de la cuenta y lo de un correo demostrado; renovar; las versiones nuevas; el script del propietario; las favoritas; el zip de un pedido |
 | `test_proofs.py` | la prueba de un correo: un uso, en dos pasos, sólo para la cuenta que la pidió, sólo hashes, sin llenar buzones, CSRF, el idioma |
@@ -331,13 +338,36 @@ miniaturas WebP, hechas la primera vez que se piden) y `fx.json` (los cambios de
 `flask --app app zt backup` (del núcleo) se copia la base de datos; la carpeta de datos, con el resto del
 servidor.
 
+## La aplicación gemela: el generador de estrategias
+
+| | |
+|---|---|
+| **Qué es** | [Leci37/ML-Sklearn-strategy-stock-crypto-for-TraderView](https://github.com/Leci37/ML-Sklearn-strategy-stock-crypto-for-TraderView/tree/claude/quirky-galileo-ka4mjn), rama `claude/quirky-galileo-ka4mjn`: el repo que genera los datos (privado). Su README cuenta los pasos, lo que tarda y lo que se arregló |
+| **Qué hace** | velas de Alpaca (acciones) y Binance (cripto) → indicadores → bosques de scikit-learn → un script de Pine por bosque → backtest (en TradingView, o en Python con las mismas reglas) con sus dos gráficos → el export |
+| **Esta** | la interfaz: nunca entrena ni hace backtests, sólo publica lo que el generador exporta |
+
+Dónde se conectan (lo que escribe el generador → lo que lee la tienda):
+
+| Qué | El generador escribe (su paso) | La tienda lo lee de | Cómo pasa |
+|---|---|---|---|
+| Las filas del catálogo | `d_result/pine_TW_img_info_6_WEB.csv` (paso 7, `S_04_ladding_file_info_to_see_in_web.py`; sus columnas son `SHOP_COLUMNS`) | `catalogue/catalogue.csv` | `catalogue/publish.py` |
+| Los dos gráficos de cada estrategia | `d_result/pine_TW_img/*_profit.png`, `*_candel.png` (paso 6a o 6b) | `static/assets/charts/` | `publish.py --assets <generador>/d_result` |
+| Los logos | `d_result/icons/` | `static/assets/icons/` | igual (con `SHOP_ICONS_DIR=<tienda>/static/assets/icons`, el paso 7 no hace logos que la tienda ya tiene) |
+| Las vistas previas públicas | `d_result/pine_TW_hide/` | `static/assets/previews/` | igual; `publish.py` las corta a su parte pública |
+| Los scripts de pago | `d_result/pine_TW_b/` | `STRATEGIES_DIR` (por defecto `<ZLECITOOL_DATA_DIR>/edgefolio/strategies`) | a mano: es la carpeta privada, nunca el repo |
+| La vuelta a la tienda | cada script, al caducar, pide bajar la versión nueva de `SHOP_URL` (`settings.py` del generador, por defecto `tuisku.eu`) | — | el texto del script |
+
+Lo que no pasa: los mosaicos del paso 8 del generador (`d_result/mosaico/`) eran de la página de antes;
+esta no los usa. Y la prueba que vigila el puente está en los dos lados: `tests/test_publish.py` aquí, y
+`tests/test_export.py` allí, que publica un export de verdad con este `publish.py` cuando `tuisku_Web_selling`
+está clonado al lado del generador.
+
 ## Publicar un catálogo nuevo
 
-La fábrica de estrategias (el repo privado `ML-Sklearn-strategy-stock-crypto-for-TraderView`) escribe un
-export separado por tabuladores con el backtest de TradingView de cada estrategia. Para publicarlo:
+Con el export del generador (arriba):
 
 ```
-python catalogue/publish.py ruta/a/pine_TW_img_info_6_WEB.csv --assets ruta/a/la/fabrica/d_result --prune
+python catalogue/publish.py ruta/al/generador/d_result/pine_TW_img_info_6_WEB.csv --assets ruta/al/generador/d_result --prune
 ```
 
 Deja una fila por estrategia, hace relativa cada ruta de imagen, quita dónde está el fichero de pago, da un
@@ -371,7 +401,9 @@ cuenta la renovación mensual y la diaria.
 Las estrategias se generaron el 2024-10-18 y llevan una «caducidad recomendada» del 2025-06-18. Una
 revisión del generador encontró que un tercio calcula sus indicadores en TradingView de forma distinta
 que el Python que las entrenó, y que la familia Ichimoku usó precios futuros al entrenar. Hay que
-regenerar el catálogo con eso corregido antes de relanzarla. Sin hacer, porque necesitan datos o
+regenerar el catálogo con eso corregido antes de relanzarla. La rama `claude/quirky-galileo-ka4mjn` del
+generador ya lo corrige; su README avisa de que, probadas con datos que no vieron, las estrategias pierden
+de media después de costes, y deja al dueño cómo listarlas. Sin hacer, porque necesitan datos o
 trabajos que la tienda no tiene: el trabajo diario que mide cada estrategia desde su publicación
 (`catalogue/since_release.csv`), las versiones de pago más allá de la v1 y las descripciones de los
 valores de los indicadores que el árbol aún no conoce (`static/trees/features.json`).
@@ -412,7 +444,8 @@ static/                    la página tal cual (sin compilar): js/ (Preact + htm
                            css/ (edgefolio.css y theme.css), vendor/, trees/, img/, assets/ (5.668
                            gráficos, 2.834 vistas previas, iconos)
 i18n/ui.json               los textos de la tienda, en 8 idiomas
-catalogue/                 catalogue.csv, indicators.csv, bundles.json, fx.json; publish.py y previews.py
+catalogue/                 catalogue.csv, indicators.csv, bundles.json, fx.json; publish.py (el puente con
+                           el generador) y previews.py
 tests/                     las pruebas (arriba)
 tools/screenshots.py       el recorrido en un navegador (las capturas de arriba)
 docs/                      IMPLEMENTATION-v7.md (el diseño), catalogue-updates.md, design/ (el diseño de

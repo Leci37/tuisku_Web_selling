@@ -10,7 +10,7 @@ How the shop's 2,834 strategies get refreshed, and how often that is realistic. 
 
 | What | Where it comes from | Tool today |
 |---|---|---|
-| Strategies, results, charts | The strategy factory (private repo), which writes an export CSV and `d_result/` | `catalogue/publish.py` |
+| Strategies, results, charts | The strategy factory, the twin app that generates the data: [ML-Sklearn-strategy-stock-crypto-for-TraderView](https://github.com/Leci37/ML-Sklearn-strategy-stock-crypto-for-TraderView/tree/claude/quirky-galileo-ka4mjn) (private), which writes an export CSV and `d_result/` | `catalogue/publish.py`, into `catalogue/catalogue.csv` and `static/assets/` |
 | Paid `.pine` scripts | The factory's `pine_TW_b/` | Copied by hand to `STRATEGIES_DIR` (default `<ZLECITOOL_DATA_DIR>/edgefolio/strategies`) |
 | Prices | `catalogue/catalogue.csv` | Read by the API, never by the browser |
 | Discount tiers and codes | `edgefolio/settings.py` and environment variables | Restart the server |
@@ -30,7 +30,7 @@ The README says the current set should not be sold as it is:
 - about a third calculate their indicators differently in TradingView than in training;
 - the Ichimoku family used future prices.
 
-The first update is therefore a full rebuild in the factory with those problems fixed.
+The first update is therefore a full rebuild in the factory with those problems fixed. Its branch `claude/quirky-galileo-ka4mjn` fixes them, and its README says that, tested on data they never saw, the strategies lose money on average after costs: how to list them is the owner's decision.
 
 ## Monthly: viable
 

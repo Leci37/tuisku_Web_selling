@@ -1,23 +1,27 @@
 """Turn the strategy factory's export into the shop's catalogue.
 
+The factory is the twin repository that generates the data, Leci37/ML-Sklearn-strategy-stock-crypto-for-TraderView:
+its step 7 (S_04_ladding_file_info_to_see_in_web.py) writes the export and d_result/.
+
     python catalogue/publish.py EXPORT.csv [--assets DIR] [--prune]
 
 EXPORT.csv is the tab-separated file the factory writes (pine_TW_img_info_*_WEB.csv). This:
   - keeps one row per strategy (ticker, interval, key_techs, id_model): the export repeats some;
-  - rewrites every image and preview path to a relative storefront/assets/... path, whether the
+  - rewrites every image and preview path to a relative assets/... path (under static/), whether the
     export gave a local path or an absolute raw.githubusercontent.com URL;
   - drops pine_path, the location of the full paid script, which must never be public;
   - names a ticker the export calls by its exchange code (BINANCE:XRPUSD) as "XRP / US Dollar",
     or by the name another row of the same ticker has;
   - keeps the shop's own optional columns (version) from the current catalogue.csv when the
     export does not bring them, so a re-publish does not reset every strategy to v1;
-  - writes catalogue/catalogue.csv, the one file both the storefront and the API read
-    (the API takes prices from it, never from the browser).
+  - writes catalogue/catalogue.csv, the one file both the page and the server read
+    (the server takes prices from it, never from the browser).
 
 --assets DIR  copies the charts, icons and previews the catalogue uses from DIR (the factory's
-              d_result/ folder) into storefront/assets/.
---prune       deletes files in storefront/assets/{charts,previews} that no catalogue row uses.
-The paid scripts are not handled here: they go to the API's private storage (STRATEGIES_DIR).
+              d_result/ folder) into static/assets/.
+--prune       deletes files in static/assets/{charts,previews} that no catalogue row uses.
+The paid scripts are not handled here: they go to the private storage (STRATEGIES_DIR,
+by default <ZLECITOOL_DATA_DIR>/edgefolio/strategies).
 
 Every preview is cut as the factory cuts the paid ones (the script up to 50 lines into its first
 tree, then a note): the factory's previews of the free strategies were the whole script, which
@@ -33,7 +37,7 @@ import pandas as pd
 from previews import cut_preview
 
 ROOT = Path(__file__).resolve().parent.parent
-ASSETS = ROOT / "storefront" / "assets"
+ASSETS = ROOT / "static" / "assets"   # the catalogue's paths ("assets/...") are relative to static/
 OUT = ROOT / "catalogue" / "catalogue.csv"
 KEY = ["ticker", "interval", "key_techs", "id_model"]
 # Columns the shop adds that the factory does not write (the API defaults them when missing).
@@ -119,7 +123,7 @@ def unused_assets(df: pd.DataFrame) -> list:
     out = []
     for sub in ("charts", "previews"):
         for f in sorted((ASSETS / sub).glob("*")):
-            if f.relative_to(ROOT / "storefront") not in used:
+            if f.relative_to(ASSETS.parent) not in used:
                 out.append(f)
     return out
 
@@ -132,7 +136,7 @@ if __name__ == "__main__":
     args = ap.parse_args()
     catalogue = publish(args.export, args.assets)
     unused = unused_assets(catalogue)
-    print(f"{len(unused)} files in storefront/assets/charts|previews are not used by any row")
+    print(f"{len(unused)} files in static/assets/charts|previews are not used by any row")
     if args.prune:
         for f in unused:
             f.unlink()
