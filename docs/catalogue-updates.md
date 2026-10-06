@@ -11,10 +11,10 @@ How the shop's 2,834 strategies get refreshed, and how often that is realistic. 
 | What | Where it comes from | Tool today |
 |---|---|---|
 | Strategies, results, charts | The strategy factory (private repo), which writes an export CSV and `d_result/` | `catalogue/publish.py` |
-| Paid `.pine` scripts | The factory's `pine_TW_b/` | Copied by hand to `STRATEGIES_DIR` |
+| Paid `.pine` scripts | The factory's `pine_TW_b/` | Copied by hand to `STRATEGIES_DIR` (default `<ZLECITOOL_DATA_DIR>/edgefolio/strategies`) |
 | Prices | `catalogue/catalogue.csv` | Read by the API, never by the browser |
-| Discount tiers and codes | `api/settings.py` and environment variables | Restart the server |
-| UI texts | `storefront/i18n/storefront.ui.json` (8 languages) | Edit the JSON |
+| Discount tiers and codes | `edgefolio/settings.py` and environment variables | Restart the server |
+| UI texts | `i18n/ui.json` (8 languages; never a key of the core's dictionary) | Edit the JSON |
 
 `publish.py` already does the hard part:
 - it drops repeated rows;

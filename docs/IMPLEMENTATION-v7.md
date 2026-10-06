@@ -8,13 +8,16 @@ The mock-up uses 8 sample strategies, and some of its figures are examples (mark
 > follows it with these differences:
 > - **Built:** §1–§5 and §9–§12; from §6 the paged catalogue with server-side filters and histograms,
 >   bundles and the pack priced by the server, the grade (with the cut-offs of §2, still to agree),
->   favourites with alert opt-ins and their daily emails (`tools/send_alerts.py`), free download for an email (with double opt-in for news), local
->   currency (`catalogue/fx.json`, refreshed by `tools/update_fx.py`), New this month, the previews,
->   the trust row under Checkout (its figures from `DOWNLOAD_DAYS`/`MAX_DOWNLOADS`, its address from
->   `CONTACT_EMAIL`) and the receipt it promises, emailed on payment (a receipt, not a tax invoice).
-> - **Different:** My strategies has its own sign-in by emailed link (the shop is a FastAPI app, not a
->   zlecitool tool, so the core's shared login is not available); thumbnails are made on request, not
->   at publish time; the welcome tour is shown once per browser.
+>   favourites with alert opt-ins and their daily emails (`flask --app app edgefolio send-alerts`), free
+>   download for an email (with double opt-in for news), local currency (`catalogue/fx.json`, refreshed by
+>   `flask --app app edgefolio fx-update`), New this month, the previews, the trust row under Checkout
+>   (its figures from `DOWNLOAD_DAYS`/`MAX_DOWNLOADS`, its address from `CONTACT_EMAIL`) and the receipt
+>   it promises, emailed on payment (a receipt, not a tax invoice).
+> - **Different:** the shop is a zlecitool tool (Flask on zlecitool-core, the files of `storefront/` are
+>   now `static/`, `templates/edgefolio/shop.html` and `i18n/ui.json`): the bar, the language menu and the
+>   footer are the core's shell, and My strategies uses the core's shared accounts; what was bought
+>   without an account shows up once the account confirms that email (a one-time emailed link).
+>   Thumbnails are made on request, not at publish time; the welcome tour is shown once per browser.
 > - **Not built (needs data or jobs the shop does not have):** the since-release job, versions beyond
 >   v1 and paid updates, translations of the indicator texts.
 

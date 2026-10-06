@@ -1,4 +1,5 @@
-"""The formats generated from a full Pine script: the parser, the .md rules, the beta .py/.js and the zip."""
+# -*- coding: utf-8 -*-
+"""Los formatos hechos de un script Pine completo: el lector, las reglas en .md, el .py/.js beta y el zip."""
 import io
 import json
 import os
@@ -11,8 +12,8 @@ from pathlib import Path
 
 import pytest
 
-from api import formats
-from api.settings import ROOT
+from edgefolio import formats
+from edgefolio.settings import ROOT, STATIC
 
 TWO_TREES = """//@version=5
 strategy("Tuisku_NVDA_1Day_1ULT_cccc3333", overlay=true)
@@ -124,7 +125,7 @@ if (op_operation <= -0.9)
 """
 WITH_EXITS = ONE_TREE[:ONE_TREE.index("float op_operation")].replace(
     "overlay=true)", "overlay=true, margin_long=1000, margin_short=1000, pyramiding=1)") + EXITS.lstrip("\n")
-PREVIEWS = sorted((ROOT / "storefront" / "assets" / "previews").glob("*.pine"))
+PREVIEWS = sorted((STATIC / "assets" / "previews").glob("*.pine"))
 
 
 def pine_as_python(src: str):
@@ -191,7 +192,7 @@ def test_markdown_rules_in_plain_words():
     assert "2. If 100.5 < ema3 ≤ 1954.56 and ema12 ≤ -30.33 → Buy (score 0.60)" in md, "0.60 ≥ 0.55: the script buys"
     assert "3. If ema3 ≤ 1954.56 and ema12 > -30.33 → Close (score -0.95)" in md, "-0.95 ≤ -0.9: it closes"
     assert "4. If ema3 > 1954.56 and histA_IsUpInt = 0 → Wait (score 0.10)" in md, "0/1 values read as yes/no"
-    assert "- `ema3`: Slow average." in md, "names from storefront/trees/features.json"
+    assert "- `ema3`: Slow average." in md, "los nombres de static/trees/features.json"
     assert "0.55 or more" in md and "-0.9 or less" in md
     # with several trees one leaf does not decide alone: the factory's labels are used
     md2 = formats.to_markdown(formats.parse(TWO_TREES), "Tuisku_NVDA")
@@ -354,19 +355,33 @@ def test_python_and_javascript_carry_the_exits_as_data_not_simulated():
         assert json.loads(out) == [py["STAGES"], False, 0, "arm_exits"]
 
 
-STRATEGIES = Path(os.environ.get("STRATEGIES_DIR") or ROOT / "private" / "strategies")
+@pytest.fixture(scope="module")
+def paid_scripts(tmp_path_factory):
+    """Los scripts de pago: los de STRATEGIES_DIR si los hay; si no, los de la historia del repo
+    (``flask edgefolio restore-scripts`` hace lo mismo); sin ninguno de los dos, la prueba se salta."""
+    if os.environ.get("STRATEGIES_DIR") and Path(os.environ["STRATEGIES_DIR"]).is_dir():
+        return Path(os.environ["STRATEGIES_DIR"])
+    import click
+
+    from edgefolio.cli import restore
+    folder = tmp_path_factory.mktemp("strategies")
+    try:
+        if restore(folder) <= 0:
+            pytest.skip("la historia del repo no tiene los scripts de pago")
+    except (click.ClickException, OSError) as e:
+        pytest.skip(f"los scripts de pago no están en esta máquina ({e})")
+    return folder
 
 
-@pytest.mark.skipif(not STRATEGIES.is_dir(), reason="the paid scripts are not on this machine")
-def test_every_paid_script_has_its_exits_understood():
-    from api.catalogue import Catalogue
+def test_every_paid_script_has_its_exits_understood(paid_scripts):
+    from edgefolio.catalogue import Catalogue
     seen = 0
     for s in Catalogue(ROOT / "catalogue" / "catalogue.csv"):
-        path = STRATEGIES / s.private_file
+        path = paid_scripts / s.private_file
         if not path.is_file():
             continue
         script = formats.parse(path.read_text(encoding="utf-8", errors="replace"))
         assert script.buy and script.close and script.arm is not None, s.id
         assert len(script.exits.stages) == 3 and not script.exits.trailing_used, s.id
         seen += 1
-    assert seen
+    assert seen == 2834, "cada estrategia del catálogo tiene su script"
