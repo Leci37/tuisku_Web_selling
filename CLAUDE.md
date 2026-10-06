@@ -78,11 +78,12 @@ README de aquí: la base de datos, las compras, la prueba de un correo.
 ## La aplicación gemela
 
 Esta es la interfaz gráfica. Los datos (estrategias, resultados, gráficos, scripts) los genera
-[Leci37/ML-Sklearn-strategy-stock-crypto-for-TraderView](https://github.com/Leci37/ML-Sklearn-strategy-stock-crypto-for-TraderView/tree/claude/quirky-galileo-ka4mjn) (rama `claude/quirky-galileo-ka4mjn`).
+[Leci37/ML-Sklearn-strategy-stock-crypto-for-TraderView](https://github.com/Leci37/ML-Sklearn-strategy-stock-crypto-for-TraderView/tree/_ztool_dev) (rama `_ztool_dev`).
 Se conectan en `catalogue/publish.py` (su export y su `d_result/` → `catalogue/catalogue.csv` y
 `static/assets/`) y en `STRATEGIES_DIR` (sus scripts de pago). Un cambio en las columnas del catálogo o en
 dónde están los ficheros se hace en los dos repos a la vez: allí `SHOP_COLUMNS` y `tests/test_export.py`,
-aquí `publish.py` y `tests/test_publish.py`. El README («La aplicación gemela») lo cuenta entero.
+aquí `publish.py` y `tests/test_publish.py`. El README («La aplicación gemela») lo cuenta entero, y el
+`CLAUDE.md` del generador lo mismo desde su lado. Sus ramas son las mismas: `_ztool_dev` y `_ztool_main`.
 
 ## Ramas
 
