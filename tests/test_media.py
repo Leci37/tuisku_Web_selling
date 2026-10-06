@@ -64,3 +64,48 @@ def test_fx_update_adds_the_pegged_riyal(app, settings, monkeypatch):
     assert data["date"] == "2026-10-02" and data["rates"] == {"USD": 1, "EUR": 0.85, "INR": 88.7, "SAR": 3.75}
     assert "ECB" in data["source"]
     assert settings.fx.read_text() != settings.fx_today.read_text(), "los de ejemplo del repo no se tocan"
+
+
+def test_a_chart_published_again_gets_a_new_thumbnail(settings, tmp_path):
+    """publish.py reemplaza un gráfico con el mismo nombre; ``python catalogue/publish.py --package`` no sabe dónde
+    están las miniaturas para vaciarlas, así que una más vieja que su gráfico se rehace. Y aunque se pidiera
+    mientras se publicaba (del gráfico de antes, con el nuevo ya escrito al lado), porque al renombrarlo se le
+    pone la hora de ese momento."""
+    from dataclasses import replace
+
+    from edgefolio.release import publisher
+    settings = replace(settings, static=tmp_path / "static")
+    chart = settings.static / "assets" / "charts" / "NEW_1Day_1C00_00000000_profit.png"
+    chart.parent.mkdir(parents=True)
+
+    def png(colour) -> bytes:
+        out = io.BytesIO()
+        Image.new("RGB", (800, 400), colour).save(out, "PNG")
+        return out.getvalue()
+
+    def colour_of(path):
+        with Image.open(path) as im:
+            return im.convert("RGB").getpixel((5, 5))
+
+    chart.write_bytes(png((255, 0, 0)))
+    first = media.thumb(settings, chart.stem)
+    assert colour_of(first)[0] > 200
+    stage = publisher().Staged()
+    stage.write(chart, png((0, 0, 255)))                  # escrito al lado, todavía sin renombrar
+    first.unlink()
+    assert colour_of(media.thumb(settings, chart.stem))[0] > 200, "aún es el de antes"
+    stage.commit()
+    assert colour_of(media.thumb(settings, chart.stem))[2] > 200, "el nuevo"
+
+
+def test_a_pruned_chart_keeps_its_thumbnail_until_the_restart(settings, tmp_path):
+    """--prune borra un gráfico con la tienda en marcha, que aún lo nombra hasta que se reinicia: su miniatura
+    sigue valiendo, no es un error."""
+    from dataclasses import replace
+    settings = replace(settings, static=tmp_path / "static")
+    chart = settings.static / "assets" / "charts" / "OLD_1Day_1C00_00000000_profit.png"
+    chart.parent.mkdir(parents=True)
+    Image.new("RGB", (800, 400), (0, 128, 0)).save(chart, "PNG")
+    made = media.thumb(settings, chart.stem)
+    chart.unlink()
+    assert media.thumb(settings, chart.stem) == made and made.is_file()

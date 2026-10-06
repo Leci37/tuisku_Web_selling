@@ -4,7 +4,9 @@ de moneda (GET /api/fx, para los precios «≈»).
 
 Un gráfico PNG pesa unos 100 KB; una tarjeta necesita un WebP de 640 px de la décima parte. Cada uno se
 hace la primera vez que se pide y se guarda en <datos>/edgefolio/thumbs: publicar un catálogo no tiene
-que hacer 5.668.
+que hacer 5.668. Y se vuelve a hacer cuando el gráfico es más nuevo que él: publicar un paquete reemplaza
+un gráfico con el mismo nombre, y no sólo con ``flask edgefolio import`` (que vacía la carpeta), también con
+``python catalogue/publish.py --package``, que no sabe dónde está.
 """
 from __future__ import annotations
 
@@ -62,8 +64,14 @@ def thumb(settings, stem: str) -> Optional[Path]:
     if Image is None:
         return None
     dest = settings.thumbs_dir / f"{stem}.webp"
-    if not dest.is_file():
-        make_thumb(settings.static / "assets" / "charts" / f"{stem}.png", dest)
+    src = settings.static / "assets" / "charts" / f"{stem}.png"
+    try:
+        # estricto: una hecha en el mismo instante que el gráfico (un disco de tiempos gruesos) se rehace una vez más
+        fresh = dest.stat().st_mtime_ns > src.stat().st_mtime_ns
+    except FileNotFoundError:  # sin miniatura; o sin el gráfico (--prune con la tienda en marcha): vale la que haya
+        fresh = dest.is_file()
+    if not fresh:
+        make_thumb(src, dest)
     return dest
 
 
