@@ -120,9 +120,10 @@ pip install playwright && python tools/screenshots.py  # with the server above r
 |---|---|---|
 | **Lite** (default) | `/` | Ticker strip, search, tabs (Hot, Win rate, Stocks, Crypto, New, Free), the overfitting warning, three bundles and *Build your pack* (5 strategies for one price), cards with grade A–D, favourite and compare, a floating cart with the discount code. |
 | **Pro** | `/` + the Lite \| Pro switch | The discount ladder, the filter panel (16 sliders with histograms and typed min / max, 5 multi-selects, Only FREE), chips, Rows / Cards / Table, 25 per page. |
+| **Under Checkout** | Lite and Pro | The trust row: PayPal (the shop never sees the card), how long the links last and how many downloads (from `DOWNLOAD_DAYS` and `MAX_DOWNLOADS`), the receipt by email, and `CONTACT_EMAIL`. |
 | **Strategy page** | `/s/<id>` | Both TradingView charts, the 14 results, backtest against results since release, versions, the indicator, the first lines of the script, the formats you get. |
 | **How it decides** | `/s/<id>/tree` | The first decision tree of the strategy, from its public preview: values as sliders, the path to the result, every rule in plain words. Owners see the complete tree. |
-| **Thank-you page** | `/thanks` | The order, `.pine` and `.zip` per strategy, *Download all*, and the 5-step install tutorial. |
+| **Thank-you page** | `/thanks` | The order, `.pine` and `.zip` per strategy, *Download all*, and the 5-step install tutorial. The receipt goes to the PayPal payer's email, in the page's language: every line with what it cost, the total, and the links to My strategies. |
 | **My strategies** | `/mine` | Everything bought or downloaded with how long its link lasts, *Get a new link*, favourites with alert opt-ins. Sign-in by emailed link, no password. |
 | **Free download** | a dialog | Free strategies are sent by email; news is a separate box, unticked, confirmed by email. |
 
@@ -144,6 +145,7 @@ browser                                  server (api/)                         P
   │ POST /api/orders/{id}/capture ────────▶ capture ─────────────────────────▶ money moves
   │                                          amount = order total? ◀─────────┘
   │ ◀──────── receipt + one link per file (only to the browser that ordered)
+  │                                          receipt by email to the payer
   │ GET /api/download/{token}[?format=zip] ▶ file from private storage
 ```
 
@@ -209,7 +211,7 @@ new columns in place, nothing to run by hand. Back it up with the rest of `priva
 
 | Table | What it keeps |
 |---|---|
-| `orders` | one row per PayPal order: the strategy keys, the code, the total, the status (`CREATED`, `PAID`, `FAILED`), the payer, the buyer's email, what was charged line by line, and a hash of the buying browser's cookie |
+| `orders` | one row per PayPal order: the strategy keys, the code, the total, the status (`CREATED`, `PAID`, `FAILED`), the payer, the buyer's email, the page's language (for the receipt), what was charged line by line, and a hash of the buying browser's cookie |
 | `downloads` | one link per strategy of a paid order: token, expiry, download count, version |
 | `free_claims` | free strategies sent by email: the address, the link, when the visitor asked for it |
 | `subscribers` | news opt-ins: only addresses that ticked the box and confirmed it from the email |
@@ -317,8 +319,9 @@ ones).
 - Filtering, sorting, paging and the histograms run on the server; the browser no longer downloads
   the whole catalogue.
 - New on the server: accounts by emailed link, free downloads for an email with recorded consent,
-  renewable links, favourites, the zip with the rules in Markdown, Python and JavaScript, WebP
-  thumbnails, exchange rates, and PayPal's redirect flow (the Checkout button of the design).
+  renewable links, favourites, the receipt by email on payment, the zip with the rules in Markdown,
+  Python and JavaScript, WebP thumbnails, exchange rates, and PayPal's redirect flow (the Checkout
+  button of the design).
 - The 79 free strategies' public previews were their whole script; they are now cut like the paid ones.
 
 The previous redesign (server-side prices and discounts, links per paid order, scripts out of the

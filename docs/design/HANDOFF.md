@@ -4,6 +4,11 @@
 
 > Read `design_handoff_edgefolio_storefront/README.md` and `docs/IMPLEMENTATION-v7.md`. In `Leci37/tuisku_Web_selling`, create branch `design/edgefolio-v7` from `zlecitool_main`. Implement the steps in `PR_DESCRIPTION.md` in order, one commit each, keeping `pytest` green. Copy `docs/` into the repo's `docs/` and `prototype/*.dc.html` into `docs/design/`. Then open a pull request to `zlecitool_main` with `PR_DESCRIPTION.md` as its description.
 
+## What changed since the previous export (6 Oct 2026)
+
+- **Trust row under Checkout** (#7), in Lite and Pro. Spec in `docs/IMPLEMENTATION-v7.md` §5 and §8.
+- Changed files: `prototype/Storefront v7.dc.html` and `docs/IMPLEMENTATION-v7.md`. The texts were already in `prototype/i18n/storefront.ui.json`.
+
 ## Overview
 
 A redesign of the strategy shop in `Leci37/tuisku_Web_selling` (branch `zlecitool_main`, folders `storefront/` and `api/`), sold as **Edgefolio**. It covers:

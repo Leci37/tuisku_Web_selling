@@ -333,7 +333,7 @@ export class App extends Component {
     if (this.paying || (!body.items.length && !body.bundles.length && !body.pack.length)) return;
     this.paying = true;
     this.setState({ paying: true });
-    post('/api/orders', body).then(o => window.location.assign(o.approve_url))
+    post('/api/orders', { ...body, lang: this.state.lang }).then(o => window.location.assign(o.approve_url))
       .catch(e => { this.paying = false; this.setState({ paying: false }); this.fail(e); });
   }
 

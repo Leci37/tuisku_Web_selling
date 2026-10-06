@@ -21,7 +21,8 @@ CREATE TABLE IF NOT EXISTS orders (
     created   REAL NOT NULL,
     email     TEXT NOT NULL DEFAULT '',    -- the signed-in buyer, or the payer's email once paid
     lines     TEXT NOT NULL DEFAULT '[]',  -- JSON: what was charged, line by line
-    buyer_hash TEXT NOT NULL DEFAULT ''    -- SHA-256 of the ef_buyer cookie of the browser that made it
+    buyer_hash TEXT NOT NULL DEFAULT '',   -- SHA-256 of the ef_buyer cookie of the browser that made it
+    lang      TEXT NOT NULL DEFAULT 'en'   -- the language of its receipt email
 );
 CREATE TABLE IF NOT EXISTS downloads (
     token     TEXT PRIMARY KEY,
@@ -101,6 +102,7 @@ MIGRATIONS = (
     ("subscribers", "token_hash", "TEXT NOT NULL DEFAULT ''"),
     ("subscribers", "confirmed_at", "REAL"),
     ("favourites", "lang", "TEXT NOT NULL DEFAULT 'en'"),   # the language of its alert emails
+    ("orders", "lang", "TEXT NOT NULL DEFAULT 'en'"),       # the language of its receipt email
 )
 
 DAY = 86400
@@ -139,12 +141,12 @@ class Store:
     # Orders and paid links: the interface the order and capture code use.
 
     def add_order(self, paypal_id: str, keys: list, code: str, total: Decimal, currency: str,
-                  email: str = "", lines: list = None, buyer: str = ""):
+                  email: str = "", lines: list = None, buyer: str = "", lang: str = "en"):
         """`buyer`: the ef_buyer cookie of the browser placing the order; only its hash is kept."""
         self._write("INSERT INTO orders (paypal_id, items, code, total, currency, status, payer, created, "
-                    "email, lines, buyer_hash) VALUES (?,?,?,?,?,'CREATED','',?,?,?,?)",
+                    "email, lines, buyer_hash, lang) VALUES (?,?,?,?,?,'CREATED','',?,?,?,?,?)",
                     (paypal_id, json.dumps(keys), code, str(total), currency, time.time(), norm(email),
-                     json.dumps(lines or []), digest(buyer) if buyer else ""))
+                     json.dumps(lines or []), digest(buyer) if buyer else "", lang))
 
     def order(self, paypal_id: str):
         row = self.db.execute("SELECT * FROM orders WHERE paypal_id=?", (paypal_id,)).fetchone()

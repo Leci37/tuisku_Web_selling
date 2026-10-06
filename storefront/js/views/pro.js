@@ -21,6 +21,12 @@ export default function Pro(v) {
           <div style="text-align:end;line-height:1.15">${v.hasDiscount ? html`<div style="font-size:12px;color:#5a6b80;text-decoration:line-through">${v.subtotal}</div>` : null}<div style="font-size:22px;font-weight:700;letter-spacing:-.3px">${v.total}</div></div>
           <button onClick=${v.checkout} disabled=${v.paying} aria-busy=${v.paying} style="font-family:inherit;background:${s(v.payBgPro)};border:none;color:#fff;font-weight:700;border-radius:12px;padding:12px 20px;font-size:14px;cursor:${s(v.payCursor)};box-shadow:${s(v.payShadow)};display:inline-flex;gap:8px;align-items:center"><i class=${v.payIcon}></i>${T(v.tx?.checkout)}</button>
           </div>
+        <div style="flex:1 1 100%;display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px 16px;font-size:11.5px;color:#5a6b80;margin-top:-4px">
+          <span style="display:inline-flex;gap:6px;align-items:center"><i class="fa-brands fa-paypal" style="color:#0950e3"></i>${T(v.tx?.trustPaypal)}</span>
+          <span style="display:inline-flex;gap:6px;align-items:center"><i class="fa-solid fa-link" style="color:#0950e3"></i>${T(v.tx?.trustLinks)}</span>
+          <span style="display:inline-flex;gap:6px;align-items:center"><i class="fa-solid fa-file-invoice" style="color:#0950e3"></i>${T(v.tx?.trustInvoice)}</span>
+          ${v.contactOn ? html`<a href=${v.contactUrl} dir="ltr" style="display:inline-flex;gap:6px;align-items:center;color:#5a6b80;text-decoration:none"><i class="fa-regular fa-envelope" style="color:#0950e3"></i>${v.contactEmail}</a>` : null}
+          </div>
         </div>
       </div>
     <main style="flex:1 0 auto;width:100%;max-width:1320px;margin:0 auto;padding:24px 28px 0;display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start">

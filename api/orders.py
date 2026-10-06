@@ -11,7 +11,7 @@ from pydantic import BaseModel, Field
 
 from api import auth, pricing
 from api.paypal import PayPalError
-from api.web import base_url, set_cookie
+from api.web import base_url, language, set_cookie
 
 router = APIRouter()
 
@@ -24,6 +24,7 @@ class Cart(BaseModel):
     bundles: list[str] = Field([], max_length=50, description="bundle keys from /api/bundles")
     pack: list[str] = Field([], max_length=50, description="the PACK_SIZE strategies of 'Build your pack'")
     code: str = Field("", max_length=64)
+    lang: str = Field("en", max_length=16, description="the page's language: the receipt email's")
 
 
 def strategies(catalogue, ids: list) -> list:
@@ -79,6 +80,6 @@ def create_order(cart: Cart, request: Request, response: Response):
         buyer = secrets.token_urlsafe(32)
     state.store.add_order(created.id, keys, q.code if q.code_status == "applied" else "", q.total,
                           state.settings.currency, email=auth.current_email(request) or "", lines=q.lines(),
-                          buyer=buyer)
+                          buyer=buyer, lang=language(cart.lang))
     set_cookie(response, request, BUYER, buyer, BUYER_DAYS)
     return {"id": created.id, "approve_url": created.approve_url, **q.as_dict()}

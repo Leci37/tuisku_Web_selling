@@ -142,6 +142,12 @@ a:hover{text-decoration:underline}
           <sc-if value="{{ codeOpen }}" hint-placeholder-val="{{ false }}"><span style="display:flex;gap:6px;align-items:center"><input value="{{ code }}" onChange="{{ onCode }}" placeholder="{{ tx.codePh }}" style="width:100px;font-family:inherit;font-size:13px;color:#16263a;border:1px solid #e2e9f0;border-radius:10px;padding:6px 9px"><button onClick="{{ applyCode }}" style="font-family:inherit;background:#fff;border:1px solid #e2e9f0;color:#16263a;font-weight:600;border-radius:10px;padding:6px 10px;font-size:12px;cursor:pointer">{{ tx.apply }}</button></span></sc-if>
           <span style="margin-inline-start:auto;text-align:end;line-height:1.15"><span style="display:block;font-size:11.5px;color:#5a6b80;text-decoration:line-through">{{ subtotal }}</span><span style="font-size:20px;font-weight:700;letter-spacing:-.3px">{{ total }}</span><sc-if value="{{ isLocal }}" hint-placeholder-val="{{ false }}"><span style="display:block;font-size:10.5px;color:#5a6b80">{{ payNote }}</span></sc-if></span>
           <button onClick="{{ checkout }}" style="font-family:inherit;background:#0950e3;border:none;color:#fff;font-weight:700;border-radius:12px;padding:12px 20px;font-size:14px;cursor:pointer;box-shadow:0 8px 20px rgba(9,80,227,.22);display:inline-flex;gap:8px;align-items:center"><i class="fa-brands fa-paypal"></i>{{ tx.checkout }}</button>
+          <div style="flex:1 1 100%;display:flex;flex-wrap:wrap;gap:6px 16px;padding-top:8px;border-top:1px solid #eef2f6;font-size:11.5px;color:#5a6b80">
+            <span style="display:inline-flex;gap:6px;align-items:center"><i class="fa-brands fa-paypal" style="color:#0950e3"></i>{{ tx.trustPaypal }}</span>
+            <span style="display:inline-flex;gap:6px;align-items:center"><i class="fa-solid fa-link" style="color:#0950e3"></i>{{ tx.trustLinks }}</span>
+            <span style="display:inline-flex;gap:6px;align-items:center"><i class="fa-solid fa-file-invoice" style="color:#0950e3"></i>{{ tx.trustInvoice }}</span>
+            <a href="mailto:sales@tuisku.eu" dir="ltr" style="display:inline-flex;gap:6px;align-items:center;color:#5a6b80;text-decoration:none"><i class="fa-regular fa-envelope" style="color:#0950e3"></i>sales@tuisku.eu</a>
+          </div>
         </div>
       </div>
     </sc-if>
@@ -164,6 +170,12 @@ a:hover{text-decoration:underline}
           <div style="display:flex;flex-direction:column;gap:2px"><div style="display:flex;gap:6px"><input value="{{ code }}" onChange="{{ onCode }}" placeholder="{{ tx.codePh }}" style="width:110px;font-family:inherit;font-size:13px;color:#16263a;border:1px solid #e2e9f0;border-radius:10px;padding:7px 9px"><button onClick="{{ applyCode }}" style="font-family:inherit;background:#fff;border:1px solid #e2e9f0;color:#16263a;font-weight:600;border-radius:10px;padding:7px 10px;font-size:12px;cursor:pointer">{{ tx.apply }}</button></div><span style="font-size:11px;font-weight:600;color:{{ codeMsgColor }}">{{ codeMsg }}</span></div>
           <div style="text-align:end;line-height:1.15"><div style="font-size:12px;color:#5a6b80;text-decoration:line-through">{{ subtotal }}</div><div style="font-size:22px;font-weight:700;letter-spacing:-.3px">{{ total }}</div></div>
           <button onClick="{{ checkout }}" style="font-family:inherit;background:linear-gradient(135deg,#0950e3,#0e7c98);border:none;color:#fff;font-weight:700;border-radius:12px;padding:12px 20px;font-size:14px;cursor:pointer;box-shadow:0 8px 20px rgba(9,80,227,.22);display:inline-flex;gap:8px;align-items:center"><i class="fa-brands fa-paypal"></i>{{ tx.checkout }}</button>
+        </div>
+        <div style="flex:1 1 100%;display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px 16px;font-size:11.5px;color:#5a6b80;margin-top:-4px">
+          <span style="display:inline-flex;gap:6px;align-items:center"><i class="fa-brands fa-paypal" style="color:#0950e3"></i>{{ tx.trustPaypal }}</span>
+          <span style="display:inline-flex;gap:6px;align-items:center"><i class="fa-solid fa-link" style="color:#0950e3"></i>{{ tx.trustLinks }}</span>
+          <span style="display:inline-flex;gap:6px;align-items:center"><i class="fa-solid fa-file-invoice" style="color:#0950e3"></i>{{ tx.trustInvoice }}</span>
+          <a href="mailto:sales@tuisku.eu" dir="ltr" style="display:inline-flex;gap:6px;align-items:center;color:#5a6b80;text-decoration:none"><i class="fa-regular fa-envelope" style="color:#0950e3"></i>sales@tuisku.eu</a>
         </div>
       </div>
     </div>

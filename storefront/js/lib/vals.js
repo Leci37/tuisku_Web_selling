@@ -25,6 +25,8 @@ export function renderVals(app) {
   TX_KEYS.forEach(k => { tx[k] = t(k); });
   const contact = (s.cfg && s.cfg.contact_email) || '';
   tx.contactProblems = t('contactProblems', { e: contact });
+  // the trust row says what the server's settings say, not the design's example figures
+  tx.trustLinks = t('trustLinks', { n: f.int((s.cfg && s.cfg.download_days) || 7), m: f.int((s.cfg && s.cfg.max_downloads) || 10) });
 
   const c = { app, s, t, tx, f, lang, rtl, contact };
   c.mk = r => rowVals(c, r);

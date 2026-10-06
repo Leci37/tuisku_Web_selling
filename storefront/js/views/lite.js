@@ -83,6 +83,12 @@ export default function Lite(v) {
           ${v.codeOpen ? html`<span style="display:flex;gap:6px;align-items:center"><input value=${v.code ?? ''} onInput=${v.onCode} placeholder=${v.tx?.codePh} style="width:100px;font-family:inherit;font-size:13px;color:#16263a;border:1px solid #e2e9f0;border-radius:10px;padding:6px 9px" /><button onClick=${v.applyCode} style="font-family:inherit;background:#fff;border:1px solid #e2e9f0;color:#16263a;font-weight:600;border-radius:10px;padding:6px 10px;font-size:12px;cursor:pointer">${v.tx?.apply}</button></span>` : null}
           <span style="margin-inline-start:auto;text-align:end;line-height:1.15">${v.hasDiscount ? html`<span style="display:block;font-size:11.5px;color:#5a6b80;text-decoration:line-through">${v.subtotal}</span>` : null}<span style="font-size:20px;font-weight:700;letter-spacing:-.3px">${v.total}</span>${v.isLocal ? html`<span style="display:block;font-size:10.5px;color:#5a6b80">${v.payNote}</span>` : null}</span>
           <button onClick=${v.checkout} disabled=${v.paying} aria-busy=${v.paying} style="font-family:inherit;background:${s(v.payBgLite)};border:none;color:#fff;font-weight:700;border-radius:12px;padding:12px 20px;font-size:14px;cursor:${s(v.payCursor)};box-shadow:${s(v.payShadow)};display:inline-flex;gap:8px;align-items:center"><i class=${v.payIcon}></i>${T(v.tx?.checkout)}</button>
+          <div style="flex:1 1 100%;display:flex;flex-wrap:wrap;gap:6px 16px;padding-top:8px;border-top:1px solid #eef2f6;font-size:11.5px;color:#5a6b80">
+            <span style="display:inline-flex;gap:6px;align-items:center"><i class="fa-brands fa-paypal" style="color:#0950e3"></i>${T(v.tx?.trustPaypal)}</span>
+            <span style="display:inline-flex;gap:6px;align-items:center"><i class="fa-solid fa-link" style="color:#0950e3"></i>${T(v.tx?.trustLinks)}</span>
+            <span style="display:inline-flex;gap:6px;align-items:center"><i class="fa-solid fa-file-invoice" style="color:#0950e3"></i>${T(v.tx?.trustInvoice)}</span>
+            ${v.contactOn ? html`<a href=${v.contactUrl} dir="ltr" style="display:inline-flex;gap:6px;align-items:center;color:#5a6b80;text-decoration:none"><i class="fa-regular fa-envelope" style="color:#0950e3"></i>${v.contactEmail}</a>` : null}
+            </div>
           </div>
         </div>
       ` : null}

@@ -6,7 +6,8 @@ import re
 from pathlib import Path
 
 MAIL_KEYS = ("mailSignInSubject", "mailSignInBody", "mailFreeSubject", "mailFreeBody", "mailNewsConfirm",
-             "mailAlertSubject", "mailAlertBody", "mailAlertNew", "mailAlertPrice", "mailAlertBundle")
+             "mailAlertSubject", "mailAlertBody", "mailAlertNew", "mailAlertPrice", "mailAlertBundle",
+             "mailReceiptSubject", "mailReceiptBody")
 PLACEHOLDER = re.compile(r"\{(\w+)\}")
 
 

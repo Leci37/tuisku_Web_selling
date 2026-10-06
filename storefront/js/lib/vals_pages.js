@@ -16,7 +16,7 @@ export function pageVals(c) {
   const errBottom = (s.vw < 640 ? 76 : 16) + (s.page === 'shop' && s.mode !== 'pro' && (s.cart.length + s.bundles.length > 0) ? 84 : 0);
   return {
     ...detailVals(c), ...compareVals(c), ...mineVals(c), ...thanksVals(c), ...installVals(c), ...freeVals(c),
-    ...legal, legalOn: !!base, contactOn: !!c.contact, contactUrl: c.contact ? 'mailto:' + c.contact : '',
+    ...legal, legalOn: !!base, contactOn: !!c.contact, contactUrl: c.contact ? 'mailto:' + c.contact : '', contactEmail: c.contact,
     errOpen: !!s.error, errTitle: tx.errServer, closeErr: () => app.setState({ error: '' }),
     errText: t(s.error) + ((s.error === 'errPayment' || s.error === 'errLater') && c.contact ? ' ' + t('contactProblems', { e: c.contact }) : ''),
     errBottom: errBottom + 'px',
