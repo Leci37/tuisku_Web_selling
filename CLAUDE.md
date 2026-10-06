@@ -89,7 +89,9 @@ aquí `publish.py` y `tests/test_publish.py`. El README («La aplicación gemela
 
 Se trabaja en `_ztool_dev`; `_ztool_main` sólo para lo estable (se fusiona
 desde `_ztool_dev` al publicar). Los mismos nombres en el núcleo y en todas
-las herramientas.
+las herramientas. `main` es la tienda de antes, y `main_2025-07-29` su copia tal
+como quedó en su último cambio, para el histórico (`main_original_2025-07-29` es
+el mismo commit): no se tocan.
 
 ## Comandos
 
