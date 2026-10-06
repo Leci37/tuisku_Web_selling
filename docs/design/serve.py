@@ -14,10 +14,13 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 STATIC = HERE.parent.parent / "static"
+# Python puts this folder first on sys.path, and its zlecitool_core/ (the mock-up's copy of the core's
+# texts) would hide the installed core: the fonts are looked up without it.
+sys.path[:] = [p for p in sys.path if Path(p or ".").resolve() != HERE]
 try:
     import zlecitool_core
     FONTS = Path(zlecitool_core.__file__).resolve().parent / "ui" / "static" / "fonts"
-except ImportError:  # without the core the mock-up falls back to the system font
+except (ImportError, TypeError):  # without the core the mock-up falls back to the system font
     FONTS = HERE / "-"
 ROUTES = {"/storefront/": STATIC, "/zlecitool_core/ui/static/fonts/": FONTS}
 

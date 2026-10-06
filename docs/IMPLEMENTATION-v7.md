@@ -4,6 +4,8 @@ The design reference is `Storefront v7.dc.html`. This guide lists what to build 
 
 The mock-up uses 8 sample strategies, and some of its figures are examples (marked below).
 
+The click-by-click behaviour of every screen, with the expected result of each action, is in `docs/USER-FLOW-v7.md`.
+
 > **Status in this repository.** This is the designer's guide, kept as it was handed over; the build
 > follows it with these differences:
 > - **Built:** §1–§5 and §9–§12; from §6 the paged catalogue with server-side filters and histograms,
@@ -12,12 +14,18 @@ The mock-up uses 8 sample strategies, and some of its figures are examples (mark
 >   download for an email (with double opt-in for news), local currency (`catalogue/fx.json`, refreshed by
 >   `flask --app app edgefolio fx-update`), New this month, the previews, the trust row under Checkout
 >   (its figures from `DOWNLOAD_DAYS`/`MAX_DOWNLOADS`, its address from `CONTACT_EMAIL`) and the receipt
->   it promises, emailed on payment (a receipt, not a tax invoice).
+>   it promises, emailed on payment (a receipt, not a tax invoice); and the changes of the second
+>   export of 6 Oct 2026 (`docs/handoff/2026-10-06/CAMBIOS.md`): the New badge, the Compare pill above
+>   Lite's cart, the code's result in Lite, "You pay … with PayPal" in Pro, the free dialog's email
+>   errors, Esc on dialogs and dropdowns, "Update available" only for an owner of an older version, and
+>   the Fact sheet and How it decides links in My strategies.
 > - **Different:** the shop is a zlecitool tool (Flask on zlecitool-core, the files of `storefront/` are
 >   now `static/`, `templates/edgefolio/shop.html` and `i18n/ui.json`): the bar, the language menu and the
 >   footer are the core's shell, and My strategies uses the core's shared accounts; what was bought
 >   without an account shows up once the account confirms that email (a one-time emailed link).
 >   Thumbnails are made on request, not at publish time; the welcome tour is shown once per browser.
+>   "Get a new link" hands over the current version (there is one script file per strategy).
+>   The work goes to `_ztool_dev`: no `design/` branch and no pull request, whatever this file says.
 > - **Not built (needs data or jobs the shop does not have):** the since-release job, versions beyond
 >   v1 and paid updates, translations of the indicator texts.
 
@@ -44,7 +52,9 @@ The mock-up uses 8 sample strategies, and some of its figures are examples (mark
 | Lite \| Pro segmented control (top bar) | Defaults to Lite and is remembered in `localStorage['tuisku-sf-mode']`. The active side is solid `#0950e3` with white text. |
 | My strategies, View tutorial, TradingView chip, currency chip, language menu | Chips with radius 999, 11px, 600. They wrap onto a second line on narrow screens. |
 | Language | The 8 core languages (`_languages` in `common.json`) with live switching and no reload. `dir="rtl"` for `ar`. Numbers, money and dates use `Intl` with the language's locale; Arabic uses Latin digits (`ar-u-nu-latn`). |
-| Phone bottom bar (< 640px) | Shop, Search, Cart (with count) and Mine. Fixed to the bottom, at least 44px tall, with 64px of page padding left below the content. |
+| Phone bottom bar (< 640px) | Shop, Search, Cart (with count) and Mine. Fixed to the bottom, at least 44px tall, with 64px of page padding left below the content. Search focuses the current mode's search box; Cart opens the shop with the cart in view. The Lite floating cart and the compare pill sit 76px from the bottom, above the bar. |
+| Routing | `/s/<id>` and `/s/<id>/tree` follow in-app navigation, so Back, Forward and reload work. An unknown id goes to the shop. |
+| Esc | Closes any open dialog or menu (tours, compare, pack picker, free download, language menu, filter dropdowns). |
 
 ## 2. Lite (default)
 
@@ -59,16 +69,18 @@ The mock-up uses 8 sample strategies, and some of its figures are examples (mark
    - **grade A–D:** A ≥ 300 trades (`#15803d`), B ≥ 100 (`#0e7c98`), C ≥ 30 (`#5a6b80`), D below 30 (`#c0392b`). These cut-offs still need to be agreed;
    - **since release %:** green when positive, red when negative;
    - **favourite** heart and **compare** toggle (up to 3);
+   - a **New** badge next to the ticker when the strategy was released in the last 30 days;
    - price and Buy.
 6. **Floating cart bar** (sticky bottom):
    - item count and a discount tag (−35%);
    - a "Have a code?" link that opens the code box;
    - the total in the local currency with "You pay $X with PayPal" under it, and Checkout;
-7. **Compare** pill at the bottom start, which opens a table of up to 3 strategies. The best value in each row is marked with green text on `#e8f7ef`.
+   - the crossed-out subtotal only when a discount applies, and the code result (applied / invalid) next to the code box;
+7. **Compare** pill at the bottom start (just above the floating cart when that is visible), which opens a table of up to 3 strategies. The best value in each row is marked with green text on `#e8f7ef`.
 
 ## 3. Pro
 
-1. **Discount ladder strip:** the cart, a progress bar (5 ticks with the % on one line and the amount under it), the code, the totals and Checkout.
+1. **Discount ladder strip:** the cart, a progress bar (5 ticks with the % on one line and the amount under it), the code, the totals and Checkout. "Empty cart" also removes bundles and the custom pack. With local currency, "You pay $X with PayPal" goes under the total, and the subtotal is crossed out only when a discount applies.
 2. **Left filter panel** (1e). It moves above the list when the width is under about 840px. It has:
    - the count and Reset;
    - Only FREE;
@@ -76,7 +88,7 @@ The mock-up uses 8 sample strategies, and some of its figures are examples (mark
    - **multi-select dropdowns** (search, Select all / Deselect all, tick boxes with icon and count) for Symbol, Time frame, Indicators, Index and Release date;
    - 14 more ranges that open in place.
 3. **Active filter chips** above the list, each with an ×, plus "Clear all".
-4. Views: **Rows** (default; the strategy's candle chart faded behind each row) · **Cards** · **Table** (sortable, a grade badge next to the ticker, a compare toggle, and an expandable row with both charts).
+4. Views: **Rows** (default; the strategy's candle chart faded behind each row) · **Cards** (the indicator name links to its TradingView page) · **Table** (sortable, a grade badge next to the ticker, a compare toggle, and an expandable row with both charts).
 5. **Strategy page** link from every view.
 
 ## 4. Strategy page (route `/s/<id>`; it can be opened in a new tab)
@@ -86,19 +98,22 @@ It contains, top to bottom:
 - **Time-frame reminder:** "In TradingView, set the chart's time frame to {tf}".
 - **Overfitting box.**
 - **Backtest vs. since release:** two bars and the grade.
-- **Versions:** v2 with "Update available", and v1 with its release date.
+- **Versions:** v2, with "Update available" only for owners of v1, and v1 with its release date.
 - **Both charts** at full size, next to all 14 results.
 - **About the indicator,** with a link to it on TradingView.
 - **Pine Script preview:** the real `pine_path_shadow` preview file, faded out, with "The full script is delivered after purchase".
 
 ## 5. Flows
 
-- **Free download:** a dialog asks for an email. Getting news is a separate box, unticked by default (GDPR). The server emails the link.
+- **Free download:** a dialog asks for an email. Getting news is a separate box, unticked by default (GDPR). The server emails the link. An empty or invalid email shows the core texts `errEmailRequired` / `errEmailInvalid` under the field, and Enter sends. Asking again for the same strategy restarts its link.
 - **Trust row under Checkout** (Lite floating cart and Pro cart strip): `trustPaypal` (PayPal: we never see your card), `trustLinks` (Links: 7 days, 10 downloads), `trustInvoice` (Invoice by email) and a `mailto:sales@tuisku.eu` link. 11.5px, `#5a6b80`, icons `#0950e3`; it wraps on phones and the email stays LTR in Arabic. The texts are already in `i18n/storefront.ui.json` for all 8 languages.
-- **Checkout → thank-you page:** order number, total and PayPal; "Download all" and one `.pine` per item; a note on how long links last; 4 install steps.
+- **One payment per strategy.** Adding a bundle or the custom pack removes its strategies from the cart as single items, and also any other bundle that shares a strategy with it. `/api/quote` applies the same rule (to confirm).
+- **"Buy to unlock"** in How it decides only adds the strategy to the cart (never removes it); on a free strategy it opens the free download.
+- **Checkout → thank-you page:** order number, total and PayPal; "Download all" and one `.pine` per item; a note on how long links last; the 5-step install tutorial (§11).
 - **My strategies** (requires an account through the core's shared login):
   - every item bought or downloaded, with how long its link has left;
-  - "Get a new link" when a link has expired, and "Get the update · v2" when a newer version exists;
+  - "Get a new link" when a link has expired (it restarts the 7 days and 10 downloads, and keeps the purchase date, order and version), and "Get the update · v2" when a newer version exists;
+  - `.pine`, `.zip` and the Fact sheet / How it decides links on every row, as on the thank-you page;
   - **favourites** with alert toggles: new version, price drop, in a bundle.
 - **Welcome tour** (core tour, 0.13): 3 steps, once per account, with mode-specific text in step 1. "View tutorial" reopens it.
 
@@ -128,6 +143,10 @@ It contains, top to bottom:
 ## 8. Acceptance checklist
 
 - [ ] The trust row shows under Checkout in Lite and Pro, in all 8 languages.
+- [ ] Every flow in `docs/USER-FLOW-v7.md` behaves as described, including the fixes in its §18.
+- [ ] Each strategy is paid once: bundles and the pack never overlap in one quote.
+- [ ] Back, Forward and reload keep the strategy page and its tab.
+- [ ] On a 390px phone the floating cart, the compare pill and the bottom bar don't overlap.
 - [ ] Lite is the default, and Pro and the language are remembered across visits.
 - [ ] Every page reflows at 390, 768, 1024 and 1366px with no clipped text. The ticker line on cards wraps, it does not cut off.
 - [ ] Arabic flips the layout, the gradients, the slider directions and the ladder.
