@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """Los comandos de la tienda: ``flask --app app edgefolio …``.
 
+    import PAQUETE [--scripts DIR | --skip-scripts] [--prune]
+                                publica un paquete del generador: catálogo, ficheros y scripts (release.py)
     restore-scripts [--force]   copia los scripts de pago a la carpeta privada desde la historia del repo
     fx-update                   los cambios de moneda del día (del BCE)
     send-alerts                 los avisos de las favoritas (una vez al día)
@@ -67,6 +69,46 @@ def register(bp):
     def shop():
         from .shop import of
         return of(current_app)
+
+    @bp.cli.command("import")
+    @click.argument("package", type=click.Path(exists=True, file_okay=False, path_type=Path))
+    @click.option("--scripts", type=click.Path(exists=True, file_okay=False, path_type=Path),
+                  help="La carpeta de los scripts completos (el d_result/pine_TW_b del generador): se copian los "
+                       "del manifiesto, comprobado su sha256.")
+    @click.option("--skip-scripts", is_flag=True, help="Publicar aunque falten scripts en STRATEGIES_DIR (dice cuántos).")
+    @click.option("--prune", is_flag=True, help="Borrar los gráficos y vistas previas que ya no usa ninguna fila.")
+    def import_package(package, scripts, skip_scripts, prune):
+        """Publica un paquete del generador (su d_result/package/), comprobado entero antes de escribir nada."""
+        from . import release
+        if scripts and skip_scripts:
+            raise click.UsageError("--scripts o --skip-scripts, no los dos")
+        try:
+            done = release.import_package(package, shop().settings, scripts=scripts, skip_scripts=skip_scripts,
+                                          prune=prune)
+        except release.Refused as e:
+            raise click.ClickException(f"no se importa {package}:\n" + "\n".join(f"  - {p}" for p in e.problems))
+        click.echo(f"{done['rows']} estrategias del contrato {done['contract']}, de la ejecución del generador del "
+                   f"{done['created']} (commit {done['commit'][:12] or 'desconocido'})")
+        click.echo(f"{done['files']} ficheros copiados a static/assets ({done['cut']} vistas previas cortadas, "
+                   f"{done['pruned']} sin usar borrados); {done['scripts']} scripts copiados; "
+                   f"{done['thumbs']} miniaturas borradas")
+        if done["kept"]:
+            click.echo(f"{len(done['kept'])} logos del paquete son distintos de los de la tienda y se han dejado los de "
+                       "la tienda (para tomar el del generador, bórralo de static/assets/icons y vuelve a importar): "
+                       f"{release.listed(done['kept'])}")
+        if done["bundles_out"]:
+            click.echo(f"{len(done['bundles_out'])} lotes de catalogue/bundles.json nombran estrategias que el "
+                       "catálogo ya no trae y la tienda los dejará fuera enteros: cámbialos o quítalos: "
+                       f"{release.listed(done['bundles_out'])}")
+        if skip_scripts:
+            click.echo(f"{done['scripts_missing']} scripts del paquete no están en STRATEGIES_DIR: esas estrategias "
+                       "no se pueden entregar hasta que estén")
+            if done["scripts_outdated"]:
+                click.echo(f"{done['scripts_outdated']} scripts de STRATEGIES_DIR no son los del paquete (otro "
+                           "sha256): esas estrategias se entregan en su versión de antes hasta que se copien "
+                           "(--scripts)")
+        # la tienda lee el catálogo al arrancar (shop.load_catalogue): la que está en marcha sigue con el de antes
+        click.echo("reinicia la tienda para que sirva este catálogo")
 
     @bp.cli.command("restore-scripts")
     @click.option("--force", is_flag=True, help="Copiarlos aunque la carpeta ya tenga scripts.")
