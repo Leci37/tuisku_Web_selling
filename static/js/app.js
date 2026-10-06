@@ -236,6 +236,14 @@ export class App extends Component {
     this.asked.add(id);
     api('/api/strategies/' + encodeURIComponent(id)).then(r => {
       this.keep([r], true);
+      // an old address or a cart saved by the first shop names the strategy by its alias (the base64 of
+      // its key), which the server resolves: from now on, by its id
+      if (r.id && r.id !== id) {
+        const swap = arr => [...new Set(arr.map(x => (x === id ? r.id : x)))];
+        this.setState(st => ({ cart: swap(st.cart), packIds: swap(st.packIds), compare: swap(st.compare), favs: swap(st.favs),
+          freeFor: st.freeFor === id ? r.id : st.freeFor }));
+        if (this.state.page === 'detail' && this.state.detail === id) this.go({ detail: r.id }, { replace: true, scroll: false });
+      }
       this.setState(st => ({ rowsV: st.rowsV + 1 }));
     }).catch(e => {
       if (e.status !== 404) { this.fail(e); return; }
