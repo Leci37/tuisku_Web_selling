@@ -13,8 +13,10 @@ publicidad, y **vende con PayPal, no con créditos**.
 Esta aplicación es **la interfaz gráfica**: enseña, cobra y entrega. Los datos los fabrica su **aplicación
 gemela**, [**ML-Sklearn-strategy-stock-crypto-for-TraderView**](https://github.com/Leci37/ML-Sklearn-strategy-stock-crypto-for-TraderView/tree/_ztool_dev) (el generador de
 estrategias, rama `_ztool_dev`): baja las velas, entrena los bosques, escribe cada estrategia en Pine Script,
-hace su backtest y sus dos gráficos, y exporta el catálogo. Las dos se tocan en `catalogue/publish.py` y
-en la carpeta privada de los scripts: ver [La aplicación gemela](#la-aplicación-gemela-el-generador-de-estrategias).
+hace su backtest y sus dos gráficos, y deja el catálogo y sus ficheros en **un paquete versionado** (su
+`d_result/package/`; los scripts de pago, aparte). Aquí, `flask --app app edgefolio import` lo comprueba
+entero y lo publica; lo que trae lo fija `catalogue/contract.json`, el contrato entre las dos: ver
+[La aplicación gemela](#la-aplicación-gemela-el-generador-de-estrategias).
 
 <p align="center">
   <img src="docs/img/edgefolio_lite.png" alt="Lite: la cinta de tickers, la búsqueda, las pestañas, el aviso de sobreajuste, tres lotes y Crea tu pack, y las fichas con su curva, su nota y su precio" width="900">
@@ -119,6 +121,10 @@ mismo `.env`** en todas (el mismo `FLASK_SECRET_KEY`, `ZLECITOOL_DATA_DIR`, `DAT
 tienda queda en http://localhost:5105**. Una sola cuenta vale para todas (en `localhost`, no en
 `127.0.0.1`).
 
+El generador (`ML-Sklearn-strategy-stock-crypto-for-TraderView`, rama `_ztool_dev`) va en esa misma
+carpeta, al lado de la tienda. No es una web y no se arranca: está ahí para que su prueba del puente
+encuentre la tienda y para que, al publicar, el paquete y sus scripts estén al lado.
+
 ### A mano
 
 ```
@@ -157,7 +163,8 @@ repo; en un clon sin ella, se saltan.
 | `test_search.py` | los filtros, el orden, las páginas y los histogramas contra el catálogo de verdad; que sean rápidos |
 | `test_orders.py` | pagar y descargar; el importe de PayPal comprobado; los enlaces que caducan y se gastan (también a la vez); el recibo con enlaces sólo para el navegador que compró, la cuenta que compró o la que demostró el correo |
 | `test_receipt.py` | el recibo por correo: una vez por pedido, en el idioma de la página, línea a línea; sin dirección pública no sale y el pago sigue |
-| `test_publish.py` | el puente con el generador: su export pasa a `catalogue.csv` y sus ficheros a `static/assets/`, sin la ruta del script de pago y con las vistas previas cortadas |
+| `test_publish.py` | el puente con el generador: `contract.json` es lo que lee `publish.py`, y las columnas que faltan o sobran se rechazan (también en el export); el paquete, comprobado entero antes de escribir nada (contrato, sha256, rutas, ficheros fuera del manifiesto, lo que nombran las filas, el script de cada fila, ningún script entero como gráfico) y publicado tal como se comprobó; los logos de la tienda; un fallo a medias deja la tienda como estaba; sin la ruta del script de pago y con las vistas previas cortadas; `publish.py` solo, con pandas |
+| `test_release.py` | `flask edgefolio import`: sólo los scripts del manifiesto, con su sha256; sin `--scripts`, ya en `STRATEGIES_DIR`; `--skip-scripts` dice cuántos faltan; si algo falla, nada escrito; las miniaturas vaciadas; los logos que se quedan; los lotes que pierden una estrategia |
 | `test_free.py` | las gratis por correo; el límite del día (también a la vez); las novedades con doble confirmación; el idioma del correo |
 | `test_mine.py` | Mis estrategias: lo de la cuenta y lo de un correo demostrado; renovar; las versiones nuevas; el script del propietario; las favoritas; el zip de un pedido |
 | `test_proofs.py` | la prueba de un correo: un uso, en dos pasos, sólo para la cuenta que la pidió, sólo hashes, sin llenar buzones, CSRF, el idioma |
@@ -270,6 +277,8 @@ Sin sesión, un script recibe `401 {"error": "errLoginRequired"}` en lo que la p
 ## Comandos
 
 ```
+flask --app app edgefolio import PAQUETE [--scripts DIR | --skip-scripts] [--prune]
+                                                      # un paquete del generador (ver «Publicar un catálogo nuevo»)
 flask --app app edgefolio restore-scripts [--force]   # los scripts de pago, de la historia del repo
 flask --app app edgefolio fx-update                   # los cambios del día del BCE (una vez al día)
 flask --app app edgefolio send-alerts                 # los avisos de las favoritas (una vez al día)
@@ -279,6 +288,7 @@ flask --app app edgefolio subscribers                 # quién confirmó las nov
 Los scripts de pago **no están en el repo**, sólo en su historia (`c3fa796:d_result/pine_TW_b`).
 `restore-scripts` los copia a `STRATEGIES_DIR` con `git archive`, **sin tocar la copia de trabajo ni el
 índice**, y sólo si la carpeta está vacía (o con `--force`): es lo que hace el lanzador la primera vez.
+Traen los del catálogo de ahora; los de un catálogo nuevo llegan con `import --scripts`.
 Como siguen en la historia, cualquiera con el repo puede sacarlos: para cerrarlo del todo, publicar la
 tienda en un repo nuevo (o reescribir la historia) antes de volver a vender.
 
@@ -334,48 +344,114 @@ cuentas, la sesión, el idioma elegido y lo demás de la familia los lleva el n�
 
 Los enlaces de un solo uso y la cookie de quien compra se guardan sólo como hash. Fuera de la base de
 datos, en `<ZLECITOOL_DATA_DIR>/edgefolio/`: `strategies/` (los scripts de pago), `thumbs/` (las
-miniaturas WebP, hechas la primera vez que se piden) y `fx.json` (los cambios del día). Con
-`flask --app app zt backup` (del núcleo) se copia la base de datos; la carpeta de datos, con el resto del
-servidor.
+miniaturas WebP, hechas la primera vez que se piden, y otra vez si su gráfico es más nuevo) y `fx.json`
+(los cambios del día). Con `flask --app app zt backup` (del núcleo) se copia la base de datos; la carpeta
+de datos, con el resto del servidor.
 
 ## La aplicación gemela: el generador de estrategias
 
 | | |
 |---|---|
 | **Qué es** | [Leci37/ML-Sklearn-strategy-stock-crypto-for-TraderView](https://github.com/Leci37/ML-Sklearn-strategy-stock-crypto-for-TraderView/tree/_ztool_dev), rama `_ztool_dev` (lo estable, en `_ztool_main`): el repo que genera los datos (privado). Su README cuenta los pasos, lo que tarda y lo que se arregló; su `CLAUDE.md`, esta conexión desde su lado |
-| **Qué hace** | velas de Alpaca (acciones) y Binance (cripto) → indicadores → bosques de scikit-learn → un script de Pine por bosque → backtest (en TradingView, o en Python con las mismas reglas) con sus dos gráficos → el export |
-| **Esta** | la interfaz: nunca entrena ni hace backtests, sólo publica lo que el generador exporta |
+| **Qué hace** | velas de Alpaca (acciones) y Binance (cripto) → indicadores → bosques de scikit-learn → un script de Pine por bosque → backtest (en TradingView, o en Python con las mismas reglas) con sus dos gráficos → el export y el paquete para la tienda |
+| **Esta** | la interfaz: nunca entrena ni hace backtests, sólo publica el paquete del generador |
+
+**El contrato** es `catalogue/contract.json`, de la tienda (versión 1): las columnas del catálogo (y la
+opcional, `version`, y la que se quita, `pine_path`), en qué carpeta del paquete está cada fichero que
+nombra una fila, a qué carpeta de `static/assets/` va y cómo se llama el script completo de cada
+estrategia. `catalogue/publish.py` lo lee de ahí. El generador lleva `CONTRACT_VERSION = 1` junto a
+`SHOP_COLUMNS` (`S_04_ladding_file_info_to_see_in_web.py`) y sus pruebas del puente comparan los dos. Un
+cambio de columnas o de carpetas sube la versión y entra en los dos repos a la vez; un paquete de otra
+versión no se importa.
+
+**El paquete** lo escribe el paso 7 del generador (`python S_04_ladding_file_info_to_see_in_web.py`,
+también desde `run_pipeline.py`), después del export, en su `d_result/package/`: fuera de git, vaciado y
+escrito de nuevo en cada vuelta, y borrado si no sale ninguna estrategia o si falla al escribirlo. Lleva:
+
+- `manifest.json`: el contrato, cuándo se hizo (UTC), el generador (repo y commit), las filas, el sha256
+  de cada fichero del paquete y, en `private`, la carpeta `pine_TW_b` y el sha256 del script completo de
+  cada fila;
+- `catalogue.csv`: las columnas del contrato, sin `pine_path`;
+- `pine_TW_img/`, `icons/`, `pine_TW_hide/`: los gráficos, los logos y las vistas previas que nombran las
+  filas (enlaces duros a los de `d_result/`, o copias donde el disco no los deja). Un logo que no está
+  en `d_result/icons/` no va: con `SHOP_ICONS_DIR`, es uno que la tienda ya tiene.
+
+Los scripts completos no van en el paquete: se quedan en `d_result/pine_TW_b/`. Y **el paquete nunca se
+hace público**: las vistas previas de las gratis son el script entero; la tienda las corta al publicarlas.
 
 Dónde se conectan (lo que escribe el generador → lo que lee la tienda):
 
 | Qué | El generador escribe (su paso) | La tienda lo lee de | Cómo pasa |
 |---|---|---|---|
-| Las filas del catálogo | `d_result/pine_TW_img_info_6_WEB.csv` (paso 7, `S_04_ladding_file_info_to_see_in_web.py`; sus columnas son `SHOP_COLUMNS`) | `catalogue/catalogue.csv` | `catalogue/publish.py` |
-| Los dos gráficos de cada estrategia | `d_result/pine_TW_img/*_profit.png`, `*_candel.png` (paso 6a o 6b) | `static/assets/charts/` | `publish.py --assets <generador>/d_result` |
-| Los logos | `d_result/icons/` | `static/assets/icons/` | igual (con `SHOP_ICONS_DIR=<tienda>/static/assets/icons`, el paso 7 no hace logos que la tienda ya tiene) |
-| Las vistas previas públicas | `d_result/pine_TW_hide/` | `static/assets/previews/` | igual; `publish.py` las corta a su parte pública |
-| Los scripts de pago | `d_result/pine_TW_b/` | `STRATEGIES_DIR` (por defecto `<ZLECITOOL_DATA_DIR>/edgefolio/strategies`) | a mano: es la carpeta privada, nunca el repo |
+| Las filas del catálogo | `d_result/pine_TW_img_info_6_WEB.csv` (paso 7, `S_04_ladding_file_info_to_see_in_web.py`; sus columnas son `SHOP_COLUMNS`) y, sin `pine_path`, el `catalogue.csv` del paquete | `catalogue/catalogue.csv` | en el paquete; `edgefolio import` comprueba sus columnas contra el contrato y lo escribe |
+| Los dos gráficos de cada estrategia | `d_result/pine_TW_img/*_profit.png`, `*_candel.png` (paso 6a o 6b) | `static/assets/charts/` | en el paquete (`pine_TW_img/`), con su sha256; `import` reemplaza los que cambiaron |
+| Los logos | `d_result/icons/` | `static/assets/icons/` | en el paquete (`icons/`); `import` añade los que faltan: uno de verdad de la tienda se queda aunque el del paquete sea otro, y uno provisional de la tienda (el círculo gris del generador) deja sitio al del paquete. Con `SHOP_ICONS_DIR=<tienda>/static/assets/icons`, el paso 7 no hace logos que la tienda ya tiene |
+| Las vistas previas públicas | `d_result/pine_TW_hide/` | `static/assets/previews/` | en el paquete (`pine_TW_hide/`); `import` las corta a su parte pública |
+| Los scripts de pago | `d_result/pine_TW_b/` | `STRATEGIES_DIR` (por defecto `<ZLECITOOL_DATA_DIR>/edgefolio/strategies`) | nunca en el paquete, sólo su sha256 en el manifiesto: `import --scripts <generador>/d_result/pine_TW_b` copia los de la lista, comprobados |
+| De qué ejecución es | `manifest.json` del paquete | `catalogue/release.json` | `import` copia el contrato, la fecha, el generador y las filas |
 | La vuelta a la tienda | cada script, al caducar, pide bajar la versión nueva de `SHOP_URL` (`settings.py` del generador, por defecto `tuisku.eu`) | — | el texto del script |
 
 Lo que no pasa: los mosaicos del paso 8 del generador (`d_result/mosaico/`) eran de la página de antes;
-esta no los usa. Y la prueba que vigila el puente está en los dos lados: `tests/test_publish.py` aquí, y
-`tests/test_export.py` allí, que publica un export de verdad con este `publish.py` cuando `tuisku_Web_selling`
-está clonado al lado del generador.
+esta no los usa.
+
+La prueba que vigila el puente está en los dos lados: `tests/test_publish.py` y `tests/test_release.py`
+aquí, y `tests/test_export.py` allí, que comprueba que su contrato es este `contract.json` y publica un
+paquete (y un export) de verdad con este `publish.py` cuando `tuisku_Web_selling` está clonado al lado
+del generador. Su CI (`.github/workflows/pruebas.yml`, Python 3.11, 3.12 y 3.13) pone al lado la carpeta
+`catalogue/` de la tienda y los ficheros de su raíz, sin los assets (es pública: no hace falta ningún secreto), de `_ztool_dev`, o de
+`_ztool_main` cuando corre en `_ztool_main` o en un pull request a ella; con `REQUIRE_SHOP=1` esas pruebas
+fallan en vez de saltarse. Por eso **importa el orden al subir**: un cambio del contrato llega a la rama de
+la tienda antes que el del generador, o a la vez; y lo mismo al fusionar en `_ztool_main`: la tienda,
+primero.
 
 ## Publicar un catálogo nuevo
 
-Con el export del generador (arriba):
+Con el paquete del generador (arriba), desde la tienda:
 
 ```
-python catalogue/publish.py ruta/al/generador/d_result/pine_TW_img_info_6_WEB.csv --assets ruta/al/generador/d_result --prune
+flask --app app edgefolio import ruta/al/generador/d_result/package --scripts ruta/al/generador/d_result/pine_TW_b --prune
 ```
 
-Deja una fila por estrategia, hace relativa cada ruta de imagen, quita dónde está el fichero de pago, da un
-nombre legible a los que tienen el código de la bolsa, copia a `static/assets/` los gráficos y las vistas
-previas que usan las filas (con `--prune` borra los que ya no usa ninguna) y corta cada vista previa a su
-parte pública. Después: los scripts de pago nuevos a `STRATEGIES_DIR`, comprobar que
-`catalogue/bundles.json` sigue nombrando estrategias que existen, y `pytest`. `docs/catalogue-updates.md`
-cuenta la renovación mensual y la diaria.
+Necesita pandas, que está en `requirements-dev.txt` y no en `requirements.txt`: se importa con el entorno
+de desarrollo (el del lanzador), donde el generador está al lado.
+
+- `--scripts DIR`: copia a `STRATEGIES_DIR` los scripts completos del manifiesto (sólo esos, nunca otro
+  fichero de la carpeta), con su sha256 comprobado. Sin `--scripts`, tienen que estar ya en
+  `STRATEGIES_DIR` con su sha256; si no, no se importa (dice cuántos faltan y cuántos tienen otro
+  contenido).
+- `--skip-scripts`: publica aunque falten o sean de antes, y dice cuántos: los que faltan no se entregan
+  hasta que estén, y los de antes se entregan en su versión de antes. No va con `--scripts`.
+- `--prune`: borra los gráficos y las vistas previas que ya no usa ninguna fila.
+
+Antes de escribir nada lo comprueba todo, y si algo falla dice todo lo que falla y no escribe nada: el
+contrato del paquete es el de `catalogue/contract.json` y sus columnas, las del contrato; cada fichero
+tiene el sha256 del manifiesto y no hay ninguno fuera de él; cada ruta del manifiesto es segura (dentro del
+paquete, en una carpeta del contrato); cada fichero que nombra una fila está en el paquete o ya en
+`static/assets/`; la lista privada trae un script por fila, y sólo esos; y ningún gráfico ni logo es un
+script completo. Luego comprueba los scripts, como dicen las opciones de arriba.
+
+Después copia los scripts y publica `catalogue/catalogue.csv` y `static/assets/` como se comprobaron: una
+fila por estrategia, rutas relativas, sin `pine_path`, un nombre legible para los que tienen el código de
+la bolsa, cada vista previa cortada a su parte pública; los gráficos y las vistas previas que cambiaron se
+reemplazan, y los logos que faltan se añaden (ver la tabla de arriba). Apunta en
+`catalogue/release.json` de qué ejecución del generador es. Todo se escribe primero al lado de su sitio y
+se renombra al final: un fallo a medias deja la tienda como estaba (si falla al renombrar, lo último, dice
+cuántos ficheros ya estaban en su sitio: se vuelve a importar). Por último vacía las miniaturas WebP,
+dice qué lotes de `catalogue/bundles.json` pierden una estrategia (la tienda deja fuera el lote entero:
+hay que cambiarlo o quitarlo) y recuerda **reiniciar la tienda**, que lee el catálogo al arrancar.
+Después, `pytest`. Lo publicado (`catalogue/`, `static/assets/`) va en el repo; los scripts, en la
+carpeta privada de la máquina donde se importa.
+
+Otras dos formas, sin Flask (sólo pandas):
+
+- `python catalogue/publish.py --package DIR [--prune]`: las mismas comprobaciones del paquete y la misma
+  publicación, pero los scripts se copian a mano, no vacía las miniaturas (una más vieja que su gráfico
+  se rehace sola) ni avisa de los lotes.
+- `python catalogue/publish.py EXPORT.csv [--assets DIR] [--prune]`, la de antes de los paquetes: también
+  comprueba las columnas contra el contrato, pero no hay sha256 ni lista privada, deja como están los
+  ficheros que la tienda ya tiene y borra `catalogue/release.json`, que ya no diría qué se enseña.
+
+`docs/catalogue-updates.md` cuenta la renovación mensual y la diaria.
 
 ## Desplegar
 
@@ -388,7 +464,10 @@ cuenta la renovación mensual y la diaria.
    legales) y el de la tienda: `PAYPAL_MODE=sandbox` con sus claves de prueba primero; con `live`, la
    primera compra de verdad es la prueba. Los códigos de descuento, en `DISCOUNT_CODES`.
 5. **Los scripts de pago**, a `STRATEGIES_DIR` (fuera de lo que se sirve, y que se conserve entre
-   despliegues), o `flask --app app edgefolio restore-scripts` desde un clon con la historia.
+   despliegues): los de un catálogo nuevo, del `d_result/pine_TW_b/` del generador (`import --scripts`
+   los copia, comprobados con el manifiesto del paquete, al `STRATEGIES_DIR` de la máquina donde se
+   importa: al servidor se llevan de ahí); los del de ahora, con `flask --app app edgefolio
+   restore-scripts` desde un clon con la historia.
 6. **Arrancar**: `gunicorn -c gunicorn.conf.py "app:create_app()"` (el `Procfile`). Las tablas se crean
    solas.
 7. **Los trabajos diarios**: `flask --app app edgefolio send-alerts` y `fx-update`, con cron.
@@ -438,14 +517,17 @@ valores de los indicadores que el árbol aún no conoce (`static/trees/features.
 app.py, tool.json          el arranque y la ficha
 edgefolio/                 la tienda: routes.py (las rutas), models.py (las tablas), cli.py (los comandos);
                            catalogue, search, pricing, paypal, orders, downloads, formats, free, mine,
-                           proofs, alerts, media, fx, settings, shop, web (el trabajo, sin Flask)
+                           proofs, alerts, media, fx, settings, shop, web (el trabajo, sin Flask);
+                           release.py (importar un paquete del generador)
 templates/edgefolio/       shop.html, la página sobre zt/base.html
 static/                    la página tal cual (sin compilar): js/ (Preact + htm, las vistas del diseño),
                            css/ (edgefolio.css y theme.css), vendor/, trees/, img/, assets/ (5.668
                            gráficos, 2.834 vistas previas, iconos)
 i18n/ui.json               los textos de la tienda, en 8 idiomas
-catalogue/                 catalogue.csv, indicators.csv, bundles.json, fx.json; publish.py (el puente con
-                           el generador) y previews.py
+catalogue/                 catalogue.csv, indicators.csv, bundles.json, fx.json; contract.json (el contrato
+                           con el generador); release.json (de qué ejecución del generador es el catálogo:
+                           lo escribe la importación de un paquete); publish.py (el puente con el
+                           generador) y previews.py
 tests/                     las pruebas (arriba)
 tools/screenshots.py       el recorrido en un navegador (las capturas de arriba)
 docs/                      IMPLEMENTATION-v7.md (el diseño), catalogue-updates.md, design/ (el diseño de
