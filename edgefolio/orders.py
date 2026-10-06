@@ -7,6 +7,9 @@ puede pedirlo (va en la dirección de vuelta de PayPal). Los enlaces del recibo,
 navegador que hizo el pedido (su cookie de quien compra), a la cuenta que lo hizo con la sesión abierta
 o, si se compró sin cuenta, a una cuenta que ha demostrado que el correo del pedido es suyo. Cualquier
 otro recibe el recibo sin ellos (``links_hidden``).
+
+El primer cobro de un pedido manda además su recibo por correo (la «factura por correo» de la fila de
+confianza bajo el botón de pagar) al correo del pedido: el de la cuenta, o el de quien pagó en PayPal.
 """
 from __future__ import annotations
 
@@ -15,7 +18,7 @@ import re
 import secrets
 from datetime import timedelta
 from decimal import Decimal
-from typing import Iterable, Optional
+from typing import Callable, Iterable, Optional
 from urllib.parse import urlencode
 
 from sqlalchemy import update
@@ -105,9 +108,10 @@ def find(paypal_id: str) -> Optional[Order]:
     return db.session.get(Order, paypal_id)
 
 
-def capture(shop, paypal_id: str) -> Order:
+def capture(shop, paypal_id: str, on_paid: Optional[Callable[[Order], None]] = None) -> Order:
     """Cobrar en PayPal y comprobar que se pagó el total del pedido, en su moneda. Repetirlo (un fallo de
-    red) no cobra otra vez: un pedido pagado se devuelve tal cual."""
+    red) no cobra otra vez: un pedido pagado se devuelve tal cual. ``on_paid(order)`` corre una sola vez
+    por pedido, en el cobro que lo pasó a pagado (el recibo por correo)."""
     order = find(paypal_id)
     if order is None:
         raise Refusal("errUnknownOrder", 404)
@@ -122,14 +126,46 @@ def capture(shop, paypal_id: str) -> Order:
         db.session.commit()
         raise Refusal("errPayment", 402, paid=f"{cap.amount} {cap.currency} {cap.status}")
     # Una sola vez de CREATED a PAID, aunque lleguen dos cobros a la vez.
-    db.session.execute(update(Order).where(Order.paypal_id == paypal_id, Order.status != "PAID")
-                       .values(status="PAID", payer=cap.payer or ""))
+    paid = db.session.execute(update(Order).where(Order.paypal_id == paypal_id, Order.status != "PAID")
+                              .values(status="PAID", payer=cap.payer or "")).rowcount
     if not order.email and "@" in (cap.payer or ""):
         # Sin cuenta: el correo de PayPal es con el que una cuenta podrá demostrar que el pedido es suyo.
         db.session.execute(update(Order).where(Order.paypal_id == paypal_id).values(email=norm(cap.payer)))
     db.session.commit()
     db.session.refresh(order)
+    if paid and on_paid is not None:
+        on_paid(order)
     return order
+
+
+def money(value, currency: str) -> str:
+    return f"{Decimal(value):,.2f} {currency}"
+
+
+def email_receipt(shop, order: Order, lang: str, mine: str, mail) -> None:
+    """El recibo: el pedido línea a línea, el total y dónde están las descargas (``mine``, la dirección
+    de Mis estrategias). ``mail`` lo manda (el ``mail.send`` del núcleo, que nunca lanza): un correo que
+    no sale no deshace el pago, la página de gracias y Mis estrategias lo tienen todo."""
+    if not order.email:
+        return
+    settings, texts, catalogue, cur = shop.settings, shop.texts, shop.catalogue, order.currency
+    lines = order.lines or {}
+    out = []
+    for item in lines.get("items") or []:
+        s = catalogue.resolve(item["id"])
+        name = f"{s.row.get('Name') or s.ticker} ({s.ticker} · {s.key_techs} · {s.interval})" if s else item["id"]
+        out.append(f"{name}: {money(item['price'], cur)}")
+    for b in lines.get("bundles") or []:
+        bundle = catalogue.bundles.get(b["key"])
+        name = f"{texts.get(bundle.name_key, lang)} ({len(bundle.items)})" if bundle else b["key"]
+        out.append(f"{name}: {money(b['price'], cur)}")
+    pack = lines.get("pack")
+    if pack:
+        out.append(f"{texts.get('packTitle', lang)} ({len(pack['ids'])}): {money(pack['price'], cur)}")
+    body = texts.get("mailReceiptBody", lang, id=order.paypal_id, lines="\n".join("- " + line for line in out),
+                     total=money(order.total, cur), mine=mine, n=settings.download_days, m=settings.max_downloads,
+                     contact=settings.contact_email)
+    mail(order.email, texts.get("mailReceiptSubject", lang, id=order.paypal_id), body, kind="edgefolio-receipt")
 
 
 # ── los enlaces ──────────────────────────────────────────────────────────────

@@ -128,7 +128,7 @@ python app.py                                             # http://localhost:510
 `.env.example` trae `PAYPAL_MODE=fake` y `DISCOUNT_CODES=demo20=0.20`: sin PayPal, «Pagar» va directo a la
 página de gracias como si se hubiera pagado, y el código `demo20` descuenta un 20 %. Sin
 `ZLECITOOL_SMTP_HOST`, **ningún correo sale**: el núcleo deja cada uno en `<datos>/mail/*.eml` (el enlace
-de una gratis, el de confirmar un correo, los avisos); se abren con cualquier lector de correo. Sin los
+de una gratis, el de confirmar un correo, los avisos, el recibo de una compra); se abren con cualquier lector de correo. Sin los
 scripts de pago todo funciona, y una descarga contesta que el fichero no está.
 
 ## Pruebas
@@ -150,6 +150,7 @@ repo; en un clon sin ella, se saltan.
 | `test_pricing.py`, `test_bundles.py` | los precios sólo del catálogo; los escalones y el código sumados con el tope del 70 %; los códigos de precio único; los lotes y el pack; una estrategia nunca dos veces; los lotes que se publican |
 | `test_search.py` | los filtros, el orden, las páginas y los histogramas contra el catálogo de verdad; que sean rápidos |
 | `test_orders.py` | pagar y descargar; el importe de PayPal comprobado; los enlaces que caducan y se gastan (también a la vez); el recibo con enlaces sólo para el navegador que compró, la cuenta que compró o la que demostró el correo |
+| `test_receipt.py` | el recibo por correo: una vez por pedido, en el idioma de la página, línea a línea; sin dirección pública no sale y el pago sigue |
 | `test_free.py` | las gratis por correo; el límite del día (también a la vez); las novedades con doble confirmación; el idioma del correo |
 | `test_mine.py` | Mis estrategias: lo de la cuenta y lo de un correo demostrado; renovar; las versiones nuevas; el script del propietario; las favoritas; el zip de un pedido |
 | `test_proofs.py` | la prueba de un correo: un uso, en dos pasos, sólo para la cuenta que la pidió, sólo hashes, sin llenar buzones, CSRF, el idioma |
@@ -173,6 +174,7 @@ navegador                                 servidor (edgefolio/)                 
   │ POST /api/orders/<id>/capture ────────▶ cobrar ─────────────────────────────────▶ el dinero se mueve
   │                                          ¿importe = total del pedido? ◀─────────┘
   │ ◀──────── recibo + un enlace por fichero (sólo a quien puede verlos)
+  │                                          el recibo, por correo a quien pagó
   │ GET /api/download/<token>[?format=zip] ▶ el fichero, de la carpeta privada
 ```
 
@@ -194,6 +196,13 @@ previas públicas van cortadas a 50 líneas de su primer árbol.
 HttpOnly, 30 días; en la base de datos sólo su hash), la cuenta que compró con la sesión abierta y, si se
 compró sin cuenta, una cuenta que ha demostrado el correo de PayPal. Cualquier otro (alguien con el id del
 pedido, que va en la dirección de vuelta de PayPal) recibe el recibo sin enlaces.
+
+**El recibo por correo** (la «factura por correo» que promete la fila de confianza bajo «Pagar»): el
+primer cobro de un pedido lo manda al correo del pedido (el de la cuenta o, sin cuenta, el de PayPal),
+en el idioma de la página: cada línea con lo que costó, el total, cuánto valen los enlaces y la
+dirección de Mis estrategias, sin enlaces de descarga (un correo no demuestra nada; ver abajo). Es un
+recibo, no una factura con datos fiscales: para eso da `CONTACT_EMAIL`. La misma fila enseña
+`DOWNLOAD_DAYS`, `MAX_DOWNLOADS` y `CONTACT_EMAIL` tal como estén configurados.
 
 ### Mis estrategias y la prueba de un correo
 

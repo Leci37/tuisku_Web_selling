@@ -200,10 +200,20 @@ def create_order():
 @bp.post("/api/orders/<paypal_id>/capture")
 @public
 def capture(paypal_id):
-    order = orders.capture(shop(), paypal_id)
+    order = orders.capture(shop(), paypal_id, on_paid=_email_receipt)
     uid = user_id()
     see = orders.may_see_links(order, request.cookies.get(BUYER_COOKIE), uid, proofs.proven(uid))
     return jsonify(orders.receipt(shop(), order, see))
+
+
+def _email_receipt(order):
+    """En el idioma de la página que cobra. Sin dirección pública que dar (producción sin
+    ZLECITOOL_PUBLIC_URL) no sale: lo pagado ya está pagado, y la página de gracias lo enseña igual."""
+    mine = external_url("edgefolio.mine_page", trusted_host_ok=False)
+    if mine is None:
+        current_app.logger.warning("Recibo sin mandar: falta ZLECITOOL_PUBLIC_URL | pedido=%s", order.paypal_id)
+        return
+    orders.email_receipt(shop(), order, request_language(), mine, send_mail)
 
 
 # ── descargar ────────────────────────────────────────────────────────────────

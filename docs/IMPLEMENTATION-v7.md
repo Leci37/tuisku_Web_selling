@@ -10,7 +10,9 @@ The mock-up uses 8 sample strategies, and some of its figures are examples (mark
 >   bundles and the pack priced by the server, the grade (with the cut-offs of §2, still to agree),
 >   favourites with alert opt-ins and their daily emails (`flask --app app edgefolio send-alerts`), free
 >   download for an email (with double opt-in for news), local currency (`catalogue/fx.json`, refreshed by
->   `flask --app app edgefolio fx-update`), New this month, the previews.
+>   `flask --app app edgefolio fx-update`), New this month, the previews, the trust row under Checkout
+>   (its figures from `DOWNLOAD_DAYS`/`MAX_DOWNLOADS`, its address from `CONTACT_EMAIL`) and the receipt
+>   it promises, emailed on payment (a receipt, not a tax invoice).
 > - **Different:** the shop is a zlecitool tool (Flask on zlecitool-core, the files of `storefront/` are
 >   now `static/`, `templates/edgefolio/shop.html` and `i18n/ui.json`): the bar, the language menu and the
 >   footer are the core's shell, and My strategies uses the core's shared accounts; what was bought
@@ -92,6 +94,7 @@ It contains, top to bottom:
 ## 5. Flows
 
 - **Free download:** a dialog asks for an email. Getting news is a separate box, unticked by default (GDPR). The server emails the link.
+- **Trust row under Checkout** (Lite floating cart and Pro cart strip): `trustPaypal` (PayPal: we never see your card), `trustLinks` (Links: 7 days, 10 downloads), `trustInvoice` (Invoice by email) and a `mailto:sales@tuisku.eu` link. 11.5px, `#5a6b80`, icons `#0950e3`; it wraps on phones and the email stays LTR in Arabic. The texts are already in `i18n/storefront.ui.json` for all 8 languages.
 - **Checkout → thank-you page:** order number, total and PayPal; "Download all" and one `.pine` per item; a note on how long links last; 4 install steps.
 - **My strategies** (requires an account through the core's shared login):
   - every item bought or downloaded, with how long its link has left;
@@ -124,6 +127,7 @@ It contains, top to bottom:
 
 ## 8. Acceptance checklist
 
+- [ ] The trust row shows under Checkout in Lite and Pro, in all 8 languages.
 - [ ] Lite is the default, and Pro and the language are remembered across visits.
 - [ ] Every page reflows at 390, 768, 1024 and 1366px with no clipped text. The ticker line on cards wraps, it does not cut off.
 - [ ] Arabic flips the layout, the gradients, the slider directions and the ladder.
