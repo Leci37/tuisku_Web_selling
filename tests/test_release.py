@@ -224,3 +224,14 @@ def test_the_real_bundles_name_strategies_of_the_real_catalogue():
     root = Path(__file__).resolve().parent.parent / "catalogue"
     catalogue = pd.read_csv(root / "catalogue.csv", sep="\t", dtype=str)
     assert release.bundles_left_out(root / "bundles.json", catalogue) == []
+
+
+def test_without_pandas_the_import_says_where_to_run_it(app, made, monkeypatch):
+    """Una instalación de producción (requirements.txt) no trae pandas: el comando lo dice, sin traza."""
+    def no_pandas():
+        raise ModuleNotFoundError("No module named 'pandas'", name="pandas")
+    monkeypatch.setattr(release, "publisher", no_pandas)
+    result = run(app, made[1], "--skip-scripts")
+    assert result.exit_code != 0 and "requirements-dev.txt" in result.output
+    assert "Traceback" not in result.output
+
