@@ -87,3 +87,28 @@ def test_every_public_preview_is_cut():
     full = "//@version=5\ndecision_tree_0_X(a)=>\n" + "".join(f"\tif( a <= {i} )\n\t\tret := 1\n" for i in range(80))
     cut = cut_preview(full)
     assert cut.endswith(PREVIEW_TAIL) and cut.count("if( a <=") < 30 and cut_preview(cut) == cut
+
+
+def test_no_paid_script_is_whole_in_an_archived_design_export():
+    """docs/handoff/<fecha>/ guarda cada exportación del diseño tal como llegó. Sus vistas previas son las
+    del repositorio cuando se hizo: una de pago entera ahí sería el script que se vende."""
+    import sys
+    import zipfile
+    sys.path.insert(0, str(ROOT / "catalogue"))
+    from previews import PREVIEW_TAIL
+
+    cat = Catalogue(ROOT / "catalogue" / "catalogue.csv")
+    exports = sorted((ROOT / "docs" / "handoff").glob("*/*.zip"))
+    assert exports, "la exportación del 6 de octubre está archivada"
+    seen = 0
+    for path in exports:
+        with zipfile.ZipFile(path) as z:
+            for name in z.namelist():
+                if not name.endswith(".pine"):
+                    continue
+                s = cat.resolve(name.rsplit("/", 1)[-1][:-len(".pine")])
+                assert s is not None, f"{path.name}: {name} no es de ninguna estrategia del catálogo"
+                seen += 1
+                if s.price > 0:
+                    assert z.read(name).decode("utf-8").endswith(PREVIEW_TAIL), f"{path.name}: {name} entero"
+    assert seen

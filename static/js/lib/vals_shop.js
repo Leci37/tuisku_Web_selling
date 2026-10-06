@@ -131,7 +131,7 @@ function proVals(c, seg) {
     }),
     activeChips: chips, hasActive: chips.length > 0,
     resetAll: () => app.setState({ sel: {}, rg: {}, draft: {}, freeOnly: false, q: '', openSel: '', moreOpen: '' }),
-    toggleFree: () => app.setState(st => ({ freeOnly: !st.freeOnly })),
+    toggleFree: () => app.setState(st => ({ freeOnly: !st.freeOnly })), freeOn: String(s.freeOnly),
     freeTrack: s.freeOnly ? '#0950e3' : '#cfd8e3',
     freeKnob: s.freeOnly ? (c.rtl ? 'translateX(-14px)' : 'translateX(14px)') : 'translateX(0px)',
     sortTabs: seg([['np', tx.sortNp], ['win', tx.sortWin], ['price', tx.sortPrice], ['trades', tx.sortTrades]], s.sort, k => app.setState({ sort: k })),
