@@ -68,7 +68,12 @@ README de aquí: la base de datos, las compras, la prueba de un correo.
     todo lo ancho): la barra, el idioma, la cuenta, el pie y lo legal son de la
     carcasa; lo de la tienda en la barra va en `topbar_start` y `topbar_end`.
     Las vistas son las del diseño (`docs/design/`), con su marcado y sus
-    estilos en línea: se cambian como el diseño, no a ojo.
+    estilos en línea: se cambian como el diseño, no a ojo. Una exportación
+    nueva entra con `tools/design_update.py` (mezcla a tres): en un conflicto,
+    lo que adaptó la tienda se queda (rutas, ganchos `data-*`, `dir="auto"`,
+    «Pagar» ocupado, avisos) y el cambio del diseño entra. El zip va tal cual
+    a `docs/handoff/<fecha>/` con su `CAMBIOS.md` («Para el núcleo»: barra,
+    pie, cuenta, idioma, cookies, el tutorial del núcleo).
 18. **Nada de JavaScript en línea** (ni `<script>…</script>` ni `onclick=`):
     va en `static/js/`, con módulos.
 19. **Los correos** con `zlecitool_core.mail.send`, en el idioma de la
@@ -110,4 +115,6 @@ flask --app app edgefolio restore-scripts     # los scripts de pago, de la histo
 python app.py                                 # http://localhost:5105
 pytest
 python tools/screenshots.py                   # el recorrido en un navegador (con el servidor en marcha)
+python tools/design_update.py ZIP [--apply]   # una exportación nueva del diseño (sin --apply, sólo lo dice)
+python docs/design/serve.py                   # la maqueta del diseño, para comparar
 ```

@@ -171,7 +171,9 @@ repo; en un clon sin ella, se saltan.
 | `test_alerts.py` | los avisos de las favoritas: una vez, en su idioma, sólo a un correo demostrado |
 | `test_security.py` | los enlaces nunca con la cabecera Host; la cookie de quien compra; correos que un programa leería distinto; los límites por IP; la forma de los rechazos; CSRF |
 | `test_formats.py` | los formatos del zip (.md, .py, .js) contra el script; cada script de pago entendido |
-| `test_site.py`, `test_media.py`, `test_cli.py`, `test_layout.py` | la página sobre la carcasa; nada privado en `static/`; las vistas previas cortadas; las miniaturas y los cambios; los comandos; la forma del repo |
+| `test_site.py`, `test_media.py`, `test_cli.py`, `test_layout.py` | la página sobre la carcasa; nada privado en `static/`; las vistas previas cortadas, también dentro de un zip del diseño archivado; las miniaturas y los cambios; los comandos; la forma del repo |
+| `test_page_code.py` | el código de la página después de mezclar el diseño: ninguna marca de conflicto; cada valor, campo de fila y texto que leen las vistas lo da `static/js`; los textos de la tienda en los 8 idiomas, con las mismas variables y sin repetir una clave del núcleo; los ganchos que busca `app.js` (`data-search`, `data-sf-cart`, `data-sf-bundles`) |
+| `test_design_update.py` | aplicar una exportación del diseño: una igual a la anterior no cambia nada; un cambio del diseño llega a la vista adaptada; la forma de las de octubre (`vendor/`, las notas nuevas, `versions/` y `offline/` fuera); `docs/design/serve.py` encuentra el núcleo |
 
 ## Cómo funciona
 
@@ -511,6 +513,24 @@ valores de los indicadores que el árbol aún no conoce (`static/trees/features.
 - **Los límites por dirección** se cuentan con la fila de la dirección bloqueada (también con varios
   procesos y con Postgres); antes, con un candado del proceso.
 
+## El diseño
+
+Las vistas de `static/js/views/` son las plantillas del diseño de Claude Design (`docs/design/`) hechas
+vistas de Preact una a una, con lo que la tienda adaptó (las rutas, la barra del núcleo, los enlaces
+contados…). Una exportación nueva entra con una mezcla a tres:
+
+```
+python tools/design_update.py RUTA/AL/ZIP             # dice qué cambiaría; no escribe nada
+python tools/design_update.py RUTA/AL/ZIP --apply     # lo aplica: vistas, textos, docs/design/ y notas
+```
+
+Donde la tienda y el diseño tocaron lo mismo queda el conflicto marcado: se resuelve quedándose con lo que
+adaptó la tienda y tomando el cambio del diseño; `tests/test_page_code.py` avisa de lo que quede a medias.
+Después, `pytest`, `python tools/screenshots.py` y comparar con la maqueta (`python docs/design/serve.py`,
+a 1366, 768 y 390 px). El zip se guarda tal cual en `docs/handoff/<fecha>/` con su `CAMBIOS.md`: cada
+diferencia, marcada herramienta o núcleo. Lo de la barra, el pie, la cuenta, el idioma o el tutorial del
+núcleo va a «Para el núcleo», nunca a un parche aquí.
+
 ## Qué hay aquí
 
 ```
@@ -530,6 +550,9 @@ catalogue/                 catalogue.csv, indicators.csv, bundles.json, fx.json;
                            generador) y previews.py
 tests/                     las pruebas (arriba)
 tools/screenshots.py       el recorrido en un navegador (las capturas de arriba)
-docs/                      IMPLEMENTATION-v7.md (el diseño), catalogue-updates.md, design/ (el diseño de
-                           referencia: python docs/design/serve.py lo abre), img/, notes/
+tools/design_update.py     aplicar una exportación nueva del diseño (con dc2htm.py, que hace las vistas)
+docs/                      IMPLEMENTATION-v7.md, USER-FLOW-v7.md y FLUJO_USUARIO.md (el diseño y el flujo
+                           de cada pantalla), catalogue-updates.md, design/ (el diseño de referencia, con
+                           su vendor/: python docs/design/serve.py lo abre), handoff/<fecha>/ (cada
+                           exportación tal como llegó y su CAMBIOS.md), img/, notes/
 ```
