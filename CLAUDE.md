@@ -79,11 +79,19 @@ README de aquí: la base de datos, las compras, la prueba de un correo.
 
 Esta es la interfaz gráfica. Los datos (estrategias, resultados, gráficos, scripts) los genera
 [Leci37/ML-Sklearn-strategy-stock-crypto-for-TraderView](https://github.com/Leci37/ML-Sklearn-strategy-stock-crypto-for-TraderView/tree/_ztool_dev) (rama `_ztool_dev`).
-Se conectan en `catalogue/publish.py` (su export y su `d_result/` → `catalogue/catalogue.csv` y
-`static/assets/`) y en `STRATEGIES_DIR` (sus scripts de pago). Un cambio en las columnas del catálogo o en
-dónde están los ficheros se hace en los dos repos a la vez: allí `SHOP_COLUMNS` y `tests/test_export.py`,
-aquí `publish.py` y `tests/test_publish.py`. El README («La aplicación gemela») lo cuenta entero, y el
-`CLAUDE.md` del generador lo mismo desde su lado. Sus ramas son las mismas: `_ztool_dev` y `_ztool_main`.
+Se conectan por **un paquete versionado**: su paso 7 lo deja en su `d_result/package/` y aquí se publica
+con `flask --app app edgefolio import <generador>/d_result/package --scripts <generador>/d_result/pine_TW_b
+[--prune]` (`edgefolio/release.py`), que lo comprueba entero antes de escribir nada y copia los scripts de
+pago a `STRATEGIES_DIR`. El paquete nunca se hace público: las vistas previas de las gratis van enteras.
+
+El contrato es `catalogue/contract.json` (versión 1): columnas, carpetas y nombre de los scripts de pago.
+`publish.py` lo lee de ahí; allí, `CONTRACT_VERSION` junto a `SHOP_COLUMNS`. Un cambio de columnas o de
+carpetas sube la versión y se hace en los dos repos a la vez: aquí `contract.json`, `tests/test_publish.py`
+y `tests/test_release.py`; allí `S_04_ladding_file_info_to_see_in_web.py` y `tests/test_export.py`. Se sube
+primero aquí (o a la vez), también al fusionar en `_ztool_main`: el CI del generador prueba contra el
+`catalogue/` de nuestra `_ztool_dev` (o `_ztool_main`). El README («La aplicación gemela») lo cuenta
+entero, y el `CLAUDE.md` del generador lo mismo desde su lado. Sus ramas son las mismas: `_ztool_dev` y
+`_ztool_main`.
 
 ## Ramas
 
