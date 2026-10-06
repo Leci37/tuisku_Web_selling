@@ -242,7 +242,7 @@ def strategies(catalogue, settings, params) -> dict:
     hits = [i for i in ix.order[order] if bits[i] == "1"]
     start = (page - 1) * size
     body = {"total": len(hits), "page": page, "size": size,
-            "rows": [ix.strategies[i].as_row() for i in hits[start:start + size]],
+            "rows": [catalogue.row(ix.strategies[i]) for i in hits[start:start + size]],
             "counts": {"all": ix.n, "new": ix.new_mask(settings.new_days).bit_count()}}
 
     if facets:

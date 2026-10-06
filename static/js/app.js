@@ -58,7 +58,7 @@ export class App extends Component {
       code: cart.code || '', applied: cart.applied || '', codeState: '', codeOpen: !!cart.applied, quote: null,
       favs: list(favs.favs), alerts: favs.alerts && typeof favs.alerts === 'object' ? favs.alerts : {},
       compare: [], cmpOpen: false, packOpen: false, packQ: '', packFound: [],
-      freeFor: '', freeEmail: '', freeNews: false, freeSent: false,
+      freeFor: '', freeEmail: '', freeNews: false, freeSent: false, freeErr: '', dockH: 0,
       me: props.signedIn ? null : { email: null }, mine: null, proofEmail: '', proofSent: false, proofExpired: false,
       proofToken: '', proofAs: '',
       receipt: null, instStep: -1, instFor: '',
@@ -103,6 +103,7 @@ export class App extends Component {
       dropParams('news');
     }
     this.sync(null);
+    this.measureDock();
   }
 
   componentWillUnmount() {
@@ -116,6 +117,15 @@ export class App extends Component {
 
   componentDidUpdate(prevProps, prevState) {
     this.sync(prevState);
+    this.measureDock();
+  }
+
+  // The height of Lite's floating cart (the Compare pill and the cart box): toasts sit above it. It
+  // changes with what the page paints (the pill, the code box, the width), so it is read after each paint.
+  measureDock() {
+    const s = this.state, el = s.page === 'shop' && s.mode !== 'pro' ? document.querySelector('[data-sf-cart]') : null;
+    const h = el ? el.offsetHeight : 0;
+    if (h && h !== s.dockH) this.setState({ dockH: h });
   }
 
   // Brings the server's data in line with what the state shows: lists, missing rows, the quote.
@@ -159,7 +169,10 @@ export class App extends Component {
       else if (s.quote) this.setState({ quote: null });
     }
 
-    if (s.me && s.me.email && s.page === 'mine' && !s.mine && !this.mineLoading && !this.uploading) this.loadMine();
+    // My strategies, on its page; on a strategy page too (what the account owns says whether «Update
+    // available» is for it), but quietly and once: there a failure is not worth a toast
+    const mineWanted = s.page === 'mine' || (s.page === 'detail' && !this.mineQuietTried);
+    if (s.me && s.me.email && mineWanted && !s.mine && !this.mineLoading && !this.uploading) this.loadMine(s.page !== 'mine');
     if (s.packOpen && s.packQ.trim() !== this.packKey) {
       const first = this.packKey == null;
       this.packKey = s.packQ.trim();
@@ -311,8 +324,13 @@ export class App extends Component {
     });
   }
 
+  // The code is checked by the server's quote (never here). An empty box takes the code off; applying
+  // the code that is already applied keeps its «applied» (the quote does not change, so nothing would
+  // say it again).
   applyCode() {
-    const code = this.state.code.trim();
+    const s = this.state, code = s.code.trim();
+    if (!code) { this.setState({ applied: '', codeState: '' }); return; }
+    if (code === s.applied && s.codeState === 'ok') return;
     this.setState({ applied: code, codeState: '' });
   }
 
@@ -337,6 +355,7 @@ export class App extends Component {
       const first = (rc.downloads || [])[0];
       // another browser than the one that paid gets no links (they are in My strategies): the
       // tutorial waits until there is a script to install
+      this.mineQuietTried = false;
       this.setState({ receipt: rc, cart: [], bundles: [], packIds: [], instFor: first ? first.id : '', mine: null,
         instStep: !first || read('edgefolio-install-v1') ? -1 : 0 });
     }).catch(e => { this.fail(e); this.go({ page: 'shop' }, { replace: true }); });
@@ -352,9 +371,10 @@ export class App extends Component {
     return !!(this.state.me && this.state.me.email);
   }
 
-  // Mis estrategias pide la sesión: sin ella, a entrar (el núcleo vuelve aquí después).
+  // Mis estrategias pide la sesión: sin ella, a su dirección, que manda a entrar y vuelve a ella después
+  // (/login?next=/mine), no a la página de la que se venía.
   goMine() {
-    if (!this.props.signedIn) { toLogin(); return; }
+    if (!this.props.signedIn) { window.location.assign('/mine'); return; }
     this.go({ page: 'mine' });
   }
 
@@ -386,6 +406,7 @@ export class App extends Component {
     this.proofBusy = true;
     post('/api/mine/proofs/confirm', { token }).then(() => {
       dropParams('proof');
+      this.mineQuietTried = false;
       this.setState({ proofToken: '', proofAs: '', proofSent: false, proofExpired: false, mine: null });
     }).catch(e => {
       if (e.status === 400) { this.setState({ proofExpired: true, proofToken: '', proofAs: '' }); dropParams('proof'); } else this.fail(e);
@@ -413,8 +434,9 @@ export class App extends Component {
       });
   }
 
-  loadMine() {
+  loadMine(quiet = false) {
     this.mineLoading = true;
+    if (quiet) this.mineQuietTried = true;
     api('/api/mine').then(m => {
       this.keep(m.items.map(x => x.row));
       this.keep(m.favourites.map(x => x.row));
@@ -422,6 +444,7 @@ export class App extends Component {
       m.favourites.forEach(x => { alerts[x.id] = x.alerts || {}; });
       this.setState({ mine: m, favs: m.favourites.map(x => x.id), alerts });
     }).catch(e => {
+      if (quiet) return;
       if (e.status === 401) toLogin();
       else this.fail(e);
     }).then(() => { this.mineLoading = false; });
@@ -453,20 +476,29 @@ export class App extends Component {
 
   // Every way into the free-download dialog starts with news unticked (GDPR: consent is asked each time).
   openFree(id) {
-    this.setState({ freeFor: id, freeSent: false, freeNews: false });
+    this.setState({ freeFor: id, freeSent: false, freeNews: false, freeErr: '' });
   }
 
   closeFree() {
-    this.setState({ freeFor: '', freeSent: false, freeNews: false });
+    this.setState({ freeFor: '', freeSent: false, freeNews: false, freeErr: '' });
   }
 
+  // What is wrong with the address shows under the field (the core's texts): empty, or not an address.
+  // The server checks it again; its refusal of the address goes under the field too, any other one
+  // (too many today, not free…) is a toast.
   sendFree() {
     const s = this.state, email = s.freeEmail.trim();
-    if (!/.+@.+\..+/.test(email) || this.freeBusy) return;
+    if (this.freeBusy) return;
+    const err = !email ? 'errEmailRequired' : !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? 'errEmailInvalid' : '';
+    if (err) { this.setState({ freeErr: err }); return; }
     this.freeBusy = true;
     post('/api/free', { id: s.freeFor, email, news: s.freeNews })
-      .then(() => this.setState({ freeSent: true, mine: null }))
-      .catch(e => this.fail(e))
+      .then(() => { this.mineQuietTried = false; this.setState({ freeSent: true, freeErr: '', mine: null }); })
+      .catch(e => {
+        const d = e.detail || {};
+        if (e.status === 400 && d.field === 'email' && e.key && this.state.dict && this.state.dict[e.key]) this.setState({ freeErr: e.key });
+        else this.fail(e);
+      })
       .then(() => { this.freeBusy = false; });
   }
 
@@ -521,7 +553,7 @@ export class App extends Component {
   // Search: the strategy search of the list on screen, Lite's or Pro's (never the discount code).
   focusSearch() {
     this.onShop(() => {
-      const input = document.querySelector('input[data-sf-search]');
+      const input = document.querySelector('input[data-search]');
       if (!input) return false;
       input.focus({ preventScroll: true });
       this.scrollUnderHeader(input);
@@ -529,19 +561,13 @@ export class App extends Component {
     });
   }
 
-  // Cart: Pro's cart strip at the top; Lite's cart bar where it sits after the list, clear of the
-  // phone bar (stuck to the bottom it slides under it); with nothing in the cart, the bundles.
+  // Cart: Pro's cart strip, just under the bar; Lite's floating cart is already on screen above the
+  // phone bar (from another page the shop opens at the top, with it); with nothing in the cart, the bundles.
   showCart() {
     this.onShop(() => {
       const cart = document.querySelector('[data-sf-cart]');
       if (cart && this.state.mode === 'pro') { this.scrollUnderHeader(cart); return true; }
-      const list = cart && cart.previousElementSibling;
-      if (list) {
-        const end = list.getBoundingClientRect().bottom + window.scrollY + 24 + cart.offsetHeight;
-        const below = this.state.vw < 640 ? 76 : 16;
-        try { window.scrollTo(0, Math.max(0, end + below - window.innerHeight)); } catch (e) { /* not scrollable */ }
-        return true;
-      }
+      if (cart) return true;
       const bundles = document.querySelector('[data-sf-bundles]');
       if (!bundles) return false;
       this.scrollUnderHeader(bundles);
@@ -586,7 +612,16 @@ export class App extends Component {
 
   onKey(e) {
     const s = this.state, which = s.instStep >= 0 ? 'instStep' : s.tourStep >= 0 ? 'tourStep' : '';
-    if (!which) return;
+    // Esc closes what is open on top, one at a time: compare, the pack picker, the free download, a Pro
+    // filter's dropdown (the language menu is the core's, and closes itself)
+    if (!which) {
+      if (e.key !== 'Escape') return;
+      if (s.cmpOpen) this.setState({ cmpOpen: false });
+      else if (s.packOpen) this.setState({ packOpen: false });
+      else if (s.freeFor) this.closeFree();
+      else if (s.openSel) this.setState({ openSel: '', selQ: '' });
+      return;
+    }
     if (e.key === 'Escape') { if (which === 'instStep') this.closeInst(); else this.closeTour(); return; }
     if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
     const max = which === 'instStep' ? 4 : 2, fwd = (e.key === 'ArrowRight') !== (s.dir === 'rtl');

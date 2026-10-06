@@ -780,16 +780,6 @@
     "ar": "إضافة عامل تصفية",
     "hi": "फ़िल्टर जोड़ें"
   },
-  "pviewTable": {
-    "es": "Tabla",
-    "en": "Table",
-    "pt": "Tabela",
-    "fr": "Tableau",
-    "de": "Tabelle",
-    "zh": "表格",
-    "ar": "جدول",
-    "hi": "टेबल"
-  },
   "colBacktest": {
     "es": "Backtest",
     "en": "Backtest",

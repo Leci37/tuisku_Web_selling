@@ -91,6 +91,22 @@ def test_an_expired_link_is_renewed_once(app, settings):
     assert again["url"] == renewed["url"], "un enlace que funciona no se cambia (su límite sigue)"
 
 
+def test_a_new_link_keeps_the_purchase_and_the_thank_you_page_shows_it(app, settings):
+    """«Conseguir un enlace nuevo» no cambia la compra (su fecha y su pedido), y la página de gracias de ese
+    pedido, abierta otra vez, da el enlace nuevo, no el que caducó."""
+    ana = signed(app, "ana@example.com")
+    settings.download_days = -1
+    order = ana.post("/api/orders", json={"items": [AAPL]}).json["id"]
+    old = ana.post(f"/api/orders/{order}/capture").json["downloads"][0]["url"]
+    [before] = my(ana)["items"]
+    settings.download_days = 7
+    renewed = ana.post("/api/mine/renew", json={"id": AAPL}).json
+    assert renewed["valid"] and renewed["url"] != old
+    assert (renewed["date"], renewed["order"], renewed["version"]) == (before["date"], before["order"], before["version"])
+    again = ana.post(f"/api/orders/{order}/capture").json["downloads"][0]["url"]
+    assert again == renewed["url"] and ana.get(again).status_code == 200
+
+
 def test_a_link_that_ran_out_is_renewed(app, settings):
     ana = signed(app, "ana@example.com")
     settings.max_downloads = 1

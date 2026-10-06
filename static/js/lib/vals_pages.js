@@ -9,17 +9,21 @@ export function pageVals(c) {
   const { app, s, t, tx, f } = c;
   const TS = s.tourStep;
   const closeTour = () => app.closeTour();
-  // above the Lite cart bar when it shows, so the toast never hides the total or Checkout
-  const errBottom = (s.vw < 640 ? 76 : 16) + (s.page === 'shop' && s.mode !== 'pro' && (s.cart.length + s.bundles.length > 0) ? 84 : 0);
+  // Lite's floating cart (the dock: the Compare pill above the cart box) shows while the cart has something
+  const liteDock = s.page === 'shop' && s.mode !== 'pro' && s.cart.length + s.bundles.length > 0;
+  const base = s.vw < 640 ? 76 : 16;
+  // above the dock when it shows, so the toast never hides the total or Checkout: the dock's measured
+  // height (app.measureDock), which grows with the pill, the code box and narrow screens
+  const errBottom = base + (liteDock ? (s.dockH || 84) + 8 : 0);
   return {
-    ...detailVals(c), ...compareVals(c), ...mineVals(c), ...thanksVals(c), ...installVals(c), ...freeVals(c),
+    ...detailVals(c), ...compareVals(c, liteDock), ...mineVals(c), ...thanksVals(c), ...installVals(c), ...freeVals(c),
     ...LEGAL, legalOn: true, contactOn: !!c.contact, contactUrl: c.contact ? 'mailto:' + c.contact : '', contactEmail: c.contact,
     errOpen: !!s.error, errTitle: tx.errServer, closeErr: () => app.setState({ error: '' }),
     errText: t(s.error, s.errorVars || undefined) + ((s.error === 'errPayment' || s.error === 'errLater' || s.error === 'errPayPal') && c.contact ? ' ' + t('contactProblems', { e: c.contact }) : ''),
     errBottom: errBottom + 'px',
-    cmpBottom: (s.vw < 640 ? 76 : 16) + 'px',
+    cmpBottom: base + 'px',
     // on a phone the bottom bar takes the last 60px: the floating cart sits above it, as the compare pill does
-    cartBarBottom: (s.vw < 640 ? 76 : 16) + 'px',
+    dockBottom: base + 'px',
     // a short notice (the news opt-in confirmed or its link expired): the toast's look, not an error;
     // it waits while an error toast shows, in the same place
     ...noticeVals(c, errBottom),
@@ -85,6 +89,9 @@ function detailVals(c) {
   if (!r) return { isDetail: false, det: {}, detOverview: !tree, detTreeTab: tree };
   const det = { ...c.mk(r), profit: r.profit, candle: r.candle };
   const owned = ((s.mine && s.mine.items) || []).find(x => x.id === r.id);
+  // «Update available» is for whoever owns an older version (My strategies says which: update), not for
+  // every visitor
+  const detOwnOld = !!(owned && owned.update);
   // lines 5–16 sharp, 17–21 fading out, as the design's preview
   const pine = (s.pine[r.preview] || '').replace(/\r/g, '').split('\n').slice(4, 21);
   const pineLines = s.pine[r.preview] ? pine.map((l, i) => ({ no: String(i + 5), toks: tokens(l || ' '),
@@ -92,7 +99,7 @@ function detailVals(c) {
   const versions = (r.versions && r.versions.length ? r.versions : [{ v: r.version || 1, date: r.release, note: '' }]).slice().sort((a, b) => b.v - a.v);
   const dash = '—';
   return {
-    isDetail: true, det, detOverview: !tree, detTreeTab: tree,
+    isDetail: true, det, detOverview: !tree, detTreeTab: tree, detOwnOld,
     showOverview: () => app.go({ detTab: 'overview' }, { scroll: false }), showHowTab: () => app.go({ detTab: 'tree' }, { scroll: false }),
     ovBg: !tree ? '#0950e3' : '#e9f0fd', ovColor: !tree ? '#ffffff' : '#0950e3', ovLine: '#0950e3',
     hwBg: tree ? '#0e7c98' : '#e3f4f8', hwColor: tree ? '#ffffff' : '#0e7c98', hwLine: '#0e7c98',
@@ -111,7 +118,7 @@ function detailVals(c) {
     versions: versions.map((x, i) => ({
       // the date isolated (FSI…PDI): in Arabic "27/09/2024" would otherwise mix with "v1 · "
       title: 'v' + x.v + (x.date ? ' · \u2068' + f.fmtDate(x.date) + '\u2069' : ''), note: x.note || (x.v === 1 ? tx.v1note : ''),
-      dot: i === 0 ? '#0950e3' : '#cfd8e3', update: i === 0 && x.v > 1
+      dot: i === 0 ? '#0950e3' : '#cfd8e3', update: i === 0 && x.v > 1 && detOwnOld
     })),
     detMetrics: [
       [t('fNetProfitUsd'), f.money(r.np)], [t('fNetProfitPct'), f.pctS(r.npp), '#15803d'], [t('fClosedTrades'), f.int(r.tr)], [t('fWinRate'), f.pct(r.w)],
@@ -123,7 +130,7 @@ function detailVals(c) {
   };
 }
 
-function compareVals(c) {
+function compareVals(c, liteDock) {
   const { app, s, t, tx, f } = c;
   const rows = s.compare.map(id => app.row(id)).filter(Boolean);
   // the best value of a row is marked; unknown values (no since-release figure yet) never win
@@ -138,7 +145,9 @@ function compareVals(c) {
     [tx.sortPrice, r => r.price, r => (r.price ? f.pmoney(r.price) : t('landingFree')), true]
   ];
   return {
-    cmpHas: s.compare.length > 0, cmpCount: f.int(s.compare.length),
+    // the pill rides in Lite's dock, above the cart, while the dock shows; elsewhere it floats at the
+    // bottom-start corner
+    cmpHas: s.compare.length > 0, cmpFloat: s.compare.length > 0 && !liteDock, cmpCount: f.int(s.compare.length),
     openCmp: () => app.setState({ cmpOpen: true }), closeCmp: () => app.setState({ cmpOpen: false }), cmpOpen: s.cmpOpen,
     cmpCols: rows.map(r => ({ icon: r.icon, ticker: r.ticker, key: r.key, remove: () => app.setState(st => ({ compare: st.compare.filter(x => x !== r.id), cmpOpen: st.compare.length > 1 })) })),
     cmpRows: defs.map(([label, get, fmt, low]) => {
@@ -230,14 +239,18 @@ function installVals(c) {
 }
 
 function freeVals(c) {
-  const { app, s } = c;
+  const { app, s, t } = c;
   const r = s.freeFor ? app.row(s.freeFor) : null;
   return {
-    freeOpen: !!r, freeRow: r ? c.mk(r) : {}, freeEmail: s.freeEmail, onFreeEmail: e => app.setState({ freeEmail: e.target.value }),
+    freeOpen: !!r, freeRow: r ? c.mk(r) : {}, freeEmail: s.freeEmail, onFreeEmail: e => app.setState({ freeEmail: e.target.value, freeErr: '' }),
+    // what is wrong with the address, under the field (the core's errEmailRequired / errEmailInvalid): the
+    // key, not the text, so it follows a change of language
+    freeErrOn: !!s.freeErr, freeErr: s.freeErr ? t(s.freeErr) : '', freeBd: s.freeErr ? '#c0392b' : '#e2e9f0',
     freeSentNow: s.freeSent, freeNotSent: !s.freeSent, newsOn: String(s.freeNews),
     newsBg: s.freeNews ? '#0950e3' : '#ffffff', newsBorder: s.freeNews ? '#0950e3' : '#cfd6e6', newsCheck: s.freeNews ? '✓' : '',
     toggleNews: () => app.setState(st => ({ freeNews: !st.freeNews })),
-    sendFree: () => app.sendFree(), freeKey: e => { if (e.key === 'Enter') app.sendFree(); },
+    // Enter sends; not while an input method is composing (zh, hi), where Enter picks the characters
+    sendFree: () => app.sendFree(), freeKey: e => { if (e.key === 'Enter' && !e.isComposing) app.sendFree(); },
     closeFree: () => app.closeFree()
   };
 }

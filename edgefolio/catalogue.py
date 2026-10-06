@@ -271,9 +271,14 @@ class Catalogue:
         except (binascii.Error, UnicodeDecodeError, ValueError):
             return None
 
+    def row(self, s: Strategy) -> dict:
+        """La fila de una lista: la de la estrategia y su indicador (la página de TradingView a la que lleva
+        «CLAVE · indicador» en las fichas de Pro, y su explicación al pasar por encima)."""
+        ind = self.indicators.get(s.key_techs, {})
+        return {**s.as_row(), "ind_text": ind.get("ind_text", ""), "ind_url": ind.get("ind_url", TV_SCRIPTS)}
+
     def detail(self, s: Strategy) -> dict:
         ind = self.indicators.get(s.key_techs, {})
         versions = [{"v": v, "date": s.release if v == s.version else None, "note": ""}
                     for v in range(s.version, 0, -1)]
-        return {**s.as_row(), "ind_text": ind.get("ind_text", ""), "ind_url": ind.get("ind_url", TV_SCRIPTS),
-                "ind_author": ind.get("ind_author", ""), "versions": versions}
+        return {**self.row(s), "ind_author": ind.get("ind_author", ""), "versions": versions}

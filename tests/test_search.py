@@ -6,7 +6,7 @@ import time
 
 import pytest
 
-from edgefolio.catalogue import Catalogue
+from edgefolio.catalogue import TV_SCRIPTS, Catalogue
 from edgefolio.search import RANGES
 from edgefolio.settings import ROOT
 from edgefolio.shop import install
@@ -15,7 +15,7 @@ from tests.conftest import ROWS, TODAY, cart_id, strategy_id
 ROW_FIELDS = {"id", "ticker", "interval", "key", "hash", "name", "ind", "index", "market", "price", "np", "npp", "tr",
               "w", "pf", "mdd", "mddp", "avg", "avgp", "bars", "m", "actv", "cand", "prc", "tdep", "release",
               "version", "profit", "candle", "icon", "preview", "thumb_profit", "thumb_candle", "grade", "live",
-              "live_as_of", "is_new", "tv_symbol", "file"}
+              "live_as_of", "is_new", "tv_symbol", "file", "ind_url", "ind_text"}
 
 
 @pytest.fixture(scope="module")
@@ -47,6 +47,19 @@ def test_row_fields(real_client):
     assert row["thumb_profit"] == f"/thumbs/{row['id']}_profit.webp"
     assert row["grade"] == ("A" if row["tr"] >= 300 else "B" if row["tr"] >= 100 else "C" if row["tr"] >= 30 else "D")
     assert row["live"] is None, "sin cifra desde la publicación hasta que la escriba el trabajo diario"
+
+
+def test_rows_carry_their_indicator_page(real_client):
+    """«CLAVE · indicador» en las fichas de Pro lleva a la página del indicador en TradingView, y al pasar
+    por encima dice qué es: lo mismo que la página de la estrategia."""
+    row = next(r for r in get(real_client, "q=1BOL&size=25")["rows"] if r["key"] == "1BOL")
+    assert row["ind_url"] == "https://www.tradingview.com/script/uCV8I4xA-Bollinger-RSI-Double-Strategy-by-ChartArt-v1-1/"
+    assert row["ind_text"].startswith("The Bollinger RSI Double Strategy combines")
+    detail = real_client.get(f"/api/strategies/{row['id']}").json
+    assert (detail["ind_url"], detail["ind_text"]) == (row["ind_url"], row["ind_text"])
+    # un indicador sin página propia (una combinación: «--» en indicators.csv) lleva a la lista de scripts
+    combined = next(r for r in get(real_client, "q=2BB0&size=25")["rows"] if r["key"] == "2BB0")
+    assert combined["ind_url"] == TV_SCRIPTS
 
 
 def test_crypto_symbol_and_missing_values(real_client, rows):

@@ -171,10 +171,11 @@ def email_receipt(shop, order: Order, lang: str, mine: str, mail) -> None:
 # ── los enlaces ──────────────────────────────────────────────────────────────
 
 def issue_links(paypal_id: str, strategies_bought: Iterable, days: int) -> dict:
-    """Un enlace por estrategia; otra vez para el mismo pedido, los mismos enlaces."""
+    """Un enlace por estrategia; otra vez para el mismo pedido, los mismos enlaces: el más nuevo de cada una
+    («Conseguir un enlace nuevo» en Mis estrategias añade otro al mismo pedido, y el de antes caducó)."""
     existing = {}
     for d in Download.query.filter_by(paypal_id=paypal_id).order_by(Download.expires_at):
-        existing.setdefault(d.item_key, d.token)
+        existing[d.item_key] = d.token
     for s in strategies_bought:
         if s.key not in existing:
             existing[s.key] = secrets.token_urlsafe(24)

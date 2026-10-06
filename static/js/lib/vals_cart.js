@@ -71,7 +71,9 @@ export function cartVals(c) {
     nextTierMsg: nt ? t('nextTier', { amount: f.money(num(nt.missing)), p: f.pct0(num(nt.rate) * 100) }) : passed >= tiers.length ? t('topTier') : '',
     ladderPct: lp.toFixed(1) + '%',
     tiers: tiers.map(([o, r], i) => ({ label: f.money0(o) + ' · ' + f.pct0(r), rate: f.pct0(r), amt: f.money0(o), pos: ((i + 1) * 100 / steps) + '%', tickBg: i < passed ? '#0950e3' : '#ffffff' })),
-    hasDiscount: rate > 0, liteOff: '−' + f.pct0(rate),
+    // any discount crosses out the subtotal: a percentage (tier or code) or a flat-price code, whose
+    // discount_rate is 0 while its total is lower
+    hasDiscount: total < sub, liteOff: '−' + f.pct0(rate > 0 ? rate : sub > 0 ? (1 - total / sub) * 100 : 0),
     payNote: t('payNote', { amount: f.money(total) }),
     code: s.code, onCode: e => app.setState({ code: e.target.value }),
     applyCode: () => app.applyCode(),
