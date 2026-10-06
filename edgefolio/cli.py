@@ -87,6 +87,14 @@ def register(bp):
                                           prune=prune)
         except release.Refused as e:
             raise click.ClickException(f"no se importa {package}:\n" + "\n".join(f"  - {p}" for p in e.problems))
+        except ModuleNotFoundError as e:
+            # publish.py usa pandas, que sólo está en requirements-dev.txt: se importa donde se desarrolla y se
+            # despliega lo que deja (el catálogo y static/assets van en el repo; los scripts, a STRATEGIES_DIR)
+            if e.name != "pandas":
+                raise
+            raise click.ClickException("el import necesita pandas, que sólo trae requirements-dev.txt: impórtalo "
+                                       "en la máquina de desarrollo (pip install -r requirements-dev.txt) y "
+                                       "despliega lo que deja") from e
         click.echo(f"{done['rows']} estrategias del contrato {done['contract']}, de la ejecución del generador del "
                    f"{done['created']} (commit {done['commit'][:12] or 'desconocido'})")
         click.echo(f"{done['files']} ficheros copiados a static/assets ({done['cut']} vistas previas cortadas, "
