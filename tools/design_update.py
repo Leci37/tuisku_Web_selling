@@ -8,9 +8,11 @@ docs/design/ es la exportación anterior tal como llegó (y docs/design/handoff/
 base de una mezcla a tres. Lo que hace:
 
 1. abre el zip en una carpeta temporal (rechaza rutas que salen de él y enlaces; nunca ejecuta nada de
-   dentro) y busca su prototype/ con las plantillas .dc.html;
+   dentro) y busca su prototype/ con las plantillas .dc.html; las de versions/ (versiones anteriores y
+   bocetos) no se convierten ni se guardan;
 2. compara sus ficheros con docs/design/ y enseña la sección «What changed since the previous export» de
-   su README;
+   su README; de lo que trae y no se usa (versions/, offline/, prototype/brand/, docs/img/, texts.json,
+   MANIFEST.md...) da una nota por carpeta, no una por fichero;
 3. convierte con tools/dc2htm.py la plantilla anterior y la nueva, y las mezcla a tres en static/js/views/
    (git merge-file): lo que cambió el diseño entra, lo que cambió la tienda se queda, y donde los dos
    tocaron lo mismo queda el conflicto marcado (<<<<<<<) y contado;
@@ -20,9 +22,12 @@ base de una mezcla a tres. Lo que hace:
    núcleo;
 6. dice qué valores nuevos usan las vistas (v.algo, v.tx.algo) que static/js/ todavía no da: es la
    funcionalidad que hay que construir;
-7. con --apply, además, deja la exportación nueva en docs/design/ (su texto, en docs/design/handoff/) y
-   mezcla a tres sus notas en docs/design/HANDOFF.md, docs/design/PR_DESCRIPTION.md,
-   docs/IMPLEMENTATION-v7.md y docs/catalogue-updates.md.
+7. con --apply, además, deja la exportación nueva en docs/design/: las plantillas, support.js, sus textos
+   y vendor/ (React, ReactDOM y Babel, que carga support.js, y el Font Awesome de las plantillas: la
+   maqueta abre sin internet); el texto de sus notas, en docs/design/handoff/; y mezcla a tres esas notas
+   en docs/design/HANDOFF.md, docs/design/PR_DESCRIPTION.md, docs/design/STATUS.md,
+   docs/FLUJO_USUARIO.md, docs/IMPLEMENTATION-v7.md, docs/USER-FLOW-v7.md y docs/catalogue-updates.md.
+   Una nota que la tienda aún no tiene entra entera.
 
 Sale con 0 si todo entra limpio, con 1 si queda un conflicto o algo por decidir (lo dice), con 2 si el zip
 no vale. Después: pytest, python tools/screenshots.py y comparar con python docs/design/serve.py.
@@ -45,14 +50,17 @@ import dc2htm  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 
-# Lo del prototype/ del zip que se guarda en docs/design/ (las plantillas y lo que cargan)...
-COPIED = ("Storefront v7.dc.html", "Strategy Tree.dc.html", "support.js", "i18n/", "trees/", "zlecitool_core/i18n/")
+# Lo del prototype/ del zip que se guarda en docs/design/ (las plantillas y lo que cargan: vendor/ son las
+# copias de React, ReactDOM, Babel y Font Awesome, que support.js y las plantillas ya no piden a internet)...
+COPIED = ("Storefront v7.dc.html", "Strategy Tree.dc.html", "support.js", "i18n/", "trees/", "zlecitool_core/i18n/",
+          "vendor/")
 # ...y lo que es de la maqueta: sus gráficos, iconos y vistas previas de muestra y las letras del núcleo. La
 # tienda tiene los suyos (static/assets/, el núcleo): de aquí sólo se avisa de lo que la tienda no tiene.
 MOCKUP = ("storefront/", "zlecitool_core/ui/")
 # Las notas del diseño (ruta en el zip -> la copia de la tienda, que lleva cambios propios).
 NOTES = {"README.md": "docs/design/HANDOFF.md", "PR_DESCRIPTION.md": "docs/design/PR_DESCRIPTION.md",
-         "docs/IMPLEMENTATION-v7.md": "docs/IMPLEMENTATION-v7.md",
+         "STATUS.md": "docs/design/STATUS.md", "FLUJO_USUARIO.md": "docs/FLUJO_USUARIO.md",
+         "docs/IMPLEMENTATION-v7.md": "docs/IMPLEMENTATION-v7.md", "docs/USER-FLOW-v7.md": "docs/USER-FLOW-v7.md",
          "docs/catalogue-updates.md": "docs/catalogue-updates.md"}
 HANDOFF = "docs/design/handoff"         # esas notas tal como llegaron la última vez: la base de su mezcla
 TEXTS_IN_EXPORT = "i18n/storefront.ui.json"
@@ -328,6 +336,7 @@ def plan_files(plan: Plan, root: Path, export: Path):
     """Las plantillas y lo que cargan, a docs/design/; las notas, a tres; y qué trae el zip que no se usa."""
     design = root / "docs" / "design"
     proto = export / "prototype"
+    unused = {}                         # ruta en el zip -> por qué no se usa
     for rel in files_of(proto):
         if rel.startswith(COPIED) or rel in COPIED:
             plan.write(f"docs/design/{rel}", (proto / rel).read_bytes(), root)
@@ -337,25 +346,53 @@ def plan_files(plan: Plan, root: Path, export: Path):
                 plan.notes.append(f"la maqueta usa prototype/{rel}, que la tienda no tiene en static/: si es un "
                                   "icono o una imagen nueva del diseño, cópialo")
         else:
-            plan.notes.append(f"prototype/{rel}: no se usa (no es una plantilla ni algo que carguen)")
+            unused[f"prototype/{rel}"] = "de prototype/ sólo se guardan las plantillas y lo que cargan"
     for rel in files_of(design):
         if (rel.startswith(COPIED) or rel in COPIED) and not (proto / rel).is_file():
             plan.notes.append(f"docs/design/{rel}: ya no viene en la exportación; se deja")
-    for rel in files_of(export):
+    everything = files_of(export)
+    for rel in everything:
         if not rel.startswith("prototype/") and rel not in NOTES:
-            plan.notes.append(f"{rel}: no se usa (sólo se guardan {', '.join(NOTES)})")
+            unused[rel] = "de fuera de prototype/ sólo se guardan las notas"
+    note_unused(plan, unused, everything)
     for rel, dest in NOTES.items():
         new = export / rel
         if not new.is_file():
             plan.notes.append(f"{rel}: no viene en la exportación")
             continue
         theirs = new.read_text(encoding="utf-8")
+        plan.write(f"{HANDOFF}/{rel}", theirs, root)
+        if not (root / dest).is_file():
+            # A tres contra un texto vacío saldría vacío (como si la tienda la hubiera borrado entera).
+            plan.write(dest, theirs, root)
+            plan.notes.append(f"{dest}: nuevo, {rel} de la exportación entero")
+            continue
         base = read(root / HANDOFF / rel)
         merged, conflicts = merge3(read(root / dest), base or theirs, theirs)
         plan.write(dest, merged, root)
-        plan.write(f"{HANDOFF}/{rel}", theirs, root)
         if conflicts:
             plan.conflicts[dest] = conflicts
+
+
+def note_unused(plan: Plan, unused: dict, everything: list):
+    """Una nota por carpeta de lo que no se usa: la más alta en la que nada se usa (versions/, offline/,
+    prototype/brand/, docs/img/), con cuántos ficheros trae; los sueltos de una carpeta que sí se usa
+    (texts.json y MANIFEST.md, en la raíz), juntos en otra."""
+    used = [rel for rel in everything if rel not in unused]
+    groups = {}                         # (carpeta, entera) -> rutas
+    for rel in sorted(unused):
+        parts = rel.split("/")
+        folders = ("/".join(parts[:i]) + "/" for i in range(1, len(parts)))
+        folder = next((f for f in folders if not any(u.startswith(f) for u in used)), None)
+        key = (folder, True) if folder else (rel.rpartition("/")[0], False)
+        groups.setdefault(key, []).append(rel)
+    for (folder, whole), rels in sorted(groups.items()):
+        why = unused[rels[0]]
+        if whole:
+            count = f"{len(rels)} fichero" + ("s" if len(rels) != 1 else "")
+            plan.notes.append(f"{folder} ({count}): no se usa; {why}")
+        else:
+            plan.notes.append(f"{', '.join(rels)}: no se usa{'n' if len(rels) != 1 else ''}; {why}")
 
 
 def make_plan(zip_path: Path, root: Path = ROOT) -> Plan:
